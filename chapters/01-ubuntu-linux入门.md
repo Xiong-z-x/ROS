@@ -1,4 +1,4 @@
-﻿# 第 1 章 Ubuntu 与 Linux 入门
+# 第 1 章 Ubuntu 与 Linux 入门
 
 ## 本章解决什么问题
 
@@ -688,6 +688,19 @@ source /opt/ros/noetic/setup.bash
 | `.bashrc` 修改后没效果 | 当前终端未重新加载 | `tail ~/.bashrc` | 执行 `source ~/.bashrc` 或重开终端 |
 | 后续在工作空间编译时权限异常 | 曾用 `sudo` 创建或编译用户文件 | `ls -l ~/catkin_ws` | 修复所有者；以后不要在用户工作空间滥用 `sudo` |
 | 复制命令失败 | 中文标点、换行、大小写错误 | 逐字符检查命令 | 使用英文半角符号，先复制一行短命令测试 |
+
+这张表不要当成孤立的“错误答案表”。真正排障时，应先判断错误属于哪一层：路径、权限、软件包、命令搜索路径，还是 shell 环境。比如 `command not found` 和 `Permission denied` 都表现为“命令不能正常运行”，但前者通常是系统找不到可执行文件，后者通常是文件存在却没有执行权限或当前用户没有访问权限。两类错误的第一检查命令完全不同。
+
+可以把本章的排障顺序压缩成下面四步：
+
+```text
+pwd / ls      -> 先确认我在哪里、文件是否存在
+ls -l         -> 再确认谁拥有它、我能不能读写执行
+which / PATH  -> 再确认命令能不能被 shell 找到
+source / env  -> 最后确认环境变量是否在当前终端生效
+```
+
+举例：以后如果你运行 `rosrun beginner_tutorials talker.py` 失败，不要第一反应去重装 ROS。先用 `rospack find beginner_tutorials` 看包是否被当前环境找到，再用 `ls -l scripts/talker.py` 看脚本是否有执行权限，再用 `head -1 scripts/talker.py` 看 shebang 是否正确。这样排查能把问题从“ROS 很玄学”变成几个可验证的系统状态。
 
 ## 1.15 本章自测
 

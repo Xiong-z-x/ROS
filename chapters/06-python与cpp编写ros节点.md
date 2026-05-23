@@ -1,4 +1,4 @@
-﻿# 第 6 章 Python 与 C++ 编写 ROS 节点
+# 第 6 章 Python 与 C++ 编写 ROS 节点
 
 ## 本章解决什么问题
 
@@ -788,6 +788,20 @@ rosrun beginner_tutorials cpp_add_two_ints_client 7 8
 | `catkin_make` | 生成 Python/C++ service 代码 | `rossrv show beginner_tutorials/AddTwoInts` |
 | 启动 server | 注册 `/add_two_ints` 服务 | `rosservice list` |
 | 调用 client | 发送请求并接收响应 | 客户端日志或 `rosservice call` |
+
+Service 的错误通常分成三类，必须分清楚：
+
+1. **类型没有生成**：`.srv` 文件存在，但 `rossrv show beginner_tutorials/AddTwoInts` 失败。这说明问题在构建规则、依赖声明或没有重新 `catkin_make`，还没有进入运行阶段。
+2. **服务没有注册**：`rossrv show` 成功，但 `rosservice list` 看不到 `/add_two_ints`。这说明类型已经生成，问题在 server 节点没有启动、启动后崩溃、服务名写错或没有连接到同一个 Master。
+3. **调用参数或逻辑错误**：`rosservice list` 能看到服务，但 `rosservice call /add_two_ints "a: 1 b: 2"` 报类型或字段错误，或者返回值不符合预期。这时才检查请求字段、client 传参、server 回调逻辑。
+
+这三类错误的检查命令不同。不要在类型未生成时反复启动 server，也不要在服务未注册时修改 `.srv` 文件。正确顺序是：
+
+```text
+rossrv show 包/服务类型 -> rosservice list -> rosservice type 服务名 -> rosservice call 服务名 参数
+```
+
+发布订阅也有类似层次：先用 `rostopic type` 确认类型，再用 `rostopic info` 确认发布者和订阅者，最后用 `rostopic echo/hz` 判断数据是否真的流动。这样写节点时，错误会被限定在“构建、注册、类型、数据、逻辑”中的某一层。
 
 ## 6.19 最小可运行实验
 

@@ -1,4 +1,4 @@
-﻿# 第 5 章 catkin 工作空间与功能包
+# 第 5 章 catkin 工作空间与功能包
 
 ## 本章解决什么问题
 
@@ -46,6 +46,19 @@ flowchart LR
 | `package.xml` | 包的元信息和依赖清单 | 不是说明文档，它会影响依赖解析和发布 |
 | `CMakeLists.txt` | 构建规则文件 | C++ 源码不会被自动编译，必须写构建规则 |
 | 环境覆盖 overlay | 后 source 的工作空间叠加在前面的 ROS 环境上 | source 只影响当前 shell，除非写入 `.bashrc` |
+
+这些概念必须连起来理解，而不是分开背。一个功能包从“磁盘上的文件夹”变成“ROS 能找到并运行的组件”，至少经历四个状态变化：
+
+```mermaid
+flowchart LR
+  A[src中的源码包] --> B[package.xml声明包名和依赖]
+  B --> C[CMakeLists.txt声明构建和安装规则]
+  C --> D[catkin_make生成build和devel]
+  D --> E[source devel/setup.bash更新当前终端环境]
+  E --> F[rospack/rosrun/roslaunch能找到包和节点]
+```
+
+这条链路能解释大量新手错误。包已经在 `src/` 里，不代表当前终端能找到它；`catkin_make` 成功，不代表新开的终端已经加载了 `devel/setup.bash`；Python 脚本放在包里，不代表它自动有执行权限；C++ 源码写好了，不代表 CMake 会自动编译它。每当出现“找不到包、找不到节点、编译没生成可执行文件”时，都要沿着这条链路检查，而不是把所有问题都归为 catkin 出错。
 
 ## 5.3 工作空间是什么
 
@@ -614,6 +627,14 @@ flowchart TD
 - 依赖写进 `package.xml` 和 `CMakeLists.txt`。
 
 真正理解 catkin，不是记住 `catkin_make`，而是知道一个包从“源码文件夹”变成“ROS 能找到、能构建、能运行的系统组件”经历了哪些状态变化。掌握这一点，第 6 章写 Python/C++ 节点时就不会被工程结构卡住。
+
+进入下一章前，建议用下面的自我验收清单检查一次：
+
+- 在任意新终端中，能说明为什么要先 `source /opt/ros/noetic/setup.bash` 或 `source ~/catkin_ws/devel/setup.bash`。
+- 在 `~/catkin_ws` 根目录下，能解释 `src/`、`build/`、`devel/` 分别由谁创建、是否应该手动编辑、是否应该提交。
+- 能用 `rospack find beginner_tutorials` 判断包是否对当前终端可见。
+- 能解释为什么 C++ 节点必须写 `add_executable` 和 `target_link_libraries`，而 Python 节点更常见的问题是执行权限和 shebang。
+- 能说出依赖为什么要同时考虑 `package.xml` 和 `CMakeLists.txt`，而不是只在一个文件里随便写。
 
 ## 延伸阅读
 
