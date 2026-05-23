@@ -2018,26 +2018,95 @@ Docker 适合作为：
 
 Docker 不适合掩盖 Linux 基础。学生仍然要理解 source、工作空间、包、topic 和网络。
 
-## 3.10 鱼香 ROS 一键安装
+## 3.10 鱼香 ROS 一键安装与辅助工具
 
-鱼香 ROS 一键安装工具在国内 ROS 学习者中很常见，特别适合处理网络、源、rosdep 等安装痛点。它的价值很明确：降低装机成本，帮助学生快速进入学习。
+鱼香 ROS 一键安装工具在国内 ROS 学习者中很常见，特别适合处理网络、系统源、rosdep 和环境配置等安装痛点。对零基础学生来说，它的价值不是“跳过学习”，而是降低第一轮装机失败率，让学生更快进入 `roscore`、turtlesim、catkin 和节点编程实验。
 
-FishROS 的安装工具仓库列出了多个能力，包括一键安装 ROS、配置 rosdep、配置 ROS 环境、配置系统源、安装 Docker 等。教材可以提及这些能力，但必须保持定位清楚。
+FishROS 的 `fishros/install` 仓库在工具列表中直接列出了多种能力，包括一键安装 ROS、配置 rosdep、配置 ROS 环境、配置系统源、安装 Docker、安装 VSCode 等。教材正文可以直接告诉学生有这类工具，并鼓励他们在理解官方安装主线后接触这些更方便的工程工具。
 
-本书中的使用原则：
+### 它能帮学生做什么
 
-- 它是辅助工具，不是 ROS 官方原理的替代品。
-- 使用它之前，学生仍应理解软件源、APT、密钥、`~/.bashrc`、rosdep。
-- 使用它之后，也要能用官方验证命令确认安装结果。
+| FishROS 工具能力 | 对学生的实际帮助 | 仍然必须理解的底层概念 |
+|---|---|---|
+| 一键安装 ROS | 减少手工添加源、安装包、选择版本时的错误 | Ubuntu 版本、ROS 发行版、`apt install`、`/opt/ros/noetic` |
+| 一键配置 rosdep | 解决 `rosdep update`、依赖源访问失败等常见问题 | rosdep 是依赖解析工具，不是 ROS 节点运行工具 |
+| 一键配置 ROS 环境 | 帮助生成或修复环境加载配置 | `source /opt/ros/noetic/setup.bash`、`~/.bashrc`、当前 shell |
+| 一键配置系统源 | 在网络不稳定时切换 Ubuntu/ROS 相关源 | 软件源文件、APT 索引、`sudo apt update` |
+| 一键安装 Docker | 为课堂兜底、容器实验或环境隔离提供便利 | 容器、镜像、volume、GUI 映射和硬件访问限制 |
+| 一键安装 VSCode 等工具 | 降低开发工具配置成本 | 编辑器只是工具，不能替代 catkin/launch/ROS CLI 理解 |
 
-建议正文写法：
+这张表要传达一个原则：**工具可以更方便，但不能让系统状态变成黑盒**。学生可以使用 FishROS，但必须知道它大致在帮自己修改哪些系统状态。
 
-1. 先讲官方 apt 安装。
-2. 再说明国内网络常见失败。
-3. 再介绍鱼香 ROS 作为辅助路径。
-4. 最后仍回到 `rosversion -d`、`roscore`、`rosnode list`、turtlesim 验证。
+### 推荐使用方式
 
-不要把“一键成功”当成学习完成。真正的目标是安装后能解释系统状态。
+课堂或自学中，可以采用下面的顺序：
+
+1. 先阅读本章官方 apt 安装流程，知道添加软件源、更新索引、安装 ROS 包、source 环境、初始化 rosdep 分别在做什么。
+2. 如果国内网络、rosdep 或软件源导致安装失败，再使用鱼香 ROS 一键安装或配置工具辅助处理。
+3. 工具执行完成后，不以“一键脚本显示成功”为最终结论，而是回到官方验证命令。
+4. 验证成功后，把 FishROS 做过的事情和本章手工步骤对应起来，形成可解释的安装记录。
+
+常见入口命令可参考 FishROS 仓库 README，例如：
+
+```bash
+source <(wget -qO- http://fishros.com/install)
+```
+
+有些教程也会写成：
+
+```bash
+wget http://fishros.com/install -O fishros
+bash fishros
+```
+
+两种写法的核心都是从网络获取安装脚本并执行。零基础学生在执行前至少要知道三件事：
+
+- 脚本来源应来自鱼香 ROS 官方站点或 `fishros/install` 仓库，不要执行来历不明的复制版本。
+- 这类脚本可能修改软件源、安装软件包、写入环境配置，因此执行前最好在虚拟机快照或干净环境中操作。
+- 脚本失败时不要反复盲目重跑，应回到 `apt`、`rosdep`、`~/.bashrc`、`/etc/apt/sources.list.d/` 等位置查状态。
+
+### 使用后的验证
+
+无论通过官方 apt 手动安装，还是通过 FishROS 辅助安装，都必须用同一组命令验收：
+
+```bash
+rosversion -d
+which roscore
+echo $ROS_DISTRO
+echo $ROS_PACKAGE_PATH
+roscore
+```
+
+另开一个终端：
+
+```bash
+source /opt/ros/noetic/setup.bash
+rosnode list
+rosrun turtlesim turtlesim_node
+```
+
+正确现象仍然是：
+
+- `rosversion -d` 输出 `noetic`。
+- `which roscore` 能定位到 ROS Noetic 的命令路径。
+- `echo $ROS_DISTRO` 输出 `noetic`。
+- `roscore` 能启动。
+- 另一个终端可以通过 `rosnode list` 看到 `/rosout`。
+- turtlesim 能弹出小乌龟窗口。
+
+如果这些验证不能通过，就说明“一键安装完成”这个说法还没有被证据支持。
+
+### 使用 FishROS 时常见的误区
+
+| 误区 | 为什么不对 | 正确做法 |
+|---|---|---|
+| 一键安装成功就等于学会 ROS | 安装只是进入 ROS 的前置条件，还没有理解节点、话题、服务和工作空间 | 继续完成第 4-6 章实验 |
+| 一键工具能替代官方文档 | 工具封装了步骤，但错误发生时仍要回到官方机制排查 | 保留官方 apt 流程作为主线理解 |
+| 换源后不需要 `apt update` | APT 必须重新读取软件包索引 | 换源后执行 `sudo apt update` |
+| rosdep 配置好了就不会缺依赖 | rosdep 只负责按规则解析和安装依赖，仍可能受网络、包名、系统版本影响 | 用 `rosdep install --from-paths src --ignore-src -r -y` 时阅读输出 |
+| 修改了 ROS 环境后所有终端自动生效 | 手动 `source` 只影响当前 shell，写入 `.bashrc` 才影响新终端 | 用 `echo $ROS_DISTRO` 和 `tail ~/.bashrc` 检查 |
+
+本书对 FishROS 的态度是明确的：**可以直接介绍、可以建议学生使用、可以作为国内学习环境的重要辅助工具，但不能让学生只会点选菜单而不会解释安装结果**。真正的目标是学生既能借助方便工具完成环境搭建，也能在工具失败时回到官方安装逻辑独立定位问题。
 
 ## 3.11 源码构建方法
 
