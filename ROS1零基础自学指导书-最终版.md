@@ -2,15 +2,15 @@
 
 生成日期：2026-05-24
 
-本书面向对 Ubuntu、Linux 命令行和 ROS 都没有经验的大学生，主线环境为 Ubuntu 20.04 Focal Fossa + ROS1 Noetic Ninjemys。写作目标不是让读者机械复制命令，而是帮助读者理解每个命令、每个节点、每条 topic、每个参数和每个配置文件在 ROS 系统中的作用。
+本书面向没有 Ubuntu、Linux 命令行和 ROS 经验的大学生，主线环境为 **Ubuntu 20.04 Focal Fossa + ROS1 Noetic Ninjemys**。写作目标不是让读者机械复制命令，而是帮助读者理解每个命令、每个节点、每条 topic、每个参数和每个配置文件在 ROS 系统中的作用。
 
-ROS Noetic 已于 2025-05-31 到达官方 EOL。本书继续使用 Noetic，是为了学习 ROS1 体系、维护历史项目和理解现有机器人系统，不是建议新项目默认继续优先选择 ROS1。
+ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续使用 Noetic，是为了学习 ROS1 体系、维护历史项目和理解现有机器人系统，不是建议新项目默认继续优先选择 ROS1。
 
 ## 使用说明
 
 建议按章节顺序学习。每章都包含本章目标、概念解释、最小可运行实验、正确现象、常见错误、自测题、参考答案和延伸阅读。读者应在 Ubuntu 20.04 + ROS Noetic 环境中实际运行命令，并在每次实验后先独立回答自测题，再对照参考答案检查理解是否完整。
 
-本书新增“学习成果验收与排障索引”，用于把每章学习内容转换成可观察交付物。自学时不要只看正文，应按索引保留命令输出、截图、系统图或 README 片段，作为自己真正完成实验的证据。
+本书包含“学习成果验收与排障索引”，用于把每章学习内容转换成可观察交付物。自学时不应只看正文，应按索引保留命令输出、截图、系统图或 README 片段，作为确实完成实验的证据。
 
 本书主线不展开后续平台部署主题，也不把高级算法推导作为主体。SLAM、定位、导航等内容只作为 ROS 系统集成案例出现。
 
@@ -36,7 +36,7 @@ ROS Noetic 已于 2025-05-31 到达官方 EOL。本书继续使用 Noetic，是�
 
 成熟 ROS 入门资料通常有一个共同特点：它们不是只解释概念，而是让读者不断完成“运行一个东西、观察一个现象、解释一个关系、修复一个错误”的循环。ROS Wiki 的 beginner tutorials 用 turtlesim、topic、service、catkin 和 rosbag 逐步建立观察能力；`A Gentle Introduction to ROS` 适合用较慢节奏解释新手误解；TurtleBot3 e-Manual 强调用完整机器人系统把仿真、话题、TF、RViz 和 Gazebo 串起来；鱼香 ROS、Autolabor 等中文资料则更贴近国内学生遇到的安装、网络和课堂排障问题。
 
-本书的目标不是把这些教程拼接起来，而是把它们的教学优点合成一条统一主线：每章读完以后，学生必须能拿出一个可观察成果，而不是只说“我看懂了”。如果某章没有成果，学习很容易停留在记忆命令；如果某个错误没有排障路径，学生下一次换环境就会再次卡住。
+本书的目标不是把这些教程简单拼接起来，而是把它们的教学优点组织成一条统一主线：每章学习完成后，学生必须形成可观察成果，而不是只停留在“已经阅读”的层面。如果某章没有成果，学习容易停留在记忆命令；如果某个错误没有排障路径，学生下一次更换环境时仍可能在同类问题上停滞。
 
 ## 全书学习成果矩阵
 
@@ -57,7 +57,7 @@ ROS Noetic 已于 2025-05-31 到达官方 EOL。本书继续使用 Noetic，是�
 
 ## 跨章节排障总原则
 
-ROS 新手最常见的问题不是“算法不会”，而是系统状态不可见。排障时不要先改代码，也不要先重装系统，应按层检查：
+ROS 新手最常见的问题不是“算法不会”，而是系统状态不可见。排障时不应先改代码，也不应先重装系统，应按层检查：
 
 ```mermaid
 flowchart TD
@@ -76,22 +76,22 @@ flowchart TD
   G -- 是 --> H[记录现象并收敛到具体代码或配置]
 ```
 
-这条顺序背后的逻辑很简单：底层状态错误会伪装成上层错误。例如没有 source 工作空间时，`rosrun` 找不到节点；CMake 没有生成 service 头文件时，C++ 会报 include 错误；TF 缺少 `odom -> base_link` 时，RViz 里模型可能“消失”。如果不先分层，就会把所有问题都误判成“ROS 不稳定”。
+这条顺序背后的逻辑是：底层状态错误会伪装成上层错误。例如没有 source 工作空间时，`rosrun` 找不到节点；CMake 没有生成 service 头文件时，C++ 会报 include 错误；TF 缺少 `odom -> base_link` 时，RViz 里模型可能“消失”。如果不先分层，就会把所有问题都误判成“ROS 不稳定”。
 
 ## 从错误现象到第一条命令
 
-| 现象 | 不要先做什么 | 第一条检查命令 | 下一步判断 |
+| 现象 | 不应先做什么 | 第一条检查命令 | 下一步判断 |
 |---|---|---|---|
-| `roscore: command not found` | 不要直接重装 ROS | `which roscore`; `echo $ROS_DISTRO` | 若 source 后可用，问题在 shell 环境；若 `/opt/ros/noetic` 不存在，才考虑安装问题 |
-| `Unable to communicate with master` | 不要修改代码 | `echo $ROS_MASTER_URI`; 查看 `roscore` 终端 | 单机保持默认 `http://localhost:11311`，多机再检查 IP/主机名 |
-| `rosrun` 找不到包 | 不要把文件随便复制到别处 | `rospack find 包名` | 找不到则检查包是否在 `src/`、是否编译、是否 source `devel/setup.bash` |
-| Python 节点无法执行 | 不要改 CMake | `ls -l scripts/节点.py`; `head -1 scripts/节点.py` | 检查执行权限、shebang、换行格式和包内路径 |
-| C++ 节点没有生成 | 不要只看源码文件 | `grep add_executable CMakeLists.txt` | 检查是否写了构建规则和链接规则 |
-| service 找不到 | 不要只看 `.srv` 文件 | `rosservice list`; `rossrv show 包/服务类型` | 区分“服务类型已生成”和“服务端节点已注册” |
-| topic 存在但无数据 | 不要只看 `rostopic list` | `rostopic info 话题名`; `rostopic hz 话题名` | `list` 只说明名字存在，`info/hz/echo` 才能说明是否有发布者和数据流 |
-| RViz 不显示模型 | 不要直接改 URDF 所有内容 | 检查 RViz `Fixed Frame`; `rosrun tf view_frames` | 先确认 fixed frame 是否存在，再查 TF 树和 robot_state_publisher |
-| Gazebo 很慢或卡住 | 不要马上判定 ROS 安装失败 | `top`; `glxinfo -B` 或虚拟机图形设置 | 区分系统性能问题、图形加速问题和 ROS 节点错误 |
-| rosbag 回放没效果 | 不要只看 bag 文件大小 | `rosbag info 文件.bag`; `rostopic list` | 确认 bag 中是否包含目标 topic，回放时订阅者是否已启动 |
+| `roscore: command not found` | 不应直接重装 ROS | `which roscore`; `echo $ROS_DISTRO` | 若 source 后可用，问题在 shell 环境；若 `/opt/ros/noetic` 不存在，才考虑安装问题 |
+| `Unable to communicate with master` | 不应修改代码 | `echo $ROS_MASTER_URI`; 查看 `roscore` 终端 | 单机保持默认 `http://localhost:11311`，多机再检查 IP/主机名 |
+| `rosrun` 找不到包 | 不应把文件复制到未经确认的位置 | `rospack find 包名` | 找不到则检查包是否在 `src/`、是否编译、是否 source `devel/setup.bash` |
+| Python 节点无法执行 | 不应修改 CMake | `ls -l scripts/节点.py`; `head -1 scripts/节点.py` | 检查执行权限、shebang、换行格式和包内路径 |
+| C++ 节点没有生成 | 不应只看源码文件 | `grep add_executable CMakeLists.txt` | 检查是否写了构建规则和链接规则 |
+| service 找不到 | 不应只看 `.srv` 文件 | `rosservice list`; `rossrv show 包/服务类型` | 区分“服务类型已生成”和“服务端节点已注册” |
+| topic 存在但无数据 | 不应只看 `rostopic list` | `rostopic info 话题名`; `rostopic hz 话题名` | `list` 只说明名字存在，`info/hz/echo` 才能说明是否有发布者和数据流 |
+| RViz 不显示模型 | 不应直接改 URDF 所有内容 | 检查 RViz `Fixed Frame`; `rosrun tf view_frames` | 先确认 fixed frame 是否存在，再查 TF 树和 robot_state_publisher |
+| Gazebo 运行缓慢或长时间无响应 | 不应立即判定 ROS 安装失败 | `top`; `glxinfo -B` 或虚拟机图形设置 | 区分系统性能问题、图形加速问题和 ROS 节点错误 |
+| rosbag 回放没效果 | 不应只看 bag 文件大小 | `rosbag info 文件.bag`; `rostopic list` | 确认 bag 中是否包含目标 topic，回放时订阅者是否已启动 |
 
 ## 每章学习时的固定闭环
 
@@ -99,9 +99,9 @@ flowchart TD
 
 1. 先读“本章解决什么问题”，明确本章不是在背命令，而是在补哪一种系统能力。
 2. 读概念表时，把每个概念对应到一个观察命令。例如 topic 对应 `rostopic info`，TF 对应 `view_frames`。
-3. 完成最小实验，不要跳过“正确现象”。如果正确现象说不清，就说明实验只是跑起来，还没有被理解。
+3. 完成最小实验，不应跳过“正确现象”。如果正确现象说不清，就说明实验只是能够启动，还没有被理解。
 4. 故意做一个小错误并修复。例如不 source 工作空间、写错 topic 名、关闭 roscore，再观察报错。
-5. 完成本章自测。先独立作答，再看参考答案。参考答案不是背诵材料，而是检查你的解释是否覆盖原因、命令和现象。
+5. 完成本章自测。先独立作答，再看参考答案。参考答案不是背诵材料，而是检查解释是否覆盖原因、命令和现象。
 6. 保存一份证据。可以是截图、命令输出、系统图、bag 信息或 README 片段。
 
 ## 参考资料的使用方式
@@ -122,7 +122,7 @@ flowchart TD
 
 - 新开一个终端，判断当前 ROS 环境是否正确。
 - 启动 `roscore`，解释 `/rosout` 为什么会出现。
-- 运行 turtlesim，用命令说明控制小乌龟的 topic 名、消息类型和发布频率。
+- 运行 turtlesim，用命令说明控制 turtlesim 模拟海龟的 topic 名、消息类型和发布频率。
 - 创建 catkin 工作空间和功能包，解释每个目录由谁创建、能不能删除、是否应提交。
 - 写一个 Python 发布者和订阅者，并用 `rostopic echo/hz/info` 验证。
 - 写一个 C++ 发布者和订阅者，并解释为什么 C++ 需要 CMake 构建规则。
@@ -142,13 +142,13 @@ flowchart TD
 
 ## 本章解决什么问题
 
-学习 ROS1 的第一个门槛通常不是机器人算法，而是 Linux 环境。很多初学者第一次遇到 ROS 错误时，真正的问题并不在 ROS：可能是当前目录错了、没有权限、软件源不可用、包名写错、环境变量没有生效，或者新打开的终端没有重新加载配置。
+学习 ROS1 的第一个门槛通常不是机器人算法，而是 Linux 环境。很多初学者第一次遇到 ROS 错误时，根本问题并不在 ROS：可能是当前目录错了、没有权限、软件源不可用、包名写错、环境变量没有生效，或者新打开的终端没有重新加载配置。
 
-本章先建立 Ubuntu 与命令行的基本心智模型。你不需要在这一章成为 Linux 专家，但必须能回答三个问题：我现在在哪个目录？这个命令会改动什么？如果命令失败，我先检查哪里？后面安装 ROS、创建 catkin 工作空间、运行节点、排查 `rosrun` 找不到包，都会依赖这些基础。
+本章先建立 Ubuntu 与命令行的基本心智模型。读者不需要在这一章成为 Linux 专家，但必须能回答三个问题：当前目录是什么？这个命令会改动什么？命令失败时应先检查哪里？后面安装 ROS、创建 catkin 工作空间、运行节点、排查 `rosrun` 找不到包，都会依赖这些基础。
 
-本书主线使用 **Ubuntu 20.04 Focal Fossa + ROS1 Noetic**。这是 ROS Noetic 的官方目标平台之一；REP-3 明确列出 Noetic 面向 Ubuntu Focal Fossa 20.04，并说明 Noetic 的目标语言环境包括 C++14 与 Python 3.8。不要把本章理解为“Linux 通用入门大全”，它服务于后续 ROS1 学习。
+本书主线使用 **Ubuntu 20.04 Focal Fossa + ROS1 Noetic**。这是 ROS Noetic 的官方目标平台之一；REP-3 明确列出 Noetic 面向 Ubuntu Focal Fossa 20.04，并说明 Noetic 的目标语言环境包括 C++14 与 Python 3.8。不应把本章理解为“Linux 通用入门大全”，它服务于后续 ROS1 学习。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 解释 Linux、Ubuntu、发行版、桌面环境之间的关系。
 - 区分原生 Ubuntu、虚拟机、WSL2、Docker 在学习 ROS 时的作用。
@@ -164,7 +164,7 @@ flowchart TD
 
 Linux 严格来说是操作系统内核。内核负责管理硬件、进程、内存、文件系统、网络等底层资源。普通用户平时接触到的“Linux 系统”，通常是一个完整发行版：内核 + 系统工具 + 包管理器 + 桌面环境 + 默认软件。
 
-Ubuntu 是一个 Linux 发行版。你可以把 Ubuntu 理解为“把 Linux 内核和大量软件按某种规则打包、测试、发布出来的一整套系统”。ROS Noetic 的官方二进制安装路径主要围绕 Ubuntu 20.04 展开，所以本书先使用 Ubuntu，而不是任意 Linux 发行版。
+Ubuntu 是一个 Linux 发行版。可以把 Ubuntu 理解为“把 Linux 内核和大量软件按某种规则打包、测试、发布出来的一整套系统”。ROS Noetic 的官方二进制安装路径主要围绕 Ubuntu 20.04 展开，所以本书先使用 Ubuntu，而不是任意 Linux 发行版。
 
 ### ROS 运行在 Ubuntu 之上
 
@@ -175,7 +175,7 @@ ROS 不是替代 Ubuntu 的操作系统。ROS 的节点、话题、服务、参�
 - APT 提供系统软件安装能力。
 - ROS 在这些基础上提供机器人软件通信、构建、运行和调试工具。
 
-后面你会执行很多类似下面的命令：
+后面将执行很多类似下面的命令：
 
 ```bash
 source /opt/ros/noetic/setup.bash
@@ -186,7 +186,7 @@ roscore
 rosrun turtlesim turtlesim_node
 ```
 
-如果你不知道 `source`、`~`、`cd`、当前目录、工作空间这些概念，那么 ROS 命令会变成不可解释的咒语。本章要避免这种情况。
+如果读者不了解 `source`、`~`、`cd`、当前目录、工作空间这些概念，ROS 命令就会变成不可解释的命令片段。本章的目的就是避免这种情况。
 
 ```mermaid
 flowchart TB
@@ -212,21 +212,21 @@ flowchart TB
 | 原生 Ubuntu 20.04 | 直接把 Ubuntu 安装在电脑硬盘上 | 实验室机器、双系统用户 | 性能好，硬件访问直接 | 安装系统有风险，误操作影响真实机器 |
 | Ubuntu 20.04 虚拟机 | 在 Windows/macOS/Linux 里运行一个完整 Ubuntu | 零基础学生 | 可快照恢复，失败成本低 | 图形和仿真性能可能较弱 |
 | WSL2 Ubuntu | Windows 上的 Linux 子系统 | Windows 学生前期学习 | 启动快，命令行方便 | GUI、USB、Gazebo、网络行为需要额外注意 |
-| Docker ROS 镜像 | 容器化运行 ROS 环境 | 课堂批量复现、助教兜底 | 环境一致，容易清理 | GUI、数据持久化、硬件映射需要额外配置 |
+| Docker ROS 镜像 | 容器化运行 ROS 环境 | 课堂批量复现、助教备用环境 | 环境一致，容易清理 | GUI、数据持久化、硬件映射需要额外配置 |
 
 本书主线建议：**第一次学习优先使用 Ubuntu 20.04 虚拟机或原生 Ubuntu 20.04**。WSL2 和 Docker 都值得学，但它们引入了额外抽象。对完全零基础学生，先在一个完整 Ubuntu 系统里理解目录、权限、APT 和终端更稳。
 
-注意：不要把“能打开一个 Linux 终端”等同于“所有 ROS 实验都能稳定运行”。例如 WSL2 官方支持 Linux GUI 应用，但 Gazebo 这类图形和仿真负载仍可能受到显卡、显示服务和设备映射影响。
+注意：不应把“能打开一个 Linux 终端”等同于“所有 ROS 实验都能稳定运行”。例如 WSL2 官方支持 Linux GUI 应用，但 Gazebo 这类图形和仿真负载仍可能受到显卡、显示服务和设备映射影响。
 
 ## 1.3 终端、Shell 和命令行
 
 ### 终端是什么
 
-终端是你和 shell 交互的窗口。Ubuntu 官方命令行入门文档把“command line”解释为在终端中输入命令的一行；shell 则负责解释这些命令。你输入命令后，命令可能输出很多文字，也可能什么都不输出就返回提示符。没有输出不一定代表失败，很多命令成功时本来就很安静。
+终端是用户与 shell 交互的窗口。Ubuntu 官方命令行入门文档把“command line”解释为在终端中输入命令的一行；shell 则负责解释这些命令。输入命令后，命令可能输出很多文字，也可能什么都不输出就返回提示符。没有输出不一定代表失败，很多命令成功时本来就很安静。
 
 ### Shell 是什么
 
-Shell 是命令解释器。本书默认使用 Bash。Bash 会读取你输入的命令，展开变量，寻找可执行程序，然后启动进程。
+Shell 是命令解释器。本书默认使用 Bash。Bash 会读取用户输入的命令，展开变量，寻找可执行程序，然后启动进程。
 
 查看当前 shell：
 
@@ -240,13 +240,13 @@ echo $SHELL
 /bin/bash
 ```
 
-如果你使用 Zsh、Fish 或其他 shell，很多命令仍然相似，但 `~/.bashrc`、变量写法、自动补全和 source 行为可能不同。本书默认不处理这些差异。
+如果使用 Zsh、Fish 或其他 shell，很多命令仍然相似，但 `~/.bashrc`、变量写法、自动补全和 source 行为可能不同。本书默认不处理这些差异。
 
 ### 命令大小写敏感
 
 Linux 命令和文件名通常区分大小写。`pwd` 和 `PWD` 不是一回事，`README.md` 和 `readme.md` 也不是一回事。复制命令时要特别注意大小写、空格和英文标点。
 
-## 1.4 目录：你现在在哪里
+## 1.4 目录：当前所在位置
 
 终端始终有一个“当前工作目录”。大多数相对路径操作都以这个目录为起点。Ubuntu 官方命令行教程也强调，`pwd` 的作用就是打印当前工作目录；在不确定当前位置时先执行 `pwd` 是安全习惯。
 
@@ -254,9 +254,9 @@ Linux 命令和文件名通常区分大小写。`pwd` 和 `PWD` 不是一回事�
 
 | 路径 | 含义 | ROS 学习中的意义 |
 |---|---|---|
-| `/` | 根目录，整个文件系统起点 | 不要随意修改 |
+| `/` | 根目录，整个文件系统起点 | 不应随意修改 |
 | `/home/用户名` | 当前用户主目录 | 个人工作空间通常放这里 |
-| `~` | 当前用户主目录的简写 | `~/catkin_ws` 很常见 |
+| `~` | 当前用户主目录的简写 | `~/catkin_ws` 较常见 |
 | `/opt/ros/noetic` | ROS Noetic 默认安装位置 | 后续 source ROS 环境 |
 | `/etc` | 系统配置目录 | 软件源、网络、服务配置常见位置 |
 | `/usr/bin` | 系统命令常见位置 | `which` 常会指向这里 |
@@ -268,10 +268,10 @@ Linux 命令和文件名通常区分大小写。`pwd` 和 `PWD` 不是一回事�
 pwd
 ```
 
-如果你刚打开终端，通常会看到：
+刚打开终端时，通常会看到：
 
 ```text
-/home/你的用户名
+/home/用户名
 ```
 
 ### 切换目录
@@ -330,7 +330,7 @@ pwd
 正确现象：
 
 ```text
-/home/你的用户名/ros_textbook_lab/ch01
+/home/用户名/ros_textbook_lab/ch01
 ```
 
 ### 创建和查看文件
@@ -364,7 +364,7 @@ cat note.txt
 - `>` 覆盖文件。
 - `>>` 追加到文件末尾。
 
-这在 ROS 学习中很重要。写 `~/.bashrc` 时，如果你误用 `>`，可能把原来的配置全部覆盖；正确做法通常是用文本编辑器打开，或谨慎使用 `>>` 追加一行。
+这对 ROS 学习十分重要。写 `~/.bashrc` 时，如果误用 `>`，可能把原来的配置全部覆盖；正确做法通常是用文本编辑器打开，或谨慎使用 `>>` 追加一行。
 
 ### 复制、移动和删除
 
@@ -382,7 +382,7 @@ ls -l
 - `mv` 移动或重命名。
 - `rm` 删除文件。
 
-谨慎点：`rm` 删除后通常不会进入回收站。不要在不理解路径时执行 `rm -rf`。本书不会要求你用破坏性命令清理系统。
+注意：`rm` 删除后通常不会进入回收站。不应在不理解路径时执行 `rm -rf`。本书不会要求使用破坏性命令清理系统。
 
 ## 1.6 权限和 sudo
 
@@ -424,7 +424,7 @@ ls -l note.txt
 sudo apt update
 ```
 
-这不是“让命令更强”的魔法，而是因为更新系统软件包索引需要访问系统级包管理数据库。
+这不是“让命令更强”的机制，而是因为更新系统软件包索引需要访问系统级包管理数据库。
 
 错误用法：
 
@@ -432,13 +432,13 @@ sudo apt update
 sudo cd /opt
 ```
 
-这通常没有意义。`cd` 是 shell 内建命令，不是独立程序；即使某些 shell 接受这种写法，它也不会按你想象的方式改变当前终端目录。
+这通常没有意义。`cd` 是 shell 内建命令，不是独立程序；即使某些 shell 接受这种写法，它也不会按预期方式改变当前终端目录。
 
 ROS 学习中的原则：
 
 - 安装系统包时通常需要 `sudo apt install ...`。
 - 在自己的工作空间 `~/catkin_ws` 下写代码、编译，不应该依赖 `sudo`。
-- 如果你在 `~/catkin_ws` 中必须用 `sudo` 才能修改文件，通常说明权限已经被你之前的错误命令污染。
+- 如果在 `~/catkin_ws` 中必须用 `sudo` 才能修改文件，通常说明权限已经被此前的错误命令污染。
 
 检查文件所有者：
 
@@ -452,9 +452,9 @@ ls -l ~/catkin_ws 2>/dev/null
 
 ### apt 解决什么问题
 
-APT 是 Ubuntu/Debian 系统常用的软件包管理工具。Ubuntu 官方文档说明，`apt` 可以安装新软件包、升级已有软件包、更新本地软件包索引。你可以把 APT 理解为系统级软件安装和依赖管理工具。
+APT 是 Ubuntu/Debian 系统常用的软件包管理工具。Ubuntu 官方文档说明，`apt` 可以安装新软件包、升级已有软件包、更新本地软件包索引。可以把 APT 理解为系统级软件安装和依赖管理工具。
 
-在 ROS 学习中，APT 很关键，因为官方二进制安装通常长这样：
+在 ROS 学习中，APT 是关键工具，因为官方二进制安装通常长这样：
 
 ```bash
 sudo apt install ros-noetic-desktop-full
@@ -480,7 +480,7 @@ sudo apt install tree
 - `sudo apt update`：更新本机“软件包索引”。它不等于升级所有软件，也不等于安装新软件。
 - `sudo apt install tree`：根据已有索引安装名为 `tree` 的软件包。
 
-如果你刚添加了 ROS 软件源，却没有执行 `sudo apt update`，系统可能还不知道新源里有哪些包，于是报：
+如果刚添加了 ROS 软件源，却没有执行 `sudo apt update`，系统可能还不知道新源里有哪些包，于是报：
 
 ```text
 Unable to locate package ros-noetic-...
@@ -518,7 +518,7 @@ git --version
 
 ## 1.8 命令从哪里来：PATH 和 which
 
-当你输入：
+输入：
 
 ```bash
 tree
@@ -612,7 +612,7 @@ echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 tail ~/.bashrc
 ```
 
-不要随便覆盖 `.bashrc`。如果要编辑，建议先备份：
+不应在未确认内容的情况下覆盖 `.bashrc`。如果要编辑，建议先备份：
 
 ```bash
 cp ~/.bashrc ~/.bashrc.backup
@@ -620,7 +620,7 @@ cp ~/.bashrc ~/.bashrc.backup
 
 ## 1.10 文本编辑器：先会一种就够
 
-ROS 学习会频繁编辑文件：`package.xml`、`CMakeLists.txt`、`.launch`、`.yaml`、Python 脚本、URDF。你至少需要熟练一种文本编辑器。
+ROS 学习会频繁编辑文件：`package.xml`、`CMakeLists.txt`、`.launch`、`.yaml`、Python 脚本、URDF。学习者至少需要熟练一种文本编辑器。
 
 零基础建议：
 
@@ -645,11 +645,11 @@ nano note.txt
 code .
 ```
 
-如果提示 `code: command not found`，说明 VS Code 命令行入口未安装或未配置。不要在这一章纠结，先用 `nano` 或 `gedit` 完成学习。
+如果提示 `code: command not found`，说明 VS Code 命令行入口未安装或未配置。不应在这一章纠结，先用 `nano` 或 `gedit` 完成学习。
 
 ## 1.11 Git：为什么 ROS 学习需要它
 
-Git 是版本控制工具。ROS 生态大量代码以 Git 仓库形式发布，例如 `ros_tutorials`、TurtleBot3、很多机器人驱动包。你不需要一开始掌握复杂分支模型，但要会克隆仓库和查看状态。
+Git 是版本控制工具。ROS 生态大量代码以 Git 仓库形式发布，例如 `ros_tutorials`、TurtleBot3、很多机器人驱动包。读者不需要一开始掌握复杂分支模型，但要会克隆仓库和查看状态。
 
 配置用户名和邮箱：
 
@@ -670,13 +670,13 @@ git config --global --list
 git clone https://github.com/ros/ros_tutorials.git
 ```
 
-本章不要求你真的克隆 ROS 仓库；这只是说明后续会看到的命令结构。
+本章不要求实际克隆 ROS 仓库；这里仅用于说明后续会看到的命令结构。
 
 ## 1.12 本章最小可运行实验
 
 ### 实验目标
 
-完成一个从目录创建、文件操作、软件安装、命令定位、环境变量观察到清理的闭环。这个实验不是为了“炫技”，而是让你获得后续 ROS 学习的最低操作能力。
+完成一个从目录创建、文件操作、软件安装、命令定位、环境变量观察到清理的闭环。这个实验不是为了展示命令数量，而是为了建立后续 ROS 学习所需的最低操作能力。
 
 ### 前置条件
 
@@ -747,7 +747,7 @@ rm -r ~/ros_textbook_lab/ch01
 ls ~/ros_textbook_lab
 ```
 
-如果你还想保留实验结果，可以不执行清理命令。
+若希望保留实验结果，可以不执行清理命令。
 
 ### 正确现象
 
@@ -773,7 +773,7 @@ ls ~/ros_textbook_lab
 
 ### `pwd`
 
-打印当前工作目录。后续 ROS 编译时，如果你不确定是否在 `~/catkin_ws`，先执行 `pwd`。
+打印当前工作目录。后续 ROS 编译时，如果不确定是否在 `~/catkin_ws`，先执行 `pwd`。
 
 ### `mkdir -p`
 
@@ -821,26 +821,26 @@ source /opt/ros/noetic/setup.bash
 
 | 现象 | 高概率原因 | 第一检查命令 | 修复思路 |
 |---|---|---|---|
-| `Permission denied` | 当前用户没有写入目标目录的权限 | `pwd`; `ls -ld .` | 回到 `~` 下操作；不要在系统目录里建学习文件 |
+| `Permission denied` | 当前用户没有写入目标目录的权限 | `pwd`; `ls -ld .` | 回到 `~` 下操作；不应在系统目录里建学习文件 |
 | `Unable to locate package tree` | 包索引未更新或软件源不可用 | `sudo apt update` | 先更新索引；若仍失败，检查网络和软件源 |
 | `command not found` | 软件未安装或不在 `PATH` 中 | `which 命令名`; `echo $PATH` | 安装软件，或检查环境变量 |
 | `cd: no such file or directory` | 目录不存在或路径写错 | `ls`; `pwd` | 先确认父目录存在，注意大小写 |
 | `.bashrc` 修改后没效果 | 当前终端未重新加载 | `tail ~/.bashrc` | 执行 `source ~/.bashrc` 或重开终端 |
-| 后续在工作空间编译时权限异常 | 曾用 `sudo` 创建或编译用户文件 | `ls -l ~/catkin_ws` | 修复所有者；以后不要在用户工作空间滥用 `sudo` |
+| 后续在工作空间编译时权限异常 | 曾用 `sudo` 创建或编译用户文件 | `ls -l ~/catkin_ws` | 修复所有者；以后不应在用户工作空间滥用 `sudo` |
 | 复制命令失败 | 中文标点、换行、大小写错误 | 逐字符检查命令 | 使用英文半角符号，先复制一行短命令测试 |
 
-这张表不要当成孤立的“错误答案表”。真正排障时，应先判断错误属于哪一层：路径、权限、软件包、命令搜索路径，还是 shell 环境。比如 `command not found` 和 `Permission denied` 都表现为“命令不能正常运行”，但前者通常是系统找不到可执行文件，后者通常是文件存在却没有执行权限或当前用户没有访问权限。两类错误的第一检查命令完全不同。
+这张表不应当成孤立的“错误答案表”。排障时，应先判断错误属于哪一层：路径、权限、软件包、命令搜索路径，还是 shell 环境。比如 `command not found` 和 `Permission denied` 都表现为“命令不能正常运行”，但前者通常是系统找不到可执行文件，后者通常是文件存在却没有执行权限或当前用户没有访问权限。两类错误的第一检查命令完全不同。
 
 可以把本章的排障顺序压缩成下面四步：
 
 ```text
-pwd / ls      -> 先确认我在哪里、文件是否存在
-ls -l         -> 再确认谁拥有它、我能不能读写执行
+pwd / ls      -> 先确认当前所在目录、文件是否存在
+ls -l         -> 再确认文件所有者、当前用户是否具备读写执行权限
 which / PATH  -> 再确认命令能不能被 shell 找到
 source / env  -> 最后确认环境变量是否在当前终端生效
 ```
 
-举例：以后如果你运行 `rosrun beginner_tutorials talker.py` 失败，不要第一反应去重装 ROS。先用 `rospack find beginner_tutorials` 看包是否被当前环境找到，再用 `ls -l scripts/talker.py` 看脚本是否有执行权限，再用 `head -1 scripts/talker.py` 看 shebang 是否正确。这样排查能把问题从“ROS 很玄学”变成几个可验证的系统状态。
+举例：以后如果运行 `rosrun beginner_tutorials talker.py` 失败，不应首先重装 ROS。应先用 `rospack find beginner_tutorials` 检查功能包是否被当前环境识别，再用 `ls -l scripts/talker.py` 检查脚本是否具有执行权限，最后用 `head -1 scripts/talker.py` 检查 shebang 是否正确。这样可以把问题从难以解释的现象转换为几个可验证的系统状态。
 
 ## 1.15 本章自测
 
@@ -849,17 +849,17 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 3. `pwd` 的输出为什么会影响后续命令的意义？
 4. `>` 和 `>>` 有什么区别？为什么修改 `.bashrc` 时要谨慎？
 5. `sudo apt update` 和 `sudo apt install tree` 分别做了什么？
-6. 如果 `roscore` 将来提示 `command not found`，你会先检查哪三个东西？
-7. 为什么不建议在 `~/catkin_ws` 中随便使用 `sudo`？
+6. 如果 `roscore` 将来提示 `command not found`，应先检查哪三个对象？
+7. 为什么不建议在 `~/catkin_ws` 中不加区分地使用 `sudo`？
 8. `.bashrc` 修改后，为什么已经打开的终端可能还没有新配置？
 9. 原生 Ubuntu、虚拟机、WSL2、Docker 的根本区别是什么？
-10. 如果一个教程要求你执行 `curl ... | sudo bash`，你应该先问自己哪些问题？
+10. 如果一个教程要求执行 `curl ... | sudo bash`，应先问哪些问题？
 
 ### 参考答案
 
 1. Linux 严格来说是内核，Ubuntu 是基于 Linux 内核并集成系统工具、包管理器、桌面环境和软件仓库的完整发行版。本书说“安装 Ubuntu 20.04”，是因为 ROS Noetic 的官方二进制安装、包名、系统依赖和教程都围绕这个发行版版本展开；只说“安装 Linux”会过于模糊，学生可能装到不匹配的发行版或版本。
 
-2. ROS Noetic 的官方目标平台包含 Ubuntu 20.04 Focal，本书选择它可以让 apt 包、Python 3、C++14、ROS Wiki 教程和社区排障经验保持一致。Ubuntu 22.04/24.04 不是 Noetic 的新手主线目标，强行安装会引入源码构建、依赖版本和兼容性问题，不适合零基础阶段。
+2. ROS Noetic 的官方目标平台包含 Ubuntu 20.04 Focal，本书选择它可以让 apt 包、Python 3、C++14、ROS Wiki 教程和社区排障经验保持一致。Ubuntu 22.04/24.04 不是 Noetic 的新手主线目标，在非目标平台安装会引入源码构建、依赖版本和兼容性问题，不适合零基础阶段。
 
 3. `pwd` 显示当前工作目录，而很多命令的意义都依赖当前位置。例如在 `~/catkin_ws` 执行 `catkin_make` 和在 `~/catkin_ws/src/beginner_tutorials` 执行 `catkin_make`，结果完全不同；复制、删除、创建文件也都受当前目录影响。排障时先看 `pwd`，可以避免把文件建到错误位置。
 
@@ -869,17 +869,17 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 
 6. 先查三层：第一，`echo $ROS_DISTRO` 或 `ls /opt/ros/noetic` 判断 ROS 是否安装；第二，`echo $PATH` 和 `which roscore` 判断命令是否在当前 shell 可搜索路径中；第三，`source /opt/ros/noetic/setup.bash` 判断是否只是环境没有加载。如果 source 后可用，说明安装可能正常，问题在当前终端环境。
 
-7. 不建议在 `~/catkin_ws` 随便用 `sudo`，因为可能把工作空间中的文件所有者变成 root，导致普通用户后续无法编辑、编译或删除生成文件。catkin 工作空间通常应由普通用户创建和编译；只有安装系统软件包、改系统目录时才需要 `sudo`。如果权限混乱，应先用 `ls -l ~/catkin_ws` 查所有者。
+7. 不建议在 `~/catkin_ws` 中不加区分地使用 `sudo`，因为这可能把工作空间中的文件所有者变成 root，导致普通用户后续无法编辑、编译或删除生成文件。catkin 工作空间通常应由普通用户创建和编译；只有安装系统软件包、改系统目录时才需要 `sudo`。如果权限异常，应先用 `ls -l ~/catkin_ws` 检查所有者。
 
-8. `.bashrc` 是新 Bash 交互 shell 启动时读取的配置文件，已经打开的终端不会自动重新执行它。修改后要么新开终端，要么在当前终端执行 `source ~/.bashrc`。因此“我已经写进 `.bashrc`，为什么当前终端还不生效”通常不是配置没写入，而是当前 shell 没重新加载。
+8. `.bashrc` 是新 Bash 交互 shell 启动时读取的配置文件，已经打开的终端不会自动重新执行它。修改后要么新开终端，要么在当前终端执行 `source ~/.bashrc`。因此“已经写进 `.bashrc`，为什么当前终端还不生效”通常不是配置没写入，而是当前 shell 没重新加载。
 
 9. 原生 Ubuntu 是直接安装在硬盘上的完整系统，性能和硬件访问最好；虚拟机是在现有系统里运行一个完整 Ubuntu，便于快照恢复但图形性能较弱；WSL2 是 Windows 上的 Linux 子系统，适合命令行和轻量实验但 GUI、USB、仿真有额外限制；Docker 是容器化环境，适合复现和隔离，但默认不持久保存工作空间，GUI 和硬件访问需要额外映射。
 
-10. 先问：脚本来自哪里，是否官方或可信？脚本会改哪些文件、安装哪些软件、是否需要 root 权限？是否能先打开脚本内容阅读？失败后如何恢复？有没有更透明的手动安装步骤？`curl ... | sudo bash` 把网络下载内容直接交给 root 执行，风险比普通命令高，不能因为教程里有就盲目复制。
+10. 先问：脚本来自哪里，是否官方或可信？脚本会改哪些文件、安装哪些软件、是否需要 root 权限？是否能先打开脚本内容阅读？失败后如何恢复？有没有更透明的手动安装步骤？`curl ... | sudo bash` 把网络下载内容直接交给 root 执行，风险比普通命令高，不能仅因教程中出现该命令就直接复制执行。
 
 ## 1.16 本章小结
 
-本章没有正式进入 ROS，但已经建立了后续学习的底层操作能力。你应该记住：终端不是神秘工具，而是一个可观察、可推理的系统接口。当前目录决定相对路径，权限决定能否修改文件，APT 决定系统软件安装，环境变量决定命令和程序如何找到依赖。
+本章没有正式进入 ROS，但已经建立了后续学习的底层操作能力。应记住：终端不是神秘工具，而是一个可观察、可推理的系统接口。当前目录决定相对路径，权限决定能否修改文件，APT 决定系统软件安装，环境变量决定命令和程序如何找到依赖。
 
 后续学习 ROS 时，很多错误都可以回到本章方法排查：
 
@@ -904,13 +904,13 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 
 ## 本章解决什么问题
 
-本章回答 ROS 入门时最关键的问题：ROS 到底是什么，以及一个 ROS1 系统为什么能由很多独立程序协同工作。很多初学者看到 “Robot Operating System” 这个名字，会以为 ROS 像 Ubuntu、Windows 一样是传统操作系统。这个理解不准确。ROS 不接管硬件，不调度 CPU，也不替代 Linux；它运行在 Ubuntu 之上，提供机器人软件开发中反复出现的通信、组织、构建、运行、调试和复用能力。
+本章回答 ROS 入门时最关键的问题：ROS 的准确定位是什么，以及一个 ROS1 系统为什么能由很多独立程序协同工作。很多初学者看到 “Robot Operating System” 这个名字，会以为 ROS 像 Ubuntu、Windows 一样是传统操作系统。这个理解不准确。ROS 不接管硬件，不调度 CPU，也不替代 Linux；它运行在 Ubuntu 之上，提供机器人软件开发中反复出现的通信、组织、构建、运行、调试和复用能力。
 
-成熟 ROS 教程通常不会一上来讲复杂机器人算法，而是先让学习者理解计算图、节点、话题、服务、参数这些基本结构。原因很简单：如果你不能解释“谁在发布数据、谁在订阅数据、消息类型是什么、Master 做了什么”，后面写 Python/C++ 节点、launch 文件、TF、导航都会变成命令堆砌。
+成熟 ROS 教程通常不会在开始阶段讲复杂机器人算法，而是先让学习者理解计算图、节点、话题、服务、参数这些基本结构。原因在于：如果不能解释“谁在发布数据、谁在订阅数据、消息类型是什么、Master 做了什么”，后面写 Python/C++ 节点、launch 文件、TF、导航都会变成命令堆叠。
 
-本章先建立 ROS1 的运行时心智模型。你会用最小系统观察 `roscore`、`rosnode`、`rostopic`、`rosservice` 和 `rosparam`，但重点不是记住命令，而是理解命令背后的系统结构。
+本章先建立 ROS1 的运行时心智模型。将使用最小系统观察 `roscore`、`rosnode`、`rostopic`、`rosservice` 和 `rosparam`，但重点不是记住命令，而是理解命令背后的系统结构。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 解释 ROS 为什么不是传统操作系统。
 - 画出 ROS Master、Node、Topic、Message、Service、Action、Parameter Server 的关系。
@@ -922,7 +922,7 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 
 ## 2.1 ROS 在本书中的位置
 
-第 1 章解决的是 Ubuntu 和终端基础。本章开始进入 ROS，但仍然不写代码。这个顺序很重要，因为 ROS 不是孤立存在的：
+第 1 章解决的是 Ubuntu 和终端基础。本章开始进入 ROS，但仍然不写代码。这个顺序重要，因为 ROS 不是孤立存在的：
 
 ```mermaid
 flowchart TD
@@ -966,11 +966,11 @@ ROS 提供的是机器人软件开发常见能力：
 事实：Master 主要负责注册和发现。节点之间的数据传输由节点直接协商连接完成。
 
 误解 3：以为安装 ROS 就等于有了机器人能力。
-事实：安装只是得到工具和包。真正的系统还需要节点、参数、模型、传感器数据、控制接口和启动文件。
+事实：安装只是得到工具和包。完整系统还需要节点、参数、模型、传感器数据、控制接口和启动文件。
 
 ## 2.3 为什么机器人软件需要 ROS
 
-假设你要做一个移动机器人。即使是最简单的室内移动机器人，也可能包含：
+以移动机器人为例。即使是最简单的室内移动机器人，也可能包含：
 
 - 激光雷达驱动：读取距离数据。
 - 底盘驱动：接收速度命令并控制电机。
@@ -1081,8 +1081,8 @@ sequenceDiagram
     participant S as 订阅者节点
     participant T as 直接数据连接
 
-    P->>M: 注册 我发布 /scan
-    S->>M: 注册 我订阅 /scan
+    P->>M: 注册发布 /scan
+    S->>M: 注册订阅 /scan
     M-->>S: 告诉订阅者 /scan 的发布者位置
     S->>P: 协商传输协议和消息类型
     P-->>S: 建立连接参数
@@ -1237,7 +1237,7 @@ Service 不适合激光雷达、图像、里程计这类连续数据。连续数
 - 让机械臂移动到某个姿态。
 - 执行一个持续数秒甚至数分钟的任务。
 
-如果只用 service，客户端发出请求后只能等待最终结果，中途很难获得进度，也很难取消。Action 解决的是这类问题：它包含目标、反馈、结果和取消机制。
+如果只用 service，客户端发出请求后只能等待最终结果，中途较难获得进度，也较难取消。Action 解决的是这类问题：它包含目标、反馈、结果和取消机制。
 
 入门阶段先记住：
 
@@ -1247,7 +1247,7 @@ Service 不适合激光雷达、图像、里程计这类连续数据。连续数
 | Service | 短请求响应 | 重置仿真、查询状态 |
 | Action | 长任务，有反馈和取消 | 导航到目标点、机械臂执行轨迹 |
 
-后续导航章节再深入 action。现在不要急着写 action 代码，先能判断它解决的问题。
+后续导航章节再深入 action。现在不应急于写 action 代码，先能判断它解决的问题。
 
 ## 2.11 Parameter Server：配置不是数据流
 
@@ -1284,11 +1284,11 @@ rosparam get /chapter2_demo_rate
 rosparam delete /chapter2_demo_rate
 ```
 
-不要把 Parameter Server 当数据库或高速通信通道。图像、激光、里程计都不应该放在参数服务器里。
+不应把 Parameter Server 当数据库或高速通信通道。图像、激光、里程计都不应该放在参数服务器里。
 
 ### 参数为什么容易让初学者误解
 
-参数服务器只负责存储值。节点是否读取参数、什么时候读取参数、参数变化后是否重新读取，由节点代码决定。你用 `rosparam set` 改了一个值，节点行为不一定立刻变化。
+参数服务器只负责存储值。节点是否读取参数、什么时候读取参数、参数变化后是否重新读取，由节点代码决定。使用 `rosparam set` 改了一个值，节点行为不一定立刻变化。
 
 排查时先问：
 
@@ -1299,7 +1299,7 @@ rosparam delete /chapter2_demo_rate
 
 ## 2.12 通信方式选择决策表
 
-当你不知道该用 topic、service、action 还是 parameter 时，可以按下面判断：
+当不确定该用 topic、service、action 还是 parameter 时，可以按下面判断：
 
 ```mermaid
 flowchart TD
@@ -1314,10 +1314,10 @@ flowchart TD
 
 这张图不是绝对规则，但能避免初学者最常见的误用：
 
-- 不要用 parameter 传传感器数据。
-- 不要用 service 传连续图像。
-- 不要用 topic 表达必须有明确返回值的短请求。
-- 不要用普通 service 表达需要反馈和取消的长任务。
+- 不应用 parameter 传传感器数据。
+- 不应用 service 传连续图像。
+- 不应用 topic 表达必须有明确返回值的短请求。
+- 不应用普通 service 表达需要反馈和取消的长任务。
 
 ## 2.13 最小可运行实验
 
@@ -1335,7 +1335,7 @@ flowchart TD
 source /opt/ros/noetic/setup.bash
 ```
 
-如果你已经把这行写入 `~/.bashrc` 并打开了新终端，可以用下面命令确认：
+如果已经把这行写入 `~/.bashrc` 并打开了新终端，可以用下面命令确认：
 
 ```bash
 echo $ROS_DISTRO
@@ -1356,7 +1356,7 @@ source /opt/ros/noetic/setup.bash
 roscore
 ```
 
-保持这个终端不要关闭。`roscore` 是本实验的基础。
+保持这个终端运行。`roscore` 是本实验的基础。
 
 终端 2：观察系统。
 
@@ -1396,7 +1396,7 @@ rosparam delete /chapter2/student_name
 
 把实验结果和概念对应起来：
 
-| 你执行的命令 | 观察到的对象 | 对应概念 |
+| 执行的命令 | 观察到的对象 | 对应概念 |
 |---|---|---|
 | `roscore` | 启动 Master 和基础日志服务 | Master |
 | `rosnode list` | `/rosout` | Node |
@@ -1445,7 +1445,7 @@ rosparam delete /chapter2/student_name
 
 ### `rosmsg show`
 
-查看消息类型的字段结构。它回答“这条消息里到底有哪些字段”。
+查看消息类型的字段结构。它回答“这条消息里具体有哪些字段”。
 
 ### `rosservice list`
 
@@ -1466,7 +1466,7 @@ rosparam delete /chapter2/student_name
 | 参数改了但节点行为没变 | 节点只在启动时读取参数 | 查看节点文档或源码 | 重启节点，或确认是否支持动态读取 |
 | 多终端行为不一致 | 有的终端没 source ROS 环境 | `echo $ROS_DISTRO` | 每个终端都 source，或写入 `.bashrc` |
 
-ROS 概念排障要特别避免“只看名字”。`rostopic list` 看到 `/scan`，只能说明系统中出现过这个 topic 名；它不能证明有激光数据持续发布，也不能证明订阅者收到的数据类型正确。真正的检查应该分四层：
+ROS 概念排障要特别避免“只看名字”。`rostopic list` 看到 `/scan`，只能说明系统中出现过这个 topic 名；它不能证明有激光数据持续发布，也不能证明订阅者收到的数据类型正确。可靠检查应该分四层：
 
 ```mermaid
 flowchart TD
@@ -1491,7 +1491,7 @@ flowchart TD
 5. 哪些场景适合 topic？哪些场景适合 service？
 6. Action 相比 service 多解决了什么问题？
 7. Parameter Server 为什么不适合传输激光雷达数据？
-8. 如果 `rostopic echo /scan` 没有输出，你会先查哪两个命令？
+8. 如果 `rostopic echo /scan` 没有输出，应先检查哪两个命令？
 9. 为什么发布者和订阅者可以按任意顺序启动？
 10. `ROS_MASTER_URI` 对单机和多机通信分别意味着什么？
 11. 如果一个节点订阅 `/cmd_vel` 但机器人不动，为什么不能只看 topic 名？
@@ -1511,7 +1511,7 @@ flowchart TD
 
 6. Action 适合可反馈、可取消、持续时间较长的任务。Service 发出请求后通常等待最终响应，不适合“导航到目标点”这类可能耗时很久、需要中途反馈进度、允许取消的任务。Action 在语义上补充了 goal、feedback、result、cancel 这些机制。
 
-7. Parameter Server 适合存低频配置，例如发布频率、文件路径、阈值、开关参数；激光雷达数据是高频连续数据，应该通过 topic 发布。把 `/scan` 这类数据塞进参数服务器会造成更新频率、时间戳、数据同步和性能问题，也不符合 ROS 工具链的观察方式。
+7. Parameter Server 适合存低频配置，例如发布频率、文件路径、阈值、开关参数；激光雷达数据是高频连续数据，应该通过 topic 发布。把 `/scan` 这类数据放入参数服务器会造成更新频率、时间戳、数据同步和性能问题，也不符合 ROS 工具链的观察方式。
 
 8. 先查 `rostopic info /scan`，确认是否有 publisher、subscriber 以及消息类型；再查 `rostopic list` 或 `rosnode list`，确认相关节点和 topic 是否存在。如果 topic 存在但无数据，再用 `rostopic hz /scan`、`rqt_graph` 或节点日志继续定位发布者是否真的在发。
 
@@ -1525,9 +1525,9 @@ flowchart TD
 
 ## 2.17 本章小结
 
-本章建立了 ROS1 的基本计算图模型。你现在应能把 ROS 系统理解成一组节点，以及节点之间通过 topic、service、action 和 parameter 建立的关系。
+本章建立了 ROS1 的基本计算图模型。读者现在应能把 ROS 系统理解成一组节点，以及节点之间通过 topic、service、action 和 parameter 建立的关系。
 
-后续学习中，遇到任何 ROS 系统，先不要急着看代码。先问：
+后续学习中，遇到任何 ROS 系统，先不应急于看代码。先问：
 
 - 有哪些节点？
 - 每个节点发布什么？
@@ -1537,7 +1537,7 @@ flowchart TD
 - 系统是否需要 action 表示长任务？
 - 数据是否真的在流动，还是只是 topic 名存在？
 
-这套观察顺序比盲目修改代码更可靠。它也是后续 catkin、节点编程、launch、bag、TF 和移动机器人系统调试的共同基础。
+这套观察顺序比直接修改代码更可靠。它也是后续 catkin、节点编程、launch、bag、TF 和移动机器人系统调试的共同基础。
 
 ## 延伸阅读
 
@@ -1555,13 +1555,13 @@ flowchart TD
 
 ## 本章解决什么问题
 
-安装 ROS 是很多初学者第一次遇到的大障碍。网络、Ubuntu 版本、软件源、密钥、rosdep、桌面组件、虚拟机图形性能、WSL2 GUI、Docker 容器持久化，都可能导致“照着教程敲但失败”。
+安装 ROS 是很多初学者第一次遇到的大障碍。网络、Ubuntu 版本、软件源、密钥、rosdep、桌面组件、虚拟机图形性能、WSL2 GUI、Docker 容器持久化，都可能导致“按照教程输入命令但失败”。
 
 本章的目标不是只给一条命令，而是讲清楚多种安装方法各自解决什么问题、适合谁、不适合谁。主线仍然是 **Ubuntu 20.04 + ROS Noetic 官方 apt 安装**。鱼香 ROS 一键安装、Docker、WSL2、源码构建都可以提及和使用，但不能替代对官方安装机制的理解。
 
 必须先明确事实边界：ROS Noetic 已经到达官方 EOL；REP-3 将 Noetic 的 Required Support 列为 Ubuntu Focal Fossa 20.04。选择 Noetic 是为了学习 ROS1 体系和维护历史项目，不是建议新项目默认继续优先选择 ROS1。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 解释为什么本书主线使用 Ubuntu 20.04 + ROS Noetic。
 - 区分 `ros-base`、`desktop`、`desktop-full` 和单包安装。
@@ -1573,7 +1573,7 @@ flowchart TD
 
 ## 3.1 本章在全书中的位置
 
-第 2 章已经解释了 ROS Master、Node、Topic、Service、Parameter。现在要把这些概念真正运行起来。安装不是独立任务，它决定后面所有实验是否可复现。
+第 2 章已经解释了 ROS Master、Node、Topic、Service、Parameter。现在要把这些概念落实到可运行环境中。安装不是独立任务，它决定后面所有实验是否可复现。
 
 成熟 ROS 教程通常把安装和环境配置放在最前面，然后马上进入 ROS 文件系统、节点、话题等基础实验。这个顺序合理，因为安装后的第一目标不是“装完了”，而是能够运行最小系统并观察它。
 
@@ -1594,7 +1594,7 @@ flowchart TD
     H --> D
 ```
 
-这张图表达一个原则：方法可以多，但主线不能乱。零基础教学首先追求可复现和可排障，而不是展示所有可能玩法。
+这张图表达一个原则：方法可以多，但主线必须清晰。零基础教学首先追求可复现和可排障，而不是展示所有可能路径。
 
 ## 3.2 安装前必须确认的事实
 
@@ -1604,9 +1604,9 @@ ROS Noetic Ninjemys 是 ROS1 的最后一个 LTS 发行版。官方 EOL 说明�
 
 这并不意味着 Noetic 不能学习或不能运行。它仍然有大量历史项目、教材、驱动和机器人系统使用经验。本书选择它，是因为当前教材目标是 ROS1 基础教学。
 
-### Ubuntu 版本不能随便换
+### Ubuntu 版本不能任意更换
 
-Noetic 的官方目标平台是 Ubuntu 20.04 Focal。不要把“我的系统也是 Ubuntu”理解成“版本无所谓”。Ubuntu 22.04、24.04 上通过源码或容器做 Noetic 是高级路线，不是零基础主线。
+Noetic 的官方目标平台是 Ubuntu 20.04 Focal。不应把“当前系统也是 Ubuntu”理解成“版本无所谓”。Ubuntu 22.04、24.04 上通过源码或容器做 Noetic 是高级路线，不是零基础主线。
 
 查看系统版本：
 
@@ -1621,7 +1621,7 @@ Description:    Ubuntu 20.04.x LTS
 Codename:       focal
 ```
 
-如果 Codename 不是 `focal`，不要继续照抄本章官方 apt 安装命令。先换到 Ubuntu 20.04、使用虚拟机、使用 Docker，或等待后续高级说明。
+如果 Codename 不是 `focal`，不应继续套用本章官方 apt 安装命令。应先换到 Ubuntu 20.04、使用虚拟机、使用 Docker，或等待后续高级说明。
 
 ### 二进制安装和源码安装不是一回事
 
@@ -1643,17 +1643,17 @@ ROS Wiki Noetic Ubuntu 安装文档说明，构建农场会为若干 Ubuntu 平�
 | 原生 Ubuntu 20.04 | 推荐载体 | 实验室机器、双系统用户 | 性能好，硬件访问直接 | 系统安装风险高 |
 | WSL2 | 备用 | Windows 用户前期学习 | 启动快，命令行方便 | GUI、USB、Gazebo 不总是稳 |
 | Docker | 备用/助教 | 课堂批量复现、CI | 环境一致，容易清理 | GUI、网络、硬件映射复杂 |
-| 鱼香 ROS 一键安装 | 辅助 | 国内网络装机、rosdep 问题 | 自动化程度高，适合兜底 | 不能替代官方原理 |
+| 鱼香 ROS 一键安装 | 辅助 | 国内网络装机、rosdep 问题 | 自动化程度高，适合作为辅助方案 | 不能替代官方原理 |
 | 源码构建 | 高级 | 教师、挑战实验、跨架构预备 | 理解依赖和构建链 | 慢、难、错误多 |
 
 ### 如何选择
 
-| 你的情况 | 建议 |
+| 当前情况 | 建议 |
 |---|---|
 | 第一次学习 ROS，电脑是 Windows | 优先 Ubuntu 20.04 虚拟机 |
 | 实验室电脑可以重装系统 | 原生 Ubuntu 20.04 |
 | 只想先学命令行和 ROS CLI | WSL2 可作为备用 |
-| 教师要给几十台机器统一环境 | Docker 可作为兜底 |
+| 教师要给几十台机器统一环境 | Docker 可作为备用方案 |
 | 官方源/rosdep 经常失败 | 可参考鱼香 ROS 辅助 |
 | 想研究移植或编译链 | 源码构建作为高级实验 |
 
@@ -1679,7 +1679,7 @@ echo $SHELL
 sudo apt update
 ```
 
-如果这里已经失败，先不要安装 ROS。APT 基础不可用时，ROS 安装一定不可靠。
+如果这里已经失败，暂不应安装 ROS。APT 基础不可用时，ROS 安装一定不可靠。
 
 ### 配置 Ubuntu 仓库
 
@@ -1800,7 +1800,7 @@ echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-严肃提醒：如果你的电脑装了多个 ROS 发行版，`~/.bashrc` 不应同时 source 多个发行版。一次只让一个 ROS 发行版成为默认环境。
+重要提醒：如果同一台电脑装了多个 ROS 发行版，`~/.bashrc` 不应同时 source 多个发行版。一次只让一个 ROS 发行版成为默认环境。
 
 ### 安装构建依赖和 rosdep
 
@@ -1822,7 +1822,7 @@ rosdep update
 - `rosdep` 用来把 ROS 包依赖转换成系统依赖安装指令。
 - 后续编译源码包时经常用它。
 
-如果 `sudo rosdep init` 提示文件已存在，说明可能已经初始化过。不要重复乱删，先查看：
+如果 `sudo rosdep init` 提示文件已存在，说明可能已经初始化过。不应重复删除配置，先查看：
 
 ```bash
 ls /etc/ros/rosdep/sources.list.d/
@@ -1830,7 +1830,7 @@ ls /etc/ros/rosdep/sources.list.d/
 
 ## 3.5 安装过程的系统状态变化
 
-新手常见问题是只知道“照着敲”，不知道系统被改了哪里。可以按下面理解：
+新手常见问题是只关注命令本身，却不知道系统状态发生了哪些变化。可以按下面理解：
 
 ```mermaid
 flowchart LR
@@ -1854,7 +1854,7 @@ flowchart LR
 | 写入 `.bashrc` | Bash 启动配置 | `tail ~/.bashrc` |
 | 初始化 rosdep | `/etc/ros/rosdep/sources.list.d/` | `ls /etc/ros/rosdep/sources.list.d/` |
 
-这张表能帮助你判断失败发生在哪一层，而不是盲目重装。
+这张表用于帮助判断失败发生在哪一层，而不是直接重装。
 
 ## 3.6 安装验证
 
@@ -1900,13 +1900,13 @@ rosrun turtlesim turtlesim_node
 正确现象：
 
 - 出现 turtlesim 窗口。
-- 窗口中有一只小乌龟。
+- 窗口中显示 turtlesim 模拟海龟。
 
-如果你在 WSL2、Docker 或远程环境中执行，图形窗口失败不一定说明 ROS 安装失败，可能是显示服务没有配置。先在原生 Ubuntu 或虚拟机中验证。
+如果在 WSL2、Docker 或远程环境中执行，图形窗口失败不一定说明 ROS 安装失败，可能是显示服务没有配置。先在原生 Ubuntu 或虚拟机中验证。
 
 ### 安装完成的最低验收标准
 
-不要只说“没有报错”。至少要满足：
+不应只说“没有报错”。至少要满足：
 
 ```bash
 echo $ROS_DISTRO
@@ -1920,7 +1920,7 @@ rosrun turtlesim turtlesim_node
 
 ## 3.7 虚拟机方法
 
-虚拟机是在现有系统上运行一个完整 Ubuntu。对零基础学生，虚拟机的最大优势是可恢复：安装失败、配置错、环境乱了，可以回滚快照。
+虚拟机是在现有系统上运行一个完整 Ubuntu。对零基础学生，虚拟机的最大优势是可恢复：安装失败、配置错误、环境不一致时，可以回滚快照。
 
 建议配置：
 
@@ -1940,7 +1940,7 @@ rosrun turtlesim turtlesim_node
 6. 验证 `roscore` 和 turtlesim。
 7. 拍摄“ROS 安装完成快照”。
 
-不要把虚拟机里 Gazebo 运行慢误判为 ROS 安装错误。图形性能慢和 ROS 通信机制是两件事。
+不应把虚拟机里 Gazebo 运行慢误判为 ROS 安装错误。图形性能慢和 ROS 通信机制是两件事。
 
 ### 虚拟机适合教学的原因
 
@@ -1978,12 +1978,12 @@ WSL2 谨慎用途：
 |---|---|---|
 | RViz 不显示 | GUI/显卡/显示服务问题 | ROS 安装一定失败 |
 | USB 设备不可见 | 设备映射问题 | 驱动包一定有 bug |
-| Gazebo 很卡 | 图形性能问题 | ROS topic 通信有问题 |
+| Gazebo 运行缓慢或长时间无响应 | 图形性能问题 | ROS topic 通信有问题 |
 | 多机通信异常 | WSL 网络模式问题 | ROS Master 概念错了 |
 
 ## 3.9 Docker 方法
 
-Docker 容器适合课堂批量复现和助教兜底。官方 Docker Hub 提供 ROS 镜像。
+Docker 容器适合课堂批量复现和助教备用环境。官方 Docker Hub 提供 ROS 镜像。
 
 最小验证：
 
@@ -2000,7 +2000,7 @@ docker run -it --rm ros:noetic roscore
 
 Docker 的关键限制：
 
-- 容器默认不保存你在里面创建的工作空间，除非挂载 volume。
+- 容器默认不保存其中创建的工作空间，除非挂载 volume。
 - GUI 程序需要额外配置显示。
 - 访问摄像头、雷达、串口、USB 设备需要设备映射和权限。
 - 容器网络与宿主机网络不同，多节点通信要谨慎。
@@ -2020,7 +2020,7 @@ Docker 不适合掩盖 Linux 基础。学生仍然要理解 source、工作空�
 
 ## 3.10 鱼香 ROS 一键安装与辅助工具
 
-鱼香 ROS 一键安装工具在国内 ROS 学习者中很常见，特别适合处理网络、系统源、rosdep 和环境配置等安装痛点。对零基础学生来说，它的价值不是“跳过学习”，而是降低第一轮装机失败率，让学生更快进入 `roscore`、turtlesim、catkin 和节点编程实验。
+鱼香 ROS 一键安装工具在国内 ROS 学习者中较常见，特别适合处理网络、系统源、rosdep 和环境配置等安装痛点。对零基础学生来说，它的价值不是“跳过学习”，而是降低第一轮装机失败率，让学生更快进入 `roscore`、turtlesim、catkin 和节点编程实验。
 
 FishROS 的 `fishros/install` 仓库在工具列表中直接列出了多种能力，包括一键安装 ROS、配置 rosdep、配置 ROS 环境、配置系统源、安装 Docker、安装 VSCode 等。教材正文可以直接告诉学生有这类工具，并鼓励他们在理解官方安装主线后接触这些更方便的工程工具。
 
@@ -2032,10 +2032,10 @@ FishROS 的 `fishros/install` 仓库在工具列表中直接列出了多种能�
 | 一键配置 rosdep | 解决 `rosdep update`、依赖源访问失败等常见问题 | rosdep 是依赖解析工具，不是 ROS 节点运行工具 |
 | 一键配置 ROS 环境 | 帮助生成或修复环境加载配置 | `source /opt/ros/noetic/setup.bash`、`~/.bashrc`、当前 shell |
 | 一键配置系统源 | 在网络不稳定时切换 Ubuntu/ROS 相关源 | 软件源文件、APT 索引、`sudo apt update` |
-| 一键安装 Docker | 为课堂兜底、容器实验或环境隔离提供便利 | 容器、镜像、volume、GUI 映射和硬件访问限制 |
+| 一键安装 Docker | 为课堂备用环境、容器实验或环境隔离提供便利 | 容器、镜像、volume、GUI 映射和硬件访问限制 |
 | 一键安装 VSCode 等工具 | 降低开发工具配置成本 | 编辑器只是工具，不能替代 catkin/launch/ROS CLI 理解 |
 
-这张表要传达一个原则：**工具可以更方便，但不能让系统状态变成黑盒**。学生可以使用 FishROS，但必须知道它大致在帮自己修改哪些系统状态。
+这张表要传达一个原则：**工具可以提高效率，但不能让系统状态变成不可解释的自动化过程**。学生可以使用 FishROS，但必须知道它大致在帮自己修改哪些系统状态。
 
 ### 推荐使用方式
 
@@ -2061,9 +2061,9 @@ bash fishros
 
 两种写法的核心都是从网络获取安装脚本并执行。零基础学生在执行前至少要知道三件事：
 
-- 脚本来源应来自鱼香 ROS 官方站点或 `fishros/install` 仓库，不要执行来历不明的复制版本。
+- 脚本来源应来自鱼香 ROS 官方站点或 `fishros/install` 仓库，不应执行来历不明的复制版本。
 - 这类脚本可能修改软件源、安装软件包、写入环境配置，因此执行前最好在虚拟机快照或干净环境中操作。
-- 脚本失败时不要反复盲目重跑，应回到 `apt`、`rosdep`、`~/.bashrc`、`/etc/apt/sources.list.d/` 等位置查状态。
+- 脚本失败时不应反复无诊断地重跑，应回到 `apt`、`rosdep`、`~/.bashrc`、`/etc/apt/sources.list.d/` 等位置查状态。
 
 ### 使用后的验证
 
@@ -2092,7 +2092,7 @@ rosrun turtlesim turtlesim_node
 - `echo $ROS_DISTRO` 输出 `noetic`。
 - `roscore` 能启动。
 - 另一个终端可以通过 `rosnode list` 看到 `/rosout`。
-- turtlesim 能弹出小乌龟窗口。
+- turtlesim 能显示模拟海龟窗口。
 
 如果这些验证不能通过，就说明“一键安装完成”这个说法还没有被证据支持。
 
@@ -2106,7 +2106,7 @@ rosrun turtlesim turtlesim_node
 | rosdep 配置好了就不会缺依赖 | rosdep 只负责按规则解析和安装依赖，仍可能受网络、包名、系统版本影响 | 用 `rosdep install --from-paths src --ignore-src -r -y` 时阅读输出 |
 | 修改了 ROS 环境后所有终端自动生效 | 手动 `source` 只影响当前 shell，写入 `.bashrc` 才影响新终端 | 用 `echo $ROS_DISTRO` 和 `tail ~/.bashrc` 检查 |
 
-本书对 FishROS 的态度是明确的：**可以直接介绍、可以建议学生使用、可以作为国内学习环境的重要辅助工具，但不能让学生只会点选菜单而不会解释安装结果**。真正的目标是学生既能借助方便工具完成环境搭建，也能在工具失败时回到官方安装逻辑独立定位问题。
+本书对 FishROS 的态度是明确的：**可以直接介绍、可以建议学生使用、可以作为国内学习环境的重要辅助工具，但不能让学生只会使用交互式菜单而不会解释安装结果**。核心目标是学生既能借助方便工具完成环境搭建，也能在工具失败时回到官方安装逻辑独立定位问题。
 
 ## 3.11 源码构建方法
 
@@ -2222,7 +2222,7 @@ rosrun turtlesim turtlesim_node
 | ROS 运行时可用 | `roscore`; `rosnode list` | Master 和基础节点可运行 |
 | 图形示例可用 | `rosrun turtlesim turtlesim_node` | 后续第 4 章可继续 |
 
-如果某一层失败，只修对应层，不要直接重装系统。
+如果某一层失败，只修对应层，不应直接重装系统。
 
 ## 3.13 高频错误与排查
 
@@ -2230,7 +2230,7 @@ rosrun turtlesim turtlesim_node
 |---|---|---|---|
 | `Unable to locate package ros-noetic-desktop-full` | Ubuntu 不是 focal，或 ROS 源未添加/未 update | `lsb_release -a`; `cat /etc/apt/sources.list.d/ros-latest.list` | 确认系统为 20.04，重新 `sudo apt update` |
 | `roscore: command not found` | ROS 未安装或当前终端未 source | `which roscore`; `echo $ROS_DISTRO` | `source /opt/ros/noetic/setup.bash` |
-| `sudo rosdep init` 报已存在 | 之前初始化过 | `ls /etc/ros/rosdep/sources.list.d/` | 不要重复乱删，先运行 `rosdep update` |
+| `sudo rosdep init` 报已存在 | 之前初始化过 | `ls /etc/ros/rosdep/sources.list.d/` | 不应重复删除配置，先运行 `rosdep update` |
 | turtlesim 无窗口 | 未安装 desktop/full，或 GUI 不可用 | `dpkg -l | grep turtlesim`; 检查图形环境 | 补装 `ros-noetic-turtlesim`，或换 VM/原生验证 |
 | WSL2 中 RViz/Gazebo 异常 | GUI/显卡/显示服务问题 | `echo $DISPLAY`; 运行简单 GUI 程序 | 不把该错误归因于 ROS 本体 |
 | `.bashrc` 写了多行 source | 多发行版环境冲突 | `tail ~/.bashrc` | 保留当前使用的一个发行版 |
@@ -2263,7 +2263,7 @@ flowchart TD
 7. Docker 容器为什么默认不适合保存学生工作空间？
 8. WSL2 中 Gazebo 出问题时，为什么不能直接说 ROS 安装失败？
 9. `rosdep` 解决什么问题？
-10. 你会用哪些命令判断 ROS Noetic 安装是否成功？
+10. 将使用哪些命令判断 ROS Noetic 安装是否成功？
 11. 如果 `rosversion -d` 正常但 turtlesim 无窗口，问题可能在哪一层？
 12. 为什么源码构建不适合零基础第一次安装？
 
@@ -2275,13 +2275,13 @@ flowchart TD
 
 3. `sudo apt update` 会从 Ubuntu 和 ROS 软件源拉取最新软件包索引。添加 ROS 源或修改镜像后，如果不执行它，apt 仍不知道新源中有哪些 `ros-noetic-*` 包。安装失败时，`apt update` 的输出也是判断软件源、网络和 key 是否正常的重要证据。
 
-4. `ros-latest.list` 决定 apt 是否知道 ROS 软件源，以及源的发行版代号是否匹配当前 Ubuntu。比如 Ubuntu 20.04 应对应 `focal`，如果文件内容错误或没有写入，`apt install ros-noetic-desktop-full` 就可能找不到包。检查这个文件比盲目重复安装命令更有效。
+4. `ros-latest.list` 决定 apt 是否知道 ROS 软件源，以及源的发行版代号是否匹配当前 Ubuntu。比如 Ubuntu 20.04 应对应 `focal`，如果文件内容错误或没有写入，`apt install ros-noetic-desktop-full` 就可能找不到包。检查这个文件比重复执行安装命令更有效。
 
 5. `source /opt/ros/noetic/setup.bash` 会把 ROS Noetic 的环境变量加载到当前 shell，例如 PATH、ROS_PACKAGE_PATH 等。每个新终端都是新的 shell，不会自动继承另一个终端里手动 source 的结果。若要新终端自动加载，需要把 source 行写入 `~/.bashrc`。
 
-6. 鱼香 ROS 一键安装能帮助处理国内网络、换源、rosdep 和自动化安装问题，但它背后仍然是在操作软件源、apt、rosdep 和环境变量。学生必须理解官方安装原理，否则一键脚本失败或换机器时就无法排查。教材可以推荐它作为辅助工具，但不能把它当成黑盒替代基础知识。
+6. 鱼香 ROS 一键安装能帮助处理国内网络、换源、rosdep 和自动化安装问题，但它背后仍然是在操作软件源、apt、rosdep 和环境变量。学生必须理解官方安装原理，否则一键脚本失败或更换机器时就无法排查。教材可以推荐它作为辅助工具，但不能把它当成不透明的自动化过程来替代基础知识。
 
-7. Docker 容器默认是临时运行环境，容器删除后，容器内部未挂载到宿主机的数据会消失。学生的 `catkin_ws` 如果没有通过 volume 挂载保存，就可能丢失。Docker 还需要额外处理 GUI、网络、设备映射和权限，因此更适合助教兜底、批量复现或 CI，不是第一次学习的最简单路径。
+7. Docker 容器默认是临时运行环境，容器删除后，容器内部未挂载到宿主机的数据会消失。学生的 `catkin_ws` 如果没有通过 volume 挂载保存，就可能丢失。Docker 还需要额外处理 GUI、网络、设备映射和权限，因此更适合作为助教备用环境、批量复现或 CI，不是第一次学习的最简单路径。
 
 8. WSL2 中 Gazebo 出问题可能来自图形显示、显卡加速、WSLg、网络、权限或资源限制，不一定是 ROS 安装失败。应先用 `roscore`、`rosnode list`、`rostopic list` 等命令判断 ROS 通信是否正常，再判断是否是 Gazebo 图形或仿真性能层的问题。
 
@@ -2310,13 +2310,13 @@ flowchart TD
 
 ## 本章解决什么问题
 
-前两章你已经知道 ROS 的概念，也完成了安装。本章要让 ROS 从“术语”变成“可观察系统”。我们使用 `turtlesim`，不是因为小乌龟本身重要，而是因为它足够小，能清楚展示节点、话题、消息和计算图。
+前两章已经介绍了 ROS 的概念，并完成了安装。本章要让 ROS 从“术语”变成“可观察系统”。本章使用 `turtlesim`，不是因为模拟海龟本身重要，而是因为它足够小，能清楚展示节点、话题、消息和计算图。
 
-成熟 ROS 入门教程通常都会从 turtlesim 开始。原因很简单：它能在几分钟内让你看到一个完整的 ROS 闭环：一个节点提供仿真窗口，一个节点发布速度命令，两个节点通过 topic 解耦，CLI 和 rqt 工具可以观察整个系统。
+成熟 ROS 入门教程通常都会从 turtlesim 开始。原因在于：它能在几分钟内呈现一个完整的 ROS 闭环：一个节点提供仿真窗口，一个节点发布速度命令，两个节点通过 topic 解耦，CLI 和 rqt 工具可以观察整个系统。
 
-本章的重点不是“用键盘控制乌龟”，而是学会问：有哪些节点？哪些 topic？消息类型是什么？数据从哪里流向哪里？如果系统不动，我先检查什么？
+本章的重点不是“用键盘控制 turtlesim 模拟海龟”，而是学会提出系统观察问题：有哪些节点？哪些 topic？消息类型是什么？数据从哪里流向哪里？如果系统不动，应先检查什么？
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 启动 `roscore`、`turtlesim_node`、`turtle_teleop_key`。
 - 使用 `rosnode list` 和 `rosnode info` 查看节点。
@@ -2338,19 +2338,19 @@ flowchart LR
     D --> F[第6章 自己写节点]
 ```
 
-如果本章只做到“能让小乌龟动起来”，学习是不完整的。真正目标是能解释这只小乌龟背后的 ROS 结构。你要把窗口中看到的运动，映射到节点、topic、消息类型和数据流。
+如果本章只做到“能让 turtlesim 模拟海龟运动”，学习是不完整的。核心目标是能解释该现象背后的 ROS 结构。读者需要把窗口中看到的运动，映射到节点、topic、消息类型和数据流。
 
 ## 4.2 为什么用 turtlesim
 
-真实机器人系统包含驱动、控制器、传感器、坐标变换、地图和导航，初学者一开始很难判断错误来自哪里。turtlesim 则把问题简化到最低：
+实际机器人系统包含驱动、控制器、传感器、坐标变换、地图和导航，初学者一开始较难判断错误来自哪里。turtlesim 则把问题简化到最低：
 
 - 一个二维窗口。
-- 一个可控制的小乌龟。
+- 一个可控制的 turtlesim 模拟海龟。
 - 一个速度命令 topic。
 - 一个位姿反馈 topic。
 - 一个键盘控制节点。
 
-这个系统足够小，但 ROS 通信机制是真实的。你在 turtlesim 中学会的观察方法，后续可以直接迁移到移动机器人：
+这个系统足够小，但 ROS 通信机制是真实的。读者在 turtlesim 中学会的观察方法，后续可以直接迁移到移动机器人：
 
 | turtlesim | 移动机器人类比 | 共同点 |
 |---|---|---|
@@ -2362,22 +2362,22 @@ flowchart LR
 
 ### 一个重要提醒
 
-不要因为 turtlesim 简单就轻视它。很多真实系统的问题，缩小后和 turtlesim 一样：
+不应因为 turtlesim 简单就轻视它。很多真实系统的问题，缩小后和 turtlesim 一样：
 
 - 控制节点有没有发布 `/cmd_vel`？
 - 底盘节点有没有订阅 `/cmd_vel`？
 - 消息类型是不是 `geometry_msgs/Twist`？
 - 反馈 topic 有没有数据？
-- 图里看到的连接和你以为的一样吗？
+- 图里看到的连接是否符合预期？
 
 ## 4.3 本章必须理解的概念
 
 | 概念 | 简明定义 | 容易误解的点 | 最小观察方法 |
 |---|---|---|---|
-| `turtlesim_node` | 小乌龟仿真节点 | 它不是 ROS Master | `rosnode info /turtlesim` |
+| `turtlesim_node` | turtlesim 仿真节点 | 它不是 ROS Master | `rosnode info /turtlesim` |
 | `turtle_teleop_key` | 键盘控制节点 | 只有终端获得焦点时才响应按键 | `rosnode info /teleop_turtle` |
-| `/turtle1/cmd_vel` | 控制乌龟速度的 topic | 不是键盘节点直接调用仿真函数 | `rostopic echo /turtle1/cmd_vel` |
-| `/turtle1/pose` | 乌龟当前位姿 topic | 不是命令，而是状态反馈 | `rostopic echo /turtle1/pose` |
+| `/turtle1/cmd_vel` | 控制 turtlesim 模拟海龟速度的 topic | 不是键盘节点直接调用仿真函数 | `rostopic echo /turtle1/cmd_vel` |
+| `/turtle1/pose` | turtlesim 模拟海龟当前位姿 topic | 不是命令，而是状态反馈 | `rostopic echo /turtle1/pose` |
 | `geometry_msgs/Twist` | 速度消息类型 | 字段结构必须写对 | `rosmsg show geometry_msgs/Twist` |
 | `rqt_graph` | 计算图可视化工具 | 图不刷新时不等于系统坏了 | 点击刷新 |
 
@@ -2395,9 +2395,9 @@ flowchart LR
     G -.观察节点关系.-> S
 ```
 
-这张图里，键盘控制节点没有直接调用 turtlesim 的内部函数。它只是把按键转换成速度消息，发布到 `/turtle1/cmd_vel`。turtlesim 订阅这个 topic，收到速度后更新小乌龟状态，再发布 `/turtle1/pose`。
+这张图里，键盘控制节点没有直接调用 turtlesim 的内部函数。它只是把按键转换成速度消息，发布到 `/turtle1/cmd_vel`。turtlesim 订阅这个 topic，收到速度后更新模拟海龟状态，再发布 `/turtle1/pose`。
 
-你后续看到移动机器人时，也可以画类似图：
+后续分析移动机器人时，也可以画类似图：
 
 ```text
 teleop -> /cmd_vel -> base_driver -> /odom
@@ -2447,7 +2447,7 @@ source /opt/ros/noetic/setup.bash
 rosrun turtlesim turtle_teleop_key
 ```
 
-让终端 3 保持焦点，按方向键控制乌龟。
+让终端 3 保持焦点，按方向键控制 turtlesim 模拟海龟。
 
 终端 4：观察系统。
 
@@ -2469,8 +2469,8 @@ rqt_graph
 ### 正确现象
 
 - `roscore` 终端持续运行。
-- turtlesim 窗口显示一只小乌龟。
-- 按方向键时，小乌龟移动或旋转。
+- turtlesim 窗口显示一个模拟海龟。
+- 按方向键时，模拟海龟移动或旋转。
 - `rosnode list` 能看到类似 `/turtlesim`、`/teleop_turtle`、`/rosout` 的节点。
 - `rostopic list` 能看到 `/turtle1/cmd_vel`、`/turtle1/pose` 等 topic。
 - `rostopic echo /turtle1/pose` 持续输出 x、y、theta、linear_velocity、angular_velocity。
@@ -2480,14 +2480,14 @@ rqt_graph
 
 把实验分成四层：
 
-| 层次 | 你做了什么 | 对应命令 | 你应该理解什么 |
+| 层次 | 操作内容 | 对应命令 | 应理解的内容 |
 |---|---|---|---|
 | Master | 启动注册发现服务 | `roscore` | 节点需要注册和发现 |
 | 节点 | 启动仿真和键盘节点 | `rosrun turtlesim ...` | 节点是运行中的进程 |
 | topic | 观察命令和反馈通道 | `rostopic list/echo` | 数据通过 topic 流动 |
 | 图 | 看系统连接关系 | `rqt_graph` | 节点通过 topic 解耦 |
 
-如果你能把这四层讲给别人听，就不是在“跑 demo”，而是在理解 ROS 系统。
+如果能够把这四层讲给别人听，就不是在“跑 demo”，而是在理解 ROS 系统。
 
 ## 4.6 观察 topic 数据
 
@@ -2509,12 +2509,12 @@ angular_velocity: 0.0
 
 解释：
 
-- `x`、`y`：乌龟在窗口中的位置。
+- `x`、`y`：模拟海龟在窗口中的位置。
 - `theta`：朝向角。
 - `linear_velocity`：线速度。
 - `angular_velocity`：角速度。
 
-当你按方向键时，这些数值会变化。这里你看到的是状态反馈，不是控制命令。
+按方向键时，这些数值会变化。这里观察到的是状态反馈，不是控制命令。
 
 ### 查看 `/turtle1/cmd_vel`
 
@@ -2545,23 +2545,23 @@ angular:
 
 ### `rostopic info` 比 `rostopic echo` 更适合第一步排查
 
-如果你不知道某个 topic 是否有发布者或订阅者，先执行：
+如果不确定某个 topic 是否有发布者或订阅者，先执行：
 
 ```bash
 rostopic info /turtle1/cmd_vel
 ```
 
-你应关注：
+应关注：
 
 - Type：消息类型。
 - Publishers：谁在发布。
 - Subscribers：谁在订阅。
 
-`echo` 只能看到数据；`info` 能告诉你连接关系。
+`echo` 只能看到数据；`info` 能显示连接关系。
 
 ## 4.7 手动发布速度命令
 
-你不一定需要键盘控制节点。只要知道 topic 名和消息类型，也可以用 CLI 直接发布。
+不一定需要键盘控制节点。只要知道 topic 名和消息类型，也可以用 CLI 直接发布。
 
 先确认消息类型：
 
@@ -2619,9 +2619,9 @@ angular:
 
 `-r 10` 表示 10 Hz 发布。按 `Ctrl+C` 停止。
 
-### 为什么手动 pub 很重要
+### 为什么手动 pub 重要
 
-手动发布是最小控制实验。真实移动机器人调试中，如果导航节点没写好，你也可以先手动向 `/cmd_vel` 发一条速度命令，检查底盘链路是否正常。
+手动发布是最小控制实验。实际移动机器人调试中，如果导航节点尚未完成，也可以先手动向 `/cmd_vel` 发一条速度命令，检查底盘链路是否正常。
 
 这能把问题拆开：
 
@@ -2638,7 +2638,7 @@ rqt_graph
 
 如果图为空，先点击刷新按钮。
 
-你应看到：
+应看到：
 
 - `/teleop_turtle` 节点。
 - `/turtlesim` 节点。
@@ -2656,7 +2656,7 @@ rqt_graph
 | topic 中数据 | `rostopic echo 话题名` |
 | 消息字段 | `rosmsg show 消息类型` |
 
-不要只看图。图只能告诉你连接关系，不能告诉你数据是否合理。
+不应只看图。图只能显示连接关系，不能判断数据是否合理。
 
 ## 4.9 用 `rosnode info` 深入观察节点
 
@@ -2678,17 +2678,17 @@ rosnode info /turtlesim
 rosnode info /teleop_turtle
 ```
 
-你会发现 teleop 主要发布速度命令，而 turtlesim 订阅速度命令并发布状态。这比只看窗口更能说明 ROS 系统结构。
+可以观察到 teleop 主要发布速度命令，而 turtlesim 订阅速度命令并发布状态。这比只看窗口更能说明 ROS 系统结构。
 
 ### 仿真节点还提供服务
 
-turtlesim 不只使用 topic，也提供 service。你可以查看：
+turtlesim 不只使用 topic，也提供 service。可以查看：
 
 ```bash
 rosservice list | grep turtle
 ```
 
-常见服务包括清空背景、重置、生成新乌龟等。这里先不深入使用 service，但要注意：一个节点可以同时发布 topic、订阅 topic、提供 service。
+常见服务包括清空背景、重置、生成新的模拟海龟等。这里先不深入使用 service，但要注意：一个节点可以同时发布 topic、订阅 topic、提供 service。
 
 这正是 ROS 节点的真实形态。
 
@@ -2701,13 +2701,13 @@ rosservice list | grep turtle
 | `rqt_graph` 图为空 | 没刷新或节点没启动 | `rosnode list` | 启动节点后刷新 |
 | `rostopic echo /turtle1/cmd_vel` 没输出 | 没有按键或没有发布者 | `rostopic info /turtle1/cmd_vel` | 按住方向键或手动 pub |
 | `rostopic pub` 报 YAML 错误 | 消息字段缩进或类型错误 | `rosmsg show geometry_msgs/Twist` | 按消息结构重新写 |
-| 小乌龟不动但 topic 有数据 | turtlesim 节点未运行或 topic 名不匹配 | `rosnode list`; `rostopic info /turtle1/cmd_vel` | 确认订阅者存在 |
+| 模拟海龟不动但 topic 有数据 | turtlesim 节点未运行或 topic 名不匹配 | `rosnode list`; `rostopic info /turtle1/cmd_vel` | 确认订阅者存在 |
 
 ### 排障顺序
 
 ```mermaid
 flowchart TD
-    A[小乌龟不动] --> B{turtlesim窗口是否存在?}
+    A[模拟海龟不动] --> B{turtlesim窗口是否存在?}
     B -- 否 --> B1[检查 turtlesim 是否启动]
     B -- 是 --> C{teleop终端是否有焦点?}
     C -- 否 --> C1[点击teleop终端再按键]
@@ -2724,20 +2724,20 @@ flowchart TD
 2. `/turtle1/cmd_vel` 和 `/turtle1/pose` 分别代表命令还是反馈？
 3. `rostopic type` 和 `rosmsg show` 的区别是什么？
 4. `rostopic pub -1` 和 `rostopic pub -r 10` 的区别是什么？
-5. 如果 `rqt_graph` 看不到 teleop 和 turtlesim 的连接，你会先查哪些命令？
+5. 如果 `rqt_graph` 看不到 teleop 和 turtlesim 的连接，应先检查哪些命令？
 6. 为什么 teleop 节点不需要知道 turtlesim 内部代码？
 7. `rosnode info` 中 Publications 和 Subscriptions 分别代表什么？
-8. 如果 `rostopic echo /turtle1/cmd_vel` 有数据但小乌龟不动，可能是什么原因？
+8. 如果 `rostopic echo /turtle1/cmd_vel` 有数据但模拟海龟不动，可能是什么原因？
 9. 为什么 `rostopic info` 有时比 `rostopic echo` 更适合作为第一步排查？
 10. turtlesim 中学到的观察方法如何迁移到移动机器人？
 
 ### 参考答案
 
-1. turtlesim 足够小，启动快、依赖少、现象直观，同时包含节点、topic、message、service、参数和 rqt_graph 等 ROS 核心观察对象。它把真实机器人中的“控制输入”和“状态反馈”简化成小乌龟运动，适合初学者先理解 ROS 计算图，而不是一开始面对复杂硬件和仿真。
+1. turtlesim 足够小，启动快、依赖少、现象直观，同时包含节点、topic、message、service、参数和 rqt_graph 等 ROS 核心观察对象。它把真实机器人中的“控制输入”和“状态反馈”简化成模拟海龟运动，适合初学者先理解 ROS 计算图，而不是一开始面对复杂硬件和仿真。
 
-2. `/turtle1/cmd_vel` 是命令输入，通常由 teleop 或手动 `rostopic pub` 发布，告诉小乌龟期望速度；`/turtle1/pose` 是状态反馈，由 turtlesim 节点发布，描述当前位姿和速度信息。真实移动机器人中，类似关系是 `/cmd_vel` 作为控制输入，`/odom` 作为运动反馈。
+2. `/turtle1/cmd_vel` 是命令输入，通常由 teleop 或手动 `rostopic pub` 发布，表示模拟海龟的期望速度；`/turtle1/pose` 是状态反馈，由 turtlesim 节点发布，描述当前位姿和速度信息。真实移动机器人中，类似关系是 `/cmd_vel` 作为控制输入，`/odom` 作为运动反馈。
 
-3. `rostopic type /turtle1/cmd_vel` 只告诉你 topic 使用的消息类型，例如 `geometry_msgs/Twist`；`rosmsg show geometry_msgs/Twist` 会展开这个类型的字段结构，例如 `linear.x`、`angular.z`。前者解决“这条 topic 是什么类型”，后者解决“这个类型里有哪些字段”。
+3. `rostopic type /turtle1/cmd_vel` 只显示 topic 使用的消息类型，例如 `geometry_msgs/Twist`；`rosmsg show geometry_msgs/Twist` 会展开这个类型的字段结构，例如 `linear.x`、`angular.z`。前者解决“这条 topic 是什么类型”，后者解决“这个类型里有哪些字段”。
 
 4. `rostopic pub -1` 只发布一次消息，适合测试单次命令是否能被接收；`rostopic pub -r 10` 以 10 Hz 持续发布，适合模拟持续控制输入。速度控制通常需要持续发布，因为很多机器人或仿真系统会在命令停止后逐渐停止或触发安全机制。
 
@@ -2747,15 +2747,15 @@ flowchart TD
 
 7. Publications 表示该节点发布了哪些 topic，即它向外输出哪些数据；Subscriptions 表示该节点订阅了哪些 topic，即它依赖哪些输入数据。对 turtlesim 来说，它订阅 `/turtle1/cmd_vel` 并发布 `/turtle1/pose`，这能直接说明它的输入和输出边界。
 
-8. 可能原因包括：发布的是零速度、消息字段不符合预期、turtlesim 节点没有订阅同一个 topic、节点卡住或窗口未响应、topic 命名空间不一致。排查顺序应先看 `rostopic info /turtle1/cmd_vel` 是否有 turtlesim 作为 subscriber，再看 echo 出来的速度值是否非零。
+8. 可能原因包括：发布的是零速度、消息字段不符合预期、turtlesim 节点没有订阅同一个 topic、节点长时间无响应或窗口未响应、topic 命名空间不一致。排查顺序应先看 `rostopic info /turtle1/cmd_vel` 是否有 turtlesim 作为 subscriber，再看 echo 出来的速度值是否非零。
 
-9. `rostopic info` 能快速告诉你 topic 类型、发布者和订阅者，比 `echo` 更适合判断连接关系。`echo` 只能看数据流，如果没有输出，你还不知道是没有 publisher、没有 subscriber、topic 名错，还是发布频率太低。第一步看 info，可以先确定系统结构。
+9. `rostopic info` 能快速显示 topic 类型、发布者和订阅者，比 `echo` 更适合判断连接关系。`echo` 只能看数据流，如果没有输出，仍无法区分是没有 publisher、没有 subscriber、topic 名错，还是发布频率太低。第一步看 info，可以先确定系统结构。
 
-10. 把 `/turtle1/cmd_vel` 对应到移动机器人的 `/cmd_vel`，把 `/turtle1/pose` 对应到 `/odom` 或机器人状态，把 turtlesim 节点对应到底盘或仿真节点。迁移后的观察顺序仍然是：`rosnode list` 看节点，`rostopic list` 看接口，`rostopic info` 看连接，`rostopic echo/hz` 看数据，`rqt_graph` 看整体关系。
+10. 可以把 `/turtle1/cmd_vel` 对应到移动机器人的 `/cmd_vel`，把 `/turtle1/pose` 对应到 `/odom` 或机器人状态，把 turtlesim 节点对应为底盘或仿真节点。迁移后的观察顺序仍然是：`rosnode list` 看节点，`rostopic list` 看接口，`rostopic info` 看连接，`rostopic echo/hz` 看数据，`rqt_graph` 看整体关系。
 
 ## 4.12 本章小结
 
-本章完成了第一个可观察 ROS 系统。你不只是运行了一个 demo，而是学会了观察 ROS 系统的基本顺序：
+本章完成了第一个可观察 ROS 系统。学习重点不只是运行一个 demo，而是掌握观察 ROS 系统的基本顺序：
 
 1. `rosnode list` 看节点。
 2. `rostopic list` 看话题。
@@ -2766,7 +2766,7 @@ flowchart TD
 7. `rostopic pub` 手动构造数据。
 8. `rqt_graph` 看节点关系。
 
-后续进入 catkin、Python、C++ 和移动机器人系统时，这套方法仍然适用。真正的 ROS 入门，不是会启动 turtlesim，而是能从 turtlesim 中读出系统结构。
+后续进入 catkin、Python、C++ 和移动机器人系统时，这套方法仍然适用。规范的 ROS 入门，不是只会启动 turtlesim，而是能从 turtlesim 中读出系统结构。
 
 ## 延伸阅读
 
@@ -2781,13 +2781,13 @@ flowchart TD
 
 ## 本章解决什么问题
 
-前面你已经能启动 `roscore`、运行 `turtlesim`、观察节点和 topic。到这里为止，你更多是在“使用别人写好的 ROS 包”。本章开始解决一个更工程化的问题：自己的 ROS 代码应该放在哪里，怎样让 ROS 找到它，怎样声明它依赖了哪些库，怎样让 Python 脚本和 C++ 程序都能被 `rosrun`、`roslaunch` 正确启动。
+前面已经完成 `roscore` 启动、`turtlesim` 运行、节点和 topic 观察。到这里为止，更多是在“使用别人写好的 ROS 包”。本章开始解决一个更工程化的问题：自己的 ROS 代码应该放在哪里，怎样让 ROS 找到它，怎样声明它依赖了哪些库，怎样让 Python 脚本和 C++ 程序都能被 `rosrun`、`roslaunch` 正确启动。
 
-ROS 项目不是随便放几个脚本就结束。一个可维护的 ROS1 项目通常由工作空间、功能包、依赖声明、构建规则、运行配置和数据文件共同组成。catkin 就是 ROS1 Noetic 中最常用的包构建系统，它把 CMake、Python 包、消息生成、依赖查找和 ROS 环境叠加组织到一套约定中。
+ROS 项目不是任意放置几个脚本就可以完成。一个可维护的 ROS1 项目通常由工作空间、功能包、依赖声明、构建规则、运行配置和数据文件共同组成。catkin 是 ROS1 Noetic 中最常用的包构建系统，它把 CMake、Python 包、消息生成、依赖查找和 ROS 环境叠加组织到一套约定中。
 
-初学者大量错误都发生在这里：包不在 `src/`、在错误目录执行 `catkin_make`、忘记 source 工作空间、依赖没有写进 `package.xml`、C++ 文件写好了但没有加入 `CMakeLists.txt`、用 `sudo` 把工作空间权限弄坏。本章的目标不是让你机械记命令，而是让你知道每条命令改变了什么目录、文件或环境变量。
+初学者大量错误都发生在这里：包不在 `src/`、在错误目录执行 `catkin_make`、忘记 source 工作空间、依赖没有写进 `package.xml`、C++ 文件写好了但没有加入 `CMakeLists.txt`、用 `sudo` 把工作空间权限弄坏。本章的目标不是机械记命令，而是理解每条命令改变了什么目录、文件或环境变量。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 创建标准 catkin 工作空间。
 - 创建 `beginner_tutorials` 功能包。
@@ -2800,7 +2800,7 @@ ROS 项目不是随便放几个脚本就结束。一个可维护的 ROS1 项目�
 
 ## 5.1 本章在全书中的位置
 
-第 2-4 章解决的是“看懂 ROS 系统”。本章开始解决“创建 ROS 项目”。从这一章开始，你写下的每一段代码都应该放进功能包，而不是散落在桌面、下载目录或任意文件夹。
+第 2-4 章解决的是“看懂 ROS 系统”。本章开始解决“创建 ROS 项目”。从这一章开始，每一段 ROS 代码都应该放进功能包，而不是散落在桌面、下载目录或任意文件夹。
 
 ```mermaid
 flowchart LR
@@ -2821,7 +2821,7 @@ flowchart LR
 | 源码空间 `src/` | 放功能包源码的目录 | 功能包通常要放在这里，而不是工作空间根目录 |
 | 构建空间 `build/` | CMake 和编译器生成中间文件的目录 | 通常不手动编辑，不应提交进教材示例项目 |
 | 开发空间 `devel/` | 编译后生成的可运行开发环境 | `source devel/setup.bash` 后当前终端才能识别本工作空间 |
-| 功能包 package | ROS 代码复用、依赖声明和运行入口的基本单位 | 一个文件夹里不能随便嵌套多个 ROS 包 |
+| 功能包 package | ROS 代码复用、依赖声明和运行入口的基本单位 | 一个文件夹里不能不加区分地嵌套多个 ROS 包 |
 | `package.xml` | 包的元信息和依赖清单 | 不是说明文档，它会影响依赖解析和发布 |
 | `CMakeLists.txt` | 构建规则文件 | C++ 源码不会被自动编译，必须写构建规则 |
 | 环境覆盖 overlay | 后 source 的工作空间叠加在前面的 ROS 环境上 | source 只影响当前 shell，除非写入 `.bashrc` |
@@ -2871,11 +2871,11 @@ catkin_ws/
 
 | 目录 | 谁创建 | 放什么 | 初学者应不应该手动改 |
 |---|---|---|---|
-| `src/` | 你创建 | 功能包源码 | 应该，主要编辑这里 |
+| `src/` | 用户创建 | 功能包源码 | 应该，主要编辑这里 |
 | `build/` | `catkin_make` 创建 | CMake 缓存、编译中间文件 | 通常不应该 |
 | `devel/` | `catkin_make` 创建 | 开发环境、setup 文件、生成的可执行入口 | 通常不应该 |
 
-`src/` 是你的源码空间。`build/` 和 `devel/` 是构建工具根据源码生成的结果。很多新手把 `build/` 或 `devel/` 当成源码目录编辑，这是错误的。真正应该纳入写作、版本管理和讲解的是功能包源码目录。
+`src/` 是源码空间。`build/` 和 `devel/` 是构建工具根据源码生成的结果。很多新手把 `build/` 或 `devel/` 当成源码目录编辑，这是错误的。应该纳入写作、版本管理和讲解的是功能包源码目录。
 
 ## 5.4 catkin 的工作流程
 
@@ -2892,7 +2892,7 @@ flowchart TB
   F --> G[build/<br/>中间文件]
   F --> H[devel/<br/>setup.bash/可执行入口/生成代码]
   H --> I[source devel/setup.bash]
-  I --> J[rosrun/roslaunch/rospack<br/>能找到你的包]
+  I --> J[rosrun/roslaunch/rospack<br/>能找到当前包]
 ```
 
 这张图解释了为什么 “写了代码” 不等于 “ROS 能运行代码”：
@@ -2925,7 +2925,7 @@ my_package/
 
 `package.xml` 说明“这个包是谁、做什么、依赖谁”。`CMakeLists.txt` 说明“这个包怎样构建、生成什么、链接哪些库”。前者更像包清单，后者更像构建配方。
 
-官方教程特别强调：每个包必须有自己的文件夹，不能把多个 ROS 包塞进同一个目录，也不能把包随意嵌套在另一个包里面。因为 ROS 工具会从文件系统结构推断包边界，边界混乱会直接导致 `rospack`、`catkin_make` 和依赖解析异常。
+官方教程特别强调：每个包必须有自己的文件夹，不能把多个 ROS 包放入同一个目录，也不能把包随意嵌套在另一个包中。因为 ROS 工具会从文件系统结构推断包边界，边界不清会直接导致 `rospack`、`catkin_make` 和依赖解析异常。
 
 ## 5.6 创建工作空间
 
@@ -2995,7 +2995,7 @@ sudo apt update
 sudo apt install -y tree
 ```
 
-## 5.7 source 工作空间到底做了什么
+## 5.7 source 工作空间的作用
 
 运行：
 
@@ -3003,7 +3003,7 @@ sudo apt install -y tree
 source ~/catkin_ws/devel/setup.bash
 ```
 
-这不是“启动 ROS”。它是在当前终端中加载这个工作空间生成的环境设置。加载以后，ROS 工具才知道你的工作空间也属于 ROS 包搜索路径的一部分。
+这不是“启动 ROS”。它是在当前终端中加载这个工作空间生成的环境设置。加载以后，ROS 工具才知道当前工作空间也属于 ROS 包搜索路径的一部分。
 
 可以用下面命令观察变化：
 
@@ -3015,16 +3015,16 @@ echo $CMAKE_PREFIX_PATH
 典型现象是：`ROS_PACKAGE_PATH` 中会出现类似路径：
 
 ```text
-/home/你的用户名/catkin_ws/src:/opt/ros/noetic/share
+/home/用户名/catkin_ws/src:/opt/ros/noetic/share
 ```
 
-这说明当前终端查找 ROS 包时，会先看你的工作空间源码空间，再看系统安装的 `/opt/ros/noetic/share`。这就是环境覆盖。
+这说明当前终端查找 ROS 包时，会先看当前工作空间源码空间，再看系统安装的 `/opt/ros/noetic/share`。这就是环境覆盖。
 
 ```mermaid
 flowchart LR
   A[/opt/ros/noetic/setup.bash<br/>系统ROS环境] --> B[ROS能找到官方包]
-  B --> C[~/catkin_ws/devel/setup.bash<br/>叠加你的工作空间]
-  C --> D[ROS能找到官方包 + 你的包]
+  B --> C[~/catkin_ws/devel/setup.bash<br/>叠加当前工作空间]
+  C --> D[ROS能找到官方包 + 当前包]
 ```
 
 要让新终端自动加载，可以把 source 写入 `.bashrc`：
@@ -3035,9 +3035,9 @@ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-这里的顺序很重要。通常先加载系统 ROS，再加载自己的工作空间。后者叠加在前者之上。
+这里的顺序重要。通常先加载系统 ROS，再加载自己的工作空间。后者叠加在前者之上。
 
-注意：`source` 只影响当前 shell。你在终端 A 中 source，不会让已经打开的终端 B 自动获得同样环境。很多“为什么这个终端能运行，另一个终端不能运行”的问题，本质就是 shell 环境不同。
+注意：`source` 只影响当前 shell。在终端 A 中 source，不会让已经打开的终端 B 自动获得同样环境。很多“为什么这个终端能运行，另一个终端不能运行”的问题，本质就是 shell 环境不同。
 
 ## 5.8 创建第一个功能包
 
@@ -3068,7 +3068,7 @@ catkin_create_pkg beginner_tutorials std_msgs rospy roscpp
 tree beginner_tutorials
 ```
 
-你应看到：
+应看到：
 
 ```text
 beginner_tutorials
@@ -3102,7 +3102,7 @@ rospack find beginner_tutorials
 正确输出类似：
 
 ```text
-/home/你的用户名/catkin_ws/src/beginner_tutorials
+/home/用户名/catkin_ws/src/beginner_tutorials
 ```
 
 进入包目录：
@@ -3112,7 +3112,7 @@ roscd beginner_tutorials
 pwd
 ```
 
-如果 `roscd` 找不到包，不要直接怀疑 ROS 坏了，先按下面顺序检查：
+如果 `roscd` 找不到包，不应直接怀疑 ROS 坏了，先按下面顺序检查：
 
 ```bash
 pwd
@@ -3137,14 +3137,14 @@ cat package.xml
 |---|---|---|
 | `<name>` | 包名 | 必须和包目录语义一致 |
 | `<version>` | 版本号 | 教学包可用 `0.0.0` 或 `0.1.0` |
-| `<description>` | 包说明 | 不要空泛，应说明包做什么 |
+| `<description>` | 包说明 | 不应空泛，应说明包做什么 |
 | `<maintainer>` | 维护者 | 至少一个，带邮箱 |
 | `<license>` | 许可证 | 教学可使用 BSD/MIT 等常见许可证 |
 | `<buildtool_depend>` | 构建工具依赖 | catkin 包通常依赖 `catkin` |
 | `<build_depend>` | 编译时依赖 | C++ 编译、消息生成需要 |
 | `<exec_depend>` | 运行时依赖 | 运行节点时需要 |
 
-初学阶段最容易忽略的是依赖声明。代码里用了某个包，但 `package.xml` 里没有声明，可能在你自己的电脑上“侥幸能跑”，换到干净环境、课堂机器或 CI 就失败。
+初学阶段最容易忽略的是依赖声明。代码里用了某个包，但 `package.xml` 里没有声明，可能在当前电脑上“侥幸能跑”，换到干净环境、课堂机器或 CI 就失败。
 
 查看直接依赖：
 
@@ -3158,7 +3158,7 @@ rospack depends1 beginner_tutorials
 rospack depends beginner_tutorials
 ```
 
-直接依赖是你这个包明确依赖的包；递归依赖包含依赖的依赖。理解这个区别很重要：教材示例代码通常只要求你声明直接依赖，不要求把所有递归依赖都手动写进 `package.xml`。
+直接依赖是当前包明确依赖的包；递归依赖包含依赖的依赖。理解这个区别十分重要：教材示例代码通常只要求声明直接依赖，不要求把所有递归依赖都手动写进 `package.xml`。
 
 ## 5.11 理解 `CMakeLists.txt`
 
@@ -3197,7 +3197,7 @@ add_executable(cpp_talker src/talker.cpp)
 target_link_libraries(cpp_talker ${catkin_LIBRARIES})
 ```
 
-如果你写了 `src/talker.cpp` 却没有 `add_executable`，`catkin_make` 不会自动知道要编译它。CMake 不会“猜测你的意图”。
+如果写了 `src/talker.cpp` 却没有 `add_executable`，`catkin_make` 不会自动知道要编译它。CMake 不会推断开发者意图。
 
 Python 脚本在开发空间中可以直接通过执行权限运行；更规范的安装写法是：
 
@@ -3220,7 +3220,7 @@ cd ~/catkin_ws
 catkin_make
 ```
 
-你还可能在网上看到：
+在其他资料中还可能看到：
 
 | 命令 | 来源 | 适用场景 | 本书态度 |
 |---|---|---|---|
@@ -3228,7 +3228,7 @@ catkin_make
 | `catkin build` | `catkin_tools` 提供 | 包较多、需要更强构建控制 | 进阶了解 |
 | `catkin_make_isolated` | catkin/源码构建常见 | 隔离构建复杂包或源码构建 | 后续高级内容 |
 
-初学阶段不要在同一个工作空间里频繁混用这些工具。不同工具会生成不同的构建目录和配置文件，混用后错误更难定位。除非教师明确要求，本书前半部分统一使用 `catkin_make`。
+初学阶段不应在同一个工作空间里频繁混用这些工具。不同工具会生成不同的构建目录和配置文件，混用后错误更难定位。除非教师明确要求，本书前半部分统一使用 `catkin_make`。
 
 ## 5.13 推荐包目录结构
 
@@ -3271,13 +3271,13 @@ mkdir -p scripts src launch config msg srv
 tree -L 2
 ```
 
-不要把所有文件都堆在包根目录。目录分层不是形式主义，它能让后续 `roslaunch`、RViz 配置、参数文件、模型文件和源码分工明确。
+不应把所有文件都集中放在包根目录。目录分层不是形式主义，它能让后续 `roslaunch`、RViz 配置、参数文件、模型文件和源码分工明确。
 
 ## 5.14 最小可运行实验
 
 ### 实验目标
 
-从零创建工作空间和功能包，并验证 ROS 能找到该包。完成后你应该能解释每一步命令改变了什么。
+从零创建工作空间和功能包，并验证 ROS 能找到该包。完成后应能解释每一步命令改变了什么。
 
 ### 前置条件
 
@@ -3321,7 +3321,7 @@ tree -L 2
 
 ### 实验复盘
 
-| 你做了什么 | 系统发生了什么 | 用什么验证 |
+| 操作内容 | 系统发生了什么 | 验证方式 |
 |---|---|---|
 | `mkdir -p ~/catkin_ws/src` | 创建工作空间源码空间 | `ls ~/catkin_ws` |
 | `catkin_make` | 生成 `build/` 和 `devel/` | `ls ~/catkin_ws` |
@@ -3368,7 +3368,7 @@ flowchart TD
 5. `build/` 和 `devel/` 是谁生成的？为什么不应该把主要源码放进去？
 6. 为什么 Python 节点通常不需要像 C++ 那样编译？
 7. `source /opt/ros/noetic/setup.bash` 和 `source ~/catkin_ws/devel/setup.bash` 有什么关系？
-8. 如果 `rospack find` 找不到包，你会按什么顺序排查？
+8. 如果 `rospack find` 找不到包，应按什么顺序排查？
 9. 直接依赖和递归依赖有什么区别？
 10. 为什么初学阶段不建议在同一个工作空间混用 `catkin_make` 和 `catkin build`？
 
@@ -3386,11 +3386,11 @@ flowchart TD
 
 6. Python 是解释型语言，ROS 中的 Python 节点通常只需要脚本有正确 shebang 和执行权限，运行时由 Python 解释器执行。C++ 需要先编译成机器码并链接 ROS 库，所以必须在 `CMakeLists.txt` 中添加 `add_executable` 和 `target_link_libraries`。这也是 C++ 节点比 Python 多一步构建规则的原因。
 
-7. `/opt/ros/noetic/setup.bash` 加载系统安装的 ROS Noetic 环境，`~/catkin_ws/devel/setup.bash` 在此基础上叠加自己的工作空间。通常先 source 系统 ROS，再 source 工作空间。后者让当前终端能找到你自己写的包，同时仍能使用 `/opt/ros/noetic` 中的官方包。
+7. `/opt/ros/noetic/setup.bash` 加载系统安装的 ROS Noetic 环境，`~/catkin_ws/devel/setup.bash` 在此基础上叠加自建工作空间。通常先 source 系统 ROS，再 source 工作空间。后者让当前终端能找到自写包，同时仍能使用 `/opt/ros/noetic` 中的官方包。
 
 8. 先查包是否真的在 `~/catkin_ws/src` 下；再回到 `~/catkin_ws` 执行 `catkin_make`；然后 `source ~/catkin_ws/devel/setup.bash`；最后检查 `echo $ROS_PACKAGE_PATH` 和 `rospack find 包名`。如果仍找不到，再检查包名是否拼错、`package.xml` 是否存在、是否把包嵌套在另一个包中。
 
-9. 直接依赖是当前包在 `package.xml` 中明确声明、代码直接使用的包，例如 `rospy`、`roscpp`、`std_msgs`。递归依赖包含“依赖的依赖”，数量通常更多。编写包清单时重点声明直接依赖，不应把所有递归依赖都无脑写进去。
+9. 直接依赖是当前包在 `package.xml` 中明确声明、代码直接使用的包，例如 `rospy`、`roscpp`、`std_msgs`。递归依赖包含“依赖的依赖”，数量通常更多。编写包清单时重点声明直接依赖，不应把所有递归依赖都不加区分地写入清单。
 
 10. `catkin_make` 和 `catkin build` 使用不同的构建工具链和构建目录习惯，混用会产生缓存、构建空间和配置不一致的问题。零基础阶段排障能力还弱，统一使用 `catkin_make` 可以让错误路径更少。等理解 catkin 工作空间后，再学习 `catkin_tools` 更合适。
 
@@ -3405,7 +3405,7 @@ flowchart TD
 - 运行前 source `devel/setup.bash`。
 - 依赖写进 `package.xml` 和 `CMakeLists.txt`。
 
-真正理解 catkin，不是记住 `catkin_make`，而是知道一个包从“源码文件夹”变成“ROS 能找到、能构建、能运行的系统组件”经历了哪些状态变化。掌握这一点，第 6 章写 Python/C++ 节点时就不会被工程结构卡住。
+理解 catkin 的关键，不是记住 `catkin_make`，而是知道一个包从“源码文件夹”变成“ROS 能找到、能构建、能运行的系统组件”经历了哪些状态变化。掌握这一点，第 6 章写 Python/C++ 节点时就能减少工程结构错误。
 
 进入下一章前，建议用下面的自我验收清单检查一次：
 
@@ -3413,7 +3413,7 @@ flowchart TD
 - 在 `~/catkin_ws` 根目录下，能解释 `src/`、`build/`、`devel/` 分别由谁创建、是否应该手动编辑、是否应该提交。
 - 能用 `rospack find beginner_tutorials` 判断包是否对当前终端可见。
 - 能解释为什么 C++ 节点必须写 `add_executable` 和 `target_link_libraries`，而 Python 节点更常见的问题是执行权限和 shebang。
-- 能说出依赖为什么要同时考虑 `package.xml` 和 `CMakeLists.txt`，而不是只在一个文件里随便写。
+- 能说明依赖为什么要同时考虑 `package.xml` 和 `CMakeLists.txt`，而不是只在一个文件中任意填写。
 
 ## 延伸阅读
 
@@ -3429,13 +3429,13 @@ flowchart TD
 
 ## 本章解决什么问题
 
-前面你已经能创建工作空间和功能包。本章开始自己写 ROS 节点。节点是 ROS 系统里真正执行计算的进程：发布者产生数据，订阅者消费数据，服务端处理请求，客户端发出请求。
+前面已经完成工作空间和功能包的创建。本章开始编写 ROS 节点。节点是 ROS 系统里实际执行计算的进程：发布者产生数据，订阅者消费数据，服务端处理请求，客户端发出请求。
 
 本章采用“同一个通信思想，Python 和 C++ 各实现一遍”的方式。先用 Python 建立通信直觉，再用 C++ 理解编译、链接和类型约束。这样安排不是说 Python 比 C++ 更重要，而是为了避免初学者同时被 ROS 通信、CMake、头文件、链接错误和类型系统淹没。
 
-本章的核心目标不是背 API，而是理解一个 ROS 节点最基本的生命周期：初始化节点、创建通信接口、循环发布或等待回调、输出日志、在 ROS 关闭时退出。你还要学会用 CLI 验证自己的程序是否真的进入 ROS 计算图。
+本章的核心目标不是背 API，而是理解一个 ROS 节点最基本的生命周期：初始化节点、创建通信接口、循环发布或等待回调、输出日志、在 ROS 关闭时退出。还需要学会用 CLI 验证程序是否实际进入 ROS 计算图。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 用 `rospy` 写发布者和订阅者。
 - 用 `roscpp` 写发布者和订阅者。
@@ -3462,7 +3462,7 @@ flowchart LR
   F --> G
 ```
 
-你应该把本章看成 ROS 编程的最低闭环：写代码、编译或授权、运行节点、观察图、定位错误。
+应把本章看成 ROS 编程的最低闭环：写代码、编译或授权、运行节点、观察图、定位错误。
 
 ## 6.2 必须理解的概念
 
@@ -3489,7 +3489,7 @@ flowchart LR
 | 常见用途 | 实验脚本、配置节点、数据处理原型 | 控制、驱动、实时性更高的模块 |
 | 本章目标 | 建立通信直觉 | 理解工程构建与类型约束 |
 
-初学时不要把“Python 能跑”误解为“ROS 工程只需要 Python”，也不要把“C++ 更快”误解为“所有节点都必须用 C++”。真正的工程选择取决于频率、延迟、硬件接口、团队维护能力和项目规模。
+初学时不应把“Python 能跑”误解为“ROS 工程只需要 Python”，也不应把“C++ 更快”误解为“所有节点都必须用 C++”。工程选择取决于频率、延迟、硬件接口、团队维护能力和项目规模。
 
 ## 6.4 发布订阅模型回顾
 
@@ -3680,7 +3680,7 @@ rqt_graph
 - `rostopic info /chatter` 显示一个 publisher 和至少一个 subscriber。
 - `rqt_graph` 显示 `/talker` 通过 `/chatter` 连接 `/listener`。
 
-如果 `listener.py` 没有输出，先不要改代码，先看图和 topic：
+如果 `listener.py` 没有输出，暂不应改代码，先看图和 topic：
 
 ```bash
 rostopic info /chatter
@@ -3737,7 +3737,7 @@ int main(int argc, char** argv) {
 - `ros::NodeHandle nh` 是访问 ROS 通信接口的句柄。
 - `nh.advertise<std_msgs::String>("chatter_cpp", 10)` 创建发布者。
 - `ros::ok()` 类似 Python 中的 `not rospy.is_shutdown()`。
-- `ros::spinOnce()` 处理一次回调。这个发布者暂时没有订阅回调，写上它是为了让你熟悉常见循环结构。
+- `ros::spinOnce()` 处理一次回调。这个发布者暂时没有订阅回调，写上它是为了便于熟悉常见循环结构。
 - `ROS_INFO` 是 C++ 里的 ROS 日志宏。
 
 ## 6.10 C++ 订阅者
@@ -3825,7 +3825,7 @@ rosrun beginner_tutorials cpp_listener
 
 ## 6.12 发布订阅实验复盘
 
-| 观察命令 | 你应该看到什么 | 说明什么 |
+| 观察命令 | 应能看到什么 | 说明什么 |
 |---|---|---|
 | `rosnode list` | `/talker`、`/listener` 或 `/cpp_talker`、`/cpp_listener` | 节点已加入计算图 |
 | `rostopic list` | `/chatter` 或 `/chatter_cpp` | topic 已注册 |
@@ -3835,7 +3835,7 @@ rosrun beginner_tutorials cpp_listener
 | `rosmsg show std_msgs/String` | `string data` | 消息字段结构 |
 | `rqt_graph` | 节点通过 topic 相连 | 计算图结构正确 |
 
-如果你只看终端打印，很容易误判。例如发布者在打印日志，不代表订阅者已经收到；订阅者没输出，也不一定是代码错，可能是 topic 名或类型不一致。CLI 观察是 ROS 编程的一部分。
+如果只看终端打印，容易误判。例如发布者在打印日志，不代表订阅者已经收到；订阅者没输出，也不一定是代码错，可能是 topic 名或类型不一致。CLI 观察是 ROS 编程的一部分。
 
 ## 6.13 Service 最小概念
 
@@ -4079,7 +4079,7 @@ rosrun beginner_tutorials add_two_ints_client.py 10 32
 [INFO] ... 10 + 32 = 42
 ```
 
-`rospy.wait_for_service("add_two_ints")` 很重要。没有它时，客户端可能在服务端还没注册完成之前就发起调用，导致偶发失败。真实系统中，等待 topic/service/action 就绪比依赖启动顺序更可靠。
+`rospy.wait_for_service("add_two_ints")` 重要。没有它时，客户端可能在服务端还没注册完成之前就发起调用，导致偶发失败。真实系统中，等待 topic/service/action 就绪比依赖启动顺序更可靠。
 
 ## 6.17 C++ service server
 
@@ -4176,7 +4176,7 @@ add_dependencies(cpp_add_two_ints_client
 target_link_libraries(cpp_add_two_ints_client ${catkin_LIBRARIES})
 ```
 
-这里的 `add_dependencies` 很关键。因为 `beginner_tutorials/AddTwoInts.h` 是根据 `.srv` 生成的头文件，C++ 节点必须等服务头文件生成后再编译。
+这里的 `add_dependencies` 关键。因为 `beginner_tutorials/AddTwoInts.h` 是根据 `.srv` 生成的头文件，C++ 节点必须等服务头文件生成后再编译。
 
 编译：
 
@@ -4207,7 +4207,7 @@ rosrun beginner_tutorials cpp_add_two_ints_client 7 8
 
 ## 6.18 Service 实验复盘
 
-| 你做了什么 | 系统发生了什么 | 验证方式 |
+| 操作内容 | 系统发生了什么 | 验证方式 |
 |---|---|---|
 | 创建 `srv/AddTwoInts.srv` | 定义请求和响应结构 | `cat srv/AddTwoInts.srv` |
 | 修改 `package.xml` | 声明消息生成和运行依赖 | `grep message package.xml` |
@@ -4222,7 +4222,7 @@ Service 的错误通常分成三类，必须分清楚：
 2. **服务没有注册**：`rossrv show` 成功，但 `rosservice list` 看不到 `/add_two_ints`。这说明类型已经生成，问题在 server 节点没有启动、启动后崩溃、服务名写错或没有连接到同一个 Master。
 3. **调用参数或逻辑错误**：`rosservice list` 能看到服务，但 `rosservice call /add_two_ints "a: 1 b: 2"` 报类型或字段错误，或者返回值不符合预期。这时才检查请求字段、client 传参、server 回调逻辑。
 
-这三类错误的检查命令不同。不要在类型未生成时反复启动 server，也不要在服务未注册时修改 `.srv` 文件。正确顺序是：
+这三类错误的检查命令不同。不应在类型未生成时反复启动 server，也不应在服务未注册时修改 `.srv` 文件。正确顺序是：
 
 ```text
 rossrv show 包/服务类型 -> rosservice list -> rosservice type 服务名 -> rosservice call 服务名 参数
@@ -4333,7 +4333,7 @@ rqt_graph
 | Python 无法导入 `beginner_tutorials.srv` | 没编译或没 source | `rossrv show beginner_tutorials/AddTwoInts` | `catkin_make` 后重新 source |
 | listener 没收到消息 | topic 名不一致 | `rostopic list`; `rqt_graph` | 确认发布和订阅 topic 相同 |
 | `rostopic echo` 没输出 | 发布者没运行或消息频率太低 | `rostopic info /chatter` | 启动发布者，检查 publishers |
-| service call 卡住 | server 未启动或服务名不一致 | `rosservice list` | 启动 server，确认服务名 |
+| service call 长时间无响应 | server 未启动或服务名不一致 | `rosservice list` | 启动 server，确认服务名 |
 
 ### 排障顺序
 
@@ -4365,9 +4365,9 @@ flowchart TD
 7. Topic 名相同但消息类型不同会发生什么？
 8. Service 和 topic 的本质差异是什么？
 9. 修改 `.srv` 文件后为什么必须重新 `catkin_make` 并重新 source？
-10. 如果客户端调用 service 卡住，你会先查哪些命令？
+10. 如果客户端调用 service 后长时间无响应，应先检查哪些命令？
 11. 为什么 C++ service 节点需要 `add_dependencies`？
-12. 你如何判断一个节点没有收到数据是发布者问题还是订阅者问题？
+12. 如何判断一个节点没有收到数据是发布者问题还是订阅者问题？
 
 ### 参考答案
 
@@ -4375,7 +4375,7 @@ flowchart TD
 
 2. `rosrun` 运行 Python 脚本时，本质上要把脚本当作可执行文件启动。没有执行权限时，Linux 会拒绝执行，即使脚本内容正确也会报 `Permission denied`。通常用 `chmod +x scripts/*.py` 解决，同时确保第一行 shebang 是 `#!/usr/bin/env python3`。
 
-3. C++ 源文件不会被 catkin 自动猜测并编译。你必须在 `CMakeLists.txt` 中写 `add_executable` 告诉 CMake 要生成哪个可执行文件，再用 `target_link_libraries` 链接 ROS 库。否则 `catkin_make` 可能成功结束，但不会生成你期望的 C++ 节点。
+3. C++ 源文件不会被 catkin 自动猜测并编译。必须在 `CMakeLists.txt` 中写 `add_executable` 告诉 CMake 要生成哪个可执行文件，再用 `target_link_libraries` 链接 ROS 库。否则 `catkin_make` 可能成功结束，但不会生成预期的 C++ 节点。
 
 4. `rospy.spin()` 让订阅节点保持运行并处理回调，否则程序可能创建订阅者后直接退出。`rate.sleep()` 用在循环发布中，用于按指定频率休眠，控制发布节奏。一个解决“等待回调”，一个解决“循环频率”。
 
@@ -4385,11 +4385,11 @@ flowchart TD
 
 7. ROS 要求同一个 topic 上发布者和订阅者的消息类型一致。如果 topic 名相同但类型不同，连接通常无法正常建立，工具会显示类型不匹配或订阅者收不到数据。排查时要同时用 `rostopic type 话题名` 和代码中的消息类型核对。
 
-8. Topic 是持续、异步的数据流，适合传感器、状态、速度命令等；Service 是一次请求、一次响应，适合查询、重置、计算等离散操作。Topic 不要求接收方立即回应，service 客户端通常会等待服务端响应。选错通信方式会让系统语义混乱，例如用 service 传激光数据就不合适。
+8. Topic 是持续、异步的数据流，适合传感器、状态、速度命令等；Service 是一次请求、一次响应，适合查询、重置、计算等离散操作。Topic 不要求接收方立即回应，service 客户端通常会等待服务端响应。选错通信方式会让系统语义不清，例如用 service 传激光数据就不合适。
 
 9. `.srv` 文件只是接口定义，必须经过 catkin 的消息生成流程，才能生成 Python 可导入模块和 C++ 头文件。修改后如果不重新 `catkin_make`，代码仍看不到新生成类型；不重新 source，当前终端也可能找不到生成结果。因此改 `.srv` 后要编译并重新加载工作空间环境。
 
-10. 先查 `rosservice list` 看服务是否注册；再查 `rosservice type /服务名` 和 `rossrv show 类型` 看类型是否正确；用 `rosnode list` 看 server 节点是否运行；必要时看 server 终端日志。如果服务不存在，客户端卡住通常是在等待服务；如果服务存在但调用失败，要查请求参数和服务端异常。
+10. 先查 `rosservice list` 看服务是否注册；再查 `rosservice type /服务名` 和 `rossrv show 类型` 看类型是否正确；用 `rosnode list` 看 server 节点是否运行；必要时查看 server 终端日志。如果服务不存在，客户端通常是在等待服务；如果服务存在但调用失败，要检查请求参数和服务端异常。
 
 11. `AddTwoInts.h` 这类 C++ 头文件是由 `.srv` 生成的，不是源码目录中一开始就存在的文件。`add_dependencies` 告诉 CMake：编译 service 节点前，必须先完成消息/服务代码生成。否则可能出现偶发的“找不到生成头文件”或并行构建顺序错误。
 
@@ -4397,7 +4397,7 @@ flowchart TD
 
 ## 6.22 本章小结
 
-本章完成了第一个自写 ROS 节点闭环。你现在应该理解：ROS 节点不是孤立程序，而是计算图中的参与者。写节点时要同时考虑代码、包结构、构建规则、运行环境和观察工具。
+本章完成了第一个自写 ROS 节点闭环。读者现在应理解：ROS 节点不是孤立程序，而是计算图中的参与者。写节点时要同时考虑代码、包结构、构建规则、运行环境和观察工具。
 
 后续写更复杂的机器人程序时，调试顺序仍然不变：
 
@@ -4427,13 +4427,13 @@ flowchart TD
 
 ## 本章解决什么问题
 
-到目前为止，你已经会手动打开多个终端运行节点。但真实 ROS 系统不会靠“记住打开十几个终端”来运行。一个稍微完整的机器人系统可能包含底盘驱动、传感器驱动、状态估计、地图、导航、可视化、日志和数据记录。如果每次都手动敲命令，实验无法稳定复现，错误也很难定位。
+到目前为止，已经可以手动打开多个终端运行节点。但实际 ROS 系统不会依赖“记住打开十几个终端”来运行。一个稍微完整的机器人系统可能包含底盘驱动、传感器驱动、状态估计、地图、导航、可视化、日志和数据记录。如果每次都手动输入命令，实验无法稳定复现，错误也较难定位。
 
 本章讲 ROS1 的运行管理工具：`roslaunch`、参数服务器、YAML 配置、remap、命名空间、日志和 rosbag。核心目标是把多个节点组织成一个可复现实验：同一份配置、同一条启动命令、同一套观察方法、同一份记录数据。
 
 必须先纠正一个误区：launch 文件不是普通顺序脚本。它描述要启动哪些节点、加载哪些参数、如何命名和重映射，但不能保证写在前面的节点业务逻辑一定先完成初始化。节点之间的依赖要通过 topic、service、action 和显式等待机制处理。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 用 `roslaunch` 启动多个节点。
 - 编写最小 launch 文件。
@@ -4498,11 +4498,11 @@ rosbag record /chatter
 - topic 重命名要改代码。
 - 数据记录路径和 topic 容易不一致。
 - 不能方便交给别人复现。
-- 课堂上 30 台电脑很难保持一致。
+- 课堂上 30 台电脑较难保持一致。
 
-`roslaunch` 的作用是把运行配置写进文件，让系统启动可重复。它还会在当前没有 ROS Master 时自动启动一个 core 系统，因此很多时候你可以直接运行 `roslaunch beginner_tutorials chatter.launch`，不必单独先开 `roscore`。
+`roslaunch` 的作用是把运行配置写进文件，让系统启动可重复。它还会在当前没有 ROS Master 时自动启动一个 core 系统，因此很多时候可以直接运行 `roslaunch beginner_tutorials chatter.launch`，不必单独先开 `roscore`。
 
-但这不意味着 launch 文件是“万能启动脚本”。它能启动进程、设置参数、组织名字，却不能替你保证某个服务一定已经准备好。客户端代码仍应使用 `wait_for_service` 等机制等待依赖就绪。
+但这不意味着 launch 文件是“万能启动脚本”。它能启动进程、设置参数、组织名字，却不能替代程序本身保证某个服务一定已经准备好。客户端代码仍应使用 `wait_for_service` 等机制等待依赖就绪。
 
 ## 7.4 launch 文件最小结构
 
@@ -4571,15 +4571,15 @@ rqt_graph
 正确做法：
 
 - 客户端调用 service 前使用 `rospy.wait_for_service` 或 C++ 等待逻辑。
-- 订阅者不要假定启动瞬间就能收到第一条消息。
+- 订阅者不应假定启动瞬间就能收到第一条消息。
 - 需要参数的节点在启动时显式读取参数，并对缺失参数给默认值或报错。
-- 复杂系统用日志和状态 topic 表示“准备好”，不要依赖 XML 行号。
+- 复杂系统用日志和状态 topic 表示“准备好”，不应依赖 XML 行号。
 
 这个原则在真实机器人里非常重要。比如激光雷达驱动进程启动了，不代表硬件已经出数据；导航节点启动了，不代表 TF 树已经完整。
 
-## 7.6 让节点真正使用参数
+## 7.6 让节点实际使用参数
 
-第 6 章的 `talker.py` 固定以 1 Hz 发布固定前缀。为了验证参数服务器真的有意义，我们先把它改成读取私有参数。
+第 6 章的 `talker.py` 固定以 1 Hz 发布固定前缀。为了验证参数服务器的作用，本节把它改成读取私有参数。
 
 打开：
 
@@ -4635,7 +4635,7 @@ chmod +x scripts/talker.py
 
 ## 7.7 参数服务器与 YAML
 
-参数适合放低频配置。例如发布频率、最大速度、文件路径、开关选项。不要把高频传感器数据放进参数服务器。
+参数适合放低频配置。例如发布频率、最大速度、文件路径、开关选项。不应把高频传感器数据放进参数服务器。
 
 创建配置目录：
 
@@ -4692,7 +4692,7 @@ hello launch
 rostopic echo /chatter
 ```
 
-你应该看到消息前缀变成 `hello launch`，频率接近 2 Hz。可以粗略检查频率：
+应能看到消息前缀变成 `hello launch`，频率接近 2 Hz。可以粗略检查频率：
 
 ```bash
 rostopic hz /chatter
@@ -4711,7 +4711,7 @@ rosparam load /tmp/talker_params.yaml /talker
 rosparam delete /talker/rate
 ```
 
-但要注意：运行中的节点是否会立刻响应参数变化，取决于节点代码。第 7.6 节的 `talker.py` 在启动时读取一次参数，之后不会自动重新读取。因此你执行：
+但要注意：运行中的节点是否会立刻响应参数变化，取决于节点代码。第 7.6 节的 `talker.py` 在启动时读取一次参数，之后不会自动重新读取。因此执行：
 
 ```bash
 rosparam set /talker/rate 5.0
@@ -4841,7 +4841,7 @@ remap 的价值是：代码保持通用，运行时按系统需要改接口名�
 /robot2/listener
 ```
 
-初学阶段不要滥用命名空间，但要知道它解决的是名字冲突和系统组织问题。后续多机器人、仿真机器人和真实机器人同时运行时，命名空间会非常重要。
+初学阶段不应滥用命名空间，但要知道它解决的是名字冲突和系统组织问题。后续多机器人、仿真机器人和真实机器人同时运行时，命名空间会非常重要。
 
 ## 7.13 include：拆分 launch 文件
 
@@ -4863,7 +4863,7 @@ launch/
   bag_record.launch
 ```
 
-本章只要求你会读和写最小 `include`。第 10 章综合项目会把 bringup、RViz、参数和数据记录组织得更完整。
+本章只要求掌握最小 `include` 的读写方式。第 10 章综合项目会把 bringup、RViz、参数和数据记录组织得更完整。
 
 ## 7.14 日志
 
@@ -4910,7 +4910,7 @@ rqt_console
 
 rosbag 是 ROS1 的数据记录与回放工具。它记录的是 topic 中流动的消息数据，不是节点代码，也不是 Python/C++ 程序的内部变量。
 
-它的价值很大：
+它的价值较大：
 
 - 调试时保存现场。
 - 不连接真实传感器也能回放数据。
@@ -4946,7 +4946,7 @@ rosbag record -O chatter_demo /chatter /rosout
 rosbag info chatter_demo.bag
 ```
 
-你应关注：
+应关注：
 
 - 记录时长。
 - 文件大小。
@@ -4965,19 +4965,19 @@ rosbag play chatter_demo.bag
 rosbag play --loop chatter_demo.bag
 ```
 
-不要一开始就使用：
+不应一开始就使用：
 
 ```bash
 rosbag record -a
 ```
 
-`-a` 会记录所有 topic，初学阶段容易产生巨大文件，也会混入你还不理解的数据。更好的习惯是先用 `rostopic list` 看清系统，再只记录关键 topic。
+`-a` 会记录所有 topic，初学阶段容易产生巨大文件，也会混入尚未理解的数据。更好的习惯是先用 `rostopic list` 看清系统，再只记录关键 topic。
 
 ## 7.16 rosbag 回放时要理解什么
 
 rosbag 回放并不会“复活原来的节点”。它只是按照记录的时间戳重新发布 topic 消息。因此：
 
-- 如果你回放 `/chatter`，需要有订阅 `/chatter` 的节点才能看到效果。
+- 如果回放 `/chatter`，需要有订阅 `/chatter` 的节点才能看到效果。
 - 如果原系统还有 service 调用、参数变化、文件读写，bag 不会自动复现这些行为。
 - 如果算法依赖 `/clock` 或仿真时间，需要理解 `use_sim_time` 和 `rosbag play --clock`，本书后续仿真章节再展开。
 - bag 文件越大，记录和回放对磁盘、CPU、网络的压力越大。
@@ -4991,13 +4991,13 @@ rosbag 回放并不会“复活原来的节点”。它只是按照记录的时�
 5. 执行 `rosbag play chatter_demo.bag`。
 6. 观察 listener 是否输出记录过的数据。
 
-这个流程能让你理解：回放时数据来自 bag，而不是来自原来的 talker。
+这个流程用于说明：回放时数据来自 bag，而不是来自原来的 talker。
 
 ## 7.17 最小可运行实验
 
 ### 实验目标
 
-用一个 launch 文件启动 talker/listener，加载私有参数，录制并回放 `/chatter`。实验结束后，你应该能解释每个节点、参数、topic 和 bag 文件的作用。
+用一个 launch 文件启动 talker/listener，加载私有参数，录制并回放 `/chatter`。实验结束后，应能解释每个节点、参数、topic 和 bag 文件的作用。
 
 ### 前置条件
 
@@ -5091,7 +5091,7 @@ rosbag play chatter_demo.bag
 |---|---|---|
 | 创建 launch 文件 | 固化节点启动方式 | `roslaunch beginner_tutorials chatter.launch` |
 | 加载 YAML | 把参数写入参数服务器 | `rosparam get /talker/rate` |
-| 修改 talker 读取参数 | 让参数真正影响节点行为 | `rostopic hz /chatter` |
+| 修改 talker 读取参数 | 使参数实际影响节点行为 | `rostopic hz /chatter` |
 | 录制 bag | 保存 topic 数据 | `rosbag info chatter_demo.bag` |
 | 回放 bag | 重新发布记录过的消息 | listener 日志、`rostopic echo` |
 
@@ -5128,7 +5128,7 @@ flowchart TD
 
 ## 7.19 本章自测
 
-1. 为什么真实 ROS 系统不应该靠手动打开多个终端运行？
+1. 为什么实际 ROS 系统不应该靠手动打开多个终端运行？
 2. `roslaunch` 自动启动 roscore 是否意味着它就是 ROS Master？
 3. launch 文件为什么不是顺序脚本？
 4. YAML 参数加载到参数服务器后，节点一定会自动使用吗？为什么？
@@ -5138,14 +5138,14 @@ flowchart TD
 8. 命名空间适合什么场景？为什么初学阶段不应滥用？
 9. rosbag 记录的是代码、参数，还是 topic 数据？
 10. 为什么初学阶段不建议直接 `rosbag record -a`？
-11. 如果 bag 回放后 listener 没输出，你会先查哪些命令？
+11. 如果 bag 回放后 listener 没输出，应先检查哪些命令？
 12. `output="screen"` 对调试有什么帮助？
 
 ### 参考答案
 
-1. 手动打开多个终端容易漏启动节点、漏设参数、顺序不一致、topic 名不统一，也不方便别人复现。真实 ROS 系统需要用 launch、参数文件和记录流程把运行方式固化下来。统一入口能降低人为误差，让排障从“你敲了什么命令”转向“系统配置是否正确”。
+1. 手动打开多个终端容易漏启动节点、漏设参数、顺序不一致、topic 名不统一，也不方便别人复现。实际 ROS 系统需要用 launch、参数文件和记录流程把运行方式固化下来。统一入口能降低人为误差，让排障从“输入过哪些命令”转向“系统配置是否正确”。
 
-2. 不是。`roslaunch` 在没有 Master 时可以帮你启动 `roscore`，但它本身不是 ROS Master。ROS Master 仍然是负责注册和发现的服务；`roslaunch` 是启动和组织节点、参数、命名空间、remap 的工具。
+2. 不是。`roslaunch` 在没有 Master 时可以启动 `roscore`，但它本身不是 ROS Master。ROS Master 仍然是负责注册和发现的服务；`roslaunch` 是启动和组织节点、参数、命名空间、remap 的工具。
 
 3. launch 文件描述要启动哪些进程、加载哪些参数、如何命名和重映射，但不保证业务逻辑按 XML 行顺序完成初始化。某个节点进程启动了，不代表它的 topic、service、TF 或硬件已经就绪。依赖另一个服务时，应在代码中显式等待，例如 `wait_for_service`，而不是依赖 launch 文件中的先后顺序。
 
@@ -5181,7 +5181,7 @@ flowchart TD
 - 数据可记录。
 - 实验可复现。
 
-后续仿真和移动机器人章节会大量使用这些能力。你应该从现在开始养成习惯：每写一个节点，都思考它怎样被 launch 启动，参数从哪里来，topic 名是否可 remap，关键数据是否能用 rosbag 记录。
+后续仿真和移动机器人章节会大量使用这些能力。从现在开始应养成习惯：每写一个节点，都思考它怎样被 launch 启动，参数从哪里来，topic 名是否可 remap，关键数据是否能用 rosbag 记录。
 
 ## 延伸阅读
 
@@ -5201,11 +5201,11 @@ flowchart TD
 
 前面几章讲的是节点之间如何通信。但机器人不只传递字符串和速度命令，它还生活在空间里。激光雷达装在底盘前方，摄像头有自己的朝向，轮子相对车体有位置，地图坐标和机器人坐标不是同一回事。如果这些坐标关系不清楚，机器人系统会出现“数据有了但显示错了”“模型在 RViz 里飞走了”“导航不知道机器人在哪里”等问题。
 
-本章建立三个核心概念：TF 坐标树、URDF 机器人模型、RViz 可视化。你要理解：TF 描述坐标系之间的空间关系，URDF 描述机器人结构，RViz 只是显示已有 ROS 数据，不负责真实物理仿真。
+本章建立三个核心概念：TF 坐标树、URDF 机器人模型、RViz 可视化。需要理解：TF 描述坐标系之间的空间关系，URDF 描述机器人结构，RViz 只是显示已有 ROS 数据，不负责真实物理仿真。
 
-本章不追求复杂机械建模，而是用一个最小两轮差速机器人例子说明 `link`、`joint`、`robot_description`、`joint_states`、`robot_state_publisher` 和 RViz 的关系。写完本章后，你应该能从 RViz 的报错反推出是 TF 缺失、URDF 错误、参数未加载，还是 Fixed Frame 选错。
+本章不追求复杂机械建模，而是用一个最小两轮差速机器人例子说明 `link`、`joint`、`robot_description`、`joint_states`、`robot_state_publisher` 和 RViz 的关系。写完本章后，应能从 RViz 的报错反推出是 TF 缺失、URDF 错误、参数未加载，还是 Fixed Frame 选错。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 解释 `map`、`odom`、`base_link`、`laser_link`、`camera_link` 等常见坐标系。
 - 理解 TF 是一棵坐标变换树，不是普通变量。
@@ -5217,7 +5217,7 @@ flowchart TD
 
 ## 8.1 本章在全书中的位置
 
-第 2-7 章让你会组织节点和数据流。本章开始引入“空间流”：同一条传感器数据必须知道自己来自哪个坐标系，才能被其他节点正确解释。
+第 2-7 章已经建立节点和数据流的组织方式。本章开始引入“空间流”：同一条传感器数据必须知道自己来自哪个坐标系，才能被其他节点正确解释。
 
 ```mermaid
 flowchart LR
@@ -5289,7 +5289,7 @@ flowchart TD
   base_link --> right_wheel_link
 ```
 
-不要把 `map`、`odom`、`base_link` 混成一个坐标系。它们表达不同层次的空间关系：
+不应把 `map`、`odom`、`base_link` 混成一个坐标系。它们表达不同层次的空间关系：
 
 - `map` 更像全局地图参考。
 - `odom` 更像短时间连续运动参考。
@@ -5367,7 +5367,7 @@ flowchart LR
   B --> H[RViz: RobotModel显示]
 ```
 
-这条链路也是本章排障的主线。RViz 不显示模型时，不要只盯着 RViz。要向前检查：`robot_description` 有没有加载？`robot_state_publisher` 有没有启动？`/tf` 有没有发布？Fixed Frame 是否选对？
+这条链路也是本章排障的主线。RViz 不显示模型时，不应只盯着 RViz。要向前检查：`robot_description` 有没有加载？`robot_state_publisher` 有没有启动？`/tf` 有没有发布？Fixed Frame 是否选对？
 
 ## 8.8 最小可运行实验：创建机器人描述包
 
@@ -5410,7 +5410,7 @@ rospack find my_robot_description
 正确输出应是：
 
 ```text
-/home/你的用户名/catkin_ws/src/my_robot_description
+/home/用户名/catkin_ws/src/my_robot_description
 ```
 
 ## 8.9 最小 URDF
@@ -5520,7 +5520,7 @@ sudo apt install -y liburdfdom-tools
 | `laser_link` | 激光雷达外壳 | 车体前上方红色圆柱 |
 | `base_to_laser origin xyz="0.2 0 0.23"` | 激光相对车体前方 0.2 m、高 0.23 m | 红色圆柱出现在车体前上方 |
 
-这就是“代码到可视化”的对应关系。不要把 URDF 当成一堆 XML，而要把每个 `origin` 都想象成一个坐标变换。
+这就是“代码到可视化”的对应关系。不应把 URDF 当成一堆 XML，而要把每个 `origin` 都想象成一个坐标变换。
 
 ## 8.10 启动 RViz 显示模型
 
@@ -5573,7 +5573,7 @@ RViz 中应看到类似下面的结构：
  left_wheel_link   right_wheel_link
 ```
 
-这不是精确比例图，而是帮助你核对空间关系：
+这不是精确比例图，而是用于辅助核对空间关系：
 
 - 激光雷达应在车体前上方。
 - 左右轮应分别在车体两侧。
@@ -5602,7 +5602,7 @@ rosrun tf tf_echo base_link laser_link
 | `rostopic echo /tf_static` | fixed joint 是否形成静态 TF |
 | `tf_echo base_link laser_link` | `base_link` 到 `laser_link` 是否存在可用变换 |
 
-如果 RViz 正常但命令异常，要以命令和日志继续追查。GUI 看到图只是结果，真正支撑它的是参数和 TF 数据。
+如果 RViz 正常但命令异常，要以命令和日志继续追查。GUI 看到图只是结果，实际支撑它的是参数和 TF 数据。
 
 ## 8.12 RViz 不是 Gazebo
 
@@ -5623,7 +5623,7 @@ flowchart LR
   E --> B
 ```
 
-你可以在 RViz 中看到机器人模型，但这不代表机器人在物理世界里能运动。要让机器人在 Gazebo 中真实运动，还需要 collision、inertial、控制插件、关节控制器等。第 9 章会使用 TurtleBot3 这类成熟仿真包，而不是从零手写完整物理插件。
+可以在 RViz 中看到机器人模型，但这不代表机器人在物理世界里能运动。要让机器人在 Gazebo 中真实运动，还需要 collision、inertial、控制插件、关节控制器等。第 9 章会使用 TurtleBot3 这类成熟仿真包，而不是从零手写完整物理插件。
 
 ## 8.13 最小可运行实验
 
@@ -5690,7 +5690,7 @@ rosrun tf tf_echo base_link laser_link
 | 轮子方向怪 | cylinder 默认轴向和期望不同 | 看 URDF 中 `rpy` | 调整 visual origin 的 rpy |
 | `robot_state_publisher` 不工作 | 包未安装或节点名错误 | `rosnode list`; `rosrun robot_state_publisher robot_state_publisher` | 安装 `ros-noetic-robot-state-publisher` |
 | `tf_echo` 报两个 frame 不连通 | frame 名写错或 TF 缺失 | `rostopic echo /tf_static` | 检查 link/joint 名称 |
-| Gazebo 不显示但 RViz 显示 | URDF 只有 visual，缺少仿真配置 | 不要只看 RViz | 后续添加 collision/inertial/plugin |
+| Gazebo 不显示但 RViz 显示 | URDF 只有 visual，缺少仿真配置 | 不应只看 RViz | 后续添加 collision/inertial/plugin |
 
 ### 排障树
 
@@ -5719,7 +5719,7 @@ flowchart TD
 6. `robot_state_publisher` 为什么需要 URDF 和 `/joint_states`？
 7. `joint_state_publisher` 在没有真实机器人时有什么作用？
 8. RViz 和 Gazebo 的根本区别是什么？
-9. 如果 RViz 报 `No transform from laser_link to base_link`，你会先检查什么？
+9. 如果 RViz 报 `No transform from laser_link to base_link`，应先检查什么？
 10. 为什么 RViz 中显示正常不代表 Gazebo 仿真一定正常？
 
 ### 参考答案
@@ -5754,7 +5754,7 @@ flowchart TD
 URDF -> robot_description -> robot_state_publisher -> /tf -> RViz
 ```
 
-后续进入 Gazebo 和移动机器人仿真时，你会看到同一套概念继续出现：底盘、轮子、激光雷达、里程计、地图和导航都依赖正确的坐标关系。
+后续进入 Gazebo 和移动机器人仿真时，可以看到同一套概念继续出现：底盘、轮子、激光雷达、里程计、地图和导航都依赖正确的坐标关系。
 
 ## 延伸阅读
 
@@ -5771,13 +5771,13 @@ URDF -> robot_description -> robot_state_publisher -> /tf -> RViz
 
 ## 本章解决什么问题
 
-前面你已经能写节点、组织 launch、显示机器人模型。本章进入移动机器人系统。移动机器人不再只是 talker/listener，而是由底盘、传感器、里程计、坐标变换、仿真环境和可视化工具组成。
+前面已经完成节点编写、launch 组织和机器人模型显示。本章进入移动机器人系统。移动机器人不再只是 talker/listener，而是由底盘、传感器、里程计、坐标变换、仿真环境和可视化工具组成。
 
-本章不讲复杂 SLAM 或导航算法推导。目标是让你理解 ROS 如何组织一个移动机器人系统：速度命令从哪里来，里程计在哪里发布，激光雷达数据是什么，Gazebo 和 RViz 各自做什么，TurtleBot3 这样的开源案例为什么适合作为学习平台。
+本章不讲复杂 SLAM 或导航算法推导。目标是理解 ROS 如何组织一个移动机器人系统：速度命令从哪里来，里程计在哪里发布，激光雷达数据是什么，Gazebo 和 RViz 各自做什么，TurtleBot3 这样的开源案例为什么适合作为学习平台。
 
-本章仍然坚持一个原则：先观察系统，再解释系统。不要一上来改导航参数，也不要直接复制大型 launch。先用 CLI 看清楚 `/cmd_vel`、`/odom`、`/scan`、`/tf`，再用 RViz 和 Gazebo 做可视化确认。
+本章仍然坚持一个原则：先观察系统，再解释系统。不应在开始阶段修改导航参数，也不应直接复制大型 launch。先用 CLI 看清楚 `/cmd_vel`、`/odom`、`/scan`、`/tf`，再用 RViz 和 Gazebo 做可视化确认。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 区分 Gazebo 仿真和 RViz 可视化。
 - 解释移动机器人系统中 `/cmd_vel`、`/odom`、`/scan`、`/tf` 的作用。
@@ -5804,7 +5804,7 @@ flowchart LR
   C --> H[键盘控制/导航节点]
 ```
 
-你要关注的不是“Gazebo 窗口能打开”，而是仿真节点是否真的和 ROS topic、TF、RViz 形成闭环。
+应关注的不是“Gazebo 窗口能打开”，而是仿真节点是否确实和 ROS topic、TF、RViz 形成闭环。
 
 ## 9.2 必须理解的概念
 
@@ -5888,7 +5888,7 @@ RViz 订阅 /odom /scan /tf /map 等数据显示
 | `/tf_static` | `tf2_msgs/TFMessage` | 坐标关系 | 静态坐标变换 |
 | `/map` | `nav_msgs/OccupancyGrid` | 地图输出 | 栅格地图 |
 
-先看 topic，再看 RViz，是本章的基本方法。因为 RViz 显示异常时，真正原因通常在 topic、消息类型、TF 或 Fixed Frame。
+先看 topic，再看 RViz，是本章的基本方法。因为 RViz 显示异常时，实际原因通常在 topic、消息类型、TF 或 Fixed Frame。
 
 ## 9.5 为什么推荐 TurtleBot3 作为学习案例
 
@@ -5916,7 +5916,7 @@ TurtleBot3 是广泛使用的开源移动机器人平台，资料、仿真、模
 
 ## 9.6 安装 TurtleBot3 仿真包
 
-TurtleBot3 仿真包有两条常见获取路径：官方源码路径和 apt 快捷路径。为了和 TurtleBot3 e-Manual 的 ROS1 Noetic 说明保持一致，本书建议课堂主线优先采用 noetic 分支源码安装；如果你的软件源中已经提供对应二进制包，也可以用 apt 快速安装。
+TurtleBot3 仿真包有两条常见获取路径：官方源码路径和 apt 快捷路径。为了和 TurtleBot3 e-Manual 的 ROS1 Noetic 说明保持一致，本书建议课堂主线优先采用 noetic 分支源码安装；如果当前软件源中已经提供对应二进制包，也可以用 apt 快速安装。
 
 ### 官方源码路径
 
@@ -5956,7 +5956,7 @@ rospack find turtlebot3_teleop
 
 ### apt 快捷路径
 
-如果你的 ROS 软件源中提供完整二进制包，可以直接尝试：
+如果当前 ROS 软件源中提供完整二进制包，可以直接尝试：
 
 ```bash
 sudo apt update
@@ -5987,7 +5987,7 @@ echo $ROS_DISTRO
 apt search ros-noetic-turtlebot3
 ```
 
-如果 apt 没有完整包，不要反复换命令猜测。优先回到上面的官方源码路径，确认分支是 `noetic`，确认工作空间已经 `catkin_make` 并 source。
+如果 apt 没有完整包，不应反复更换命令进行试探。优先回到上面的官方源码路径，确认分支是 `noetic`，确认工作空间已经 `catkin_make` 并 source。
 
 ## 9.7 启动 Gazebo 仿真
 
@@ -6044,7 +6044,7 @@ rostopic echo /cmd_vel
 rostopic info /cmd_vel
 ```
 
-你应关注：
+应关注：
 
 - Publishers 中是否有键盘控制节点。
 - Subscribers 中是否有 Gazebo 或底盘控制相关节点。
@@ -6100,7 +6100,7 @@ rostopic hz /scan
 | `nav_msgs/Odometry` | `pose.pose`、`twist.twist`、`header.frame_id`、`child_frame_id` | 位姿、速度、所属 frame |
 | `sensor_msgs/LaserScan` | `angle_min/max`、`ranges`、`header.frame_id` | 扫描角度范围、距离数组、激光 frame |
 
-如果只会看数值，不看 `frame_id`，后面进入建图和导航时会很容易迷失。
+如果只会看数值，不看 `frame_id`，后面进入建图和导航时会容易迷失。
 
 ## 9.10 用 RViz 观察
 
@@ -6111,7 +6111,7 @@ export TURTLEBOT3_MODEL=burger
 roslaunch turtlebot3_gazebo turtlebot3_gazebo_rviz.launch
 ```
 
-如果该 launch 文件在你的安装中不存在，可手动运行：
+如果该 launch 文件在当前安装中不存在，可手动运行：
 
 ```bash
 rviz
@@ -6142,7 +6142,7 @@ rostopic echo /tf
 
 ### 预期成果图
 
-在 RViz 中，你应能得到下面这种逻辑视图：
+在 RViz 中，应能得到下面这种逻辑视图：
 
 ```text
 RViz 视图
@@ -6153,7 +6153,7 @@ RViz 视图
   Odometry: 机器人局部运动轨迹或箭头
 ```
 
-在 Gazebo 中，你应能看到：
+在 Gazebo 中，应能看到：
 
 ```text
 Gazebo 视图
@@ -6267,7 +6267,7 @@ catkin_make
 source ~/catkin_ws/devel/setup.bash
 ```
 
-如果你的软件源中已经有完整二进制包，也可以使用 apt 快捷路径：
+如果当前软件源中已经有完整二进制包，也可以使用 apt 快捷路径：
 
 ```bash
 sudo apt update
@@ -6360,7 +6360,7 @@ rosbag info tb3_intro.bag
 | `/cmd_vel` 有数据但机器人不动 | 仿真控制插件或 topic 连接问题 | `rostopic info /cmd_vel` | 确认 Gazebo 侧订阅者存在 |
 | RViz Fixed Frame 报错 | TF 不完整或 frame 名错 | `rosrun tf view_frames` | 改 Fixed Frame 或补 TF |
 | `/scan` 没数据 | 仿真未启动或传感器插件未运行 | `rostopic info /scan` | 检查 Gazebo 日志和模型 |
-| 仿真很卡 | 图形性能不足 | `top`; 观察 Gazebo 实时率 | 降低负载，换原生 Ubuntu |
+| 仿真运行缓慢 | 图形性能不足 | `top`; 观察 Gazebo 实时率 | 降低负载，换原生 Ubuntu |
 | bag 文件巨大 | 录制过多 topic | `rosbag info` | 只录关键 topic |
 
 ### 排障树
@@ -6385,13 +6385,13 @@ flowchart TD
 1. RViz 和 Gazebo 的根本区别是什么？
 2. `/cmd_vel`、`/odom`、`/scan` 分别属于控制输入还是状态/传感器输出？
 3. 为什么移动机器人必须维护 TF？
-4. 如果 `/cmd_vel` 有数据但机器人不动，你会按什么顺序排查？
-5. `rostopic hz /scan` 能帮助你判断什么？
+4. 如果 `/cmd_vel` 有数据但机器人不动，应按什么顺序排查？
+5. `rostopic hz /scan` 能帮助判断什么？
 6. SLAM、定位、导航三者的关系是什么？
 7. 为什么本书不在本章展开复杂导航算法？
 8. 为什么 TurtleBot3 适合作为教学案例？
 9. bag 能记录移动机器人实验的哪些内容？不能记录哪些内容？
-10. Gazebo 很卡时，为什么不能立刻判断 ROS 通信出错？
+10. Gazebo 运行缓慢时，为什么不能立刻判断 ROS 通信出错？
 
 ### 参考答案
 
@@ -6417,15 +6417,15 @@ flowchart TD
 
 ## 9.16 本章小结
 
-本章把前面的 ROS 基础能力应用到移动机器人系统。你已经看到，真实机器人系统仍然可以分解为节点、topic、参数、TF 和 launch。区别只是数据类型更复杂，节点更多，坐标关系更重要。
+本章把前面的 ROS 基础能力应用到移动机器人系统。可以看到，实际机器人系统仍然可以分解为节点、topic、参数、TF 和 launch。区别只是数据类型更复杂，节点更多，坐标关系更重要。
 
-进入综合项目之前，你应熟悉以下观察路径：
+进入综合项目之前，应熟悉以下观察路径：
 
 ```text
 rosnode list -> rostopic list -> rostopic info -> rostopic echo/hz -> rosrun tf view_frames -> rqt_graph -> RViz/Gazebo
 ```
 
-不要直接改参数碰运气。先看系统真实状态。
+不应采用试探式方式直接修改参数。应先观察系统实际状态。
 
 本章最重要的能力不是“启动某个世界文件”，而是能把移动机器人仿真拆成可观察链路：
 
@@ -6456,9 +6456,9 @@ Gazebo 世界 -> 传感器插件 -> /scan 或 /camera/... -> RViz/算法节点�
 
 项目目标不是堆功能，也不是一步到位实现完整自动导航。目标是建立一个能启动、能观察、能控制、能记录、能复现的 ROS1 系统。一个项目如果只能在作者电脑上靠手动开多个终端运行，不能算合格的 ROS 工程。
 
-本章给出综合项目的结构、交付物、验收流程和排障路径。你可以基于 TurtleBot3 仿真，也可以基于前面自定义的 `my_robot_description` 继续扩展。关键是系统必须清楚、可解释、可复现。
+本章给出综合项目的结构、交付物、验收流程和排障路径。项目可以基于 TurtleBot3 仿真，也可以基于前面自定义的 `my_robot_description` 继续扩展。关键是系统必须清楚、可解释、可复现。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 设计一个小型 ROS1 移动机器人仿真项目目录。
 - 把模型、启动、参数、脚本和记录流程分开。
@@ -6484,7 +6484,7 @@ flowchart TB
   H --> I[综合项目<br/>启动/观察/控制/记录/复现]
 ```
 
-如果你无法解释综合项目中的每个包、每个节点、每条关键 topic 和每个参数，那么项目即使能启动，也只是“跑起来了”，还不算真正学会。
+如果无法解释综合项目中的每个包、每个节点、每条关键 topic 和每个参数，那么项目即使能启动，也只是“能够启动”，还不算达到学习要求。
 
 ## 10.2 项目目标与边界
 
@@ -6542,7 +6542,7 @@ flowchart LR
 | `my_robot_bringup` | 总 launch、参数、组合启动 | 不放大量业务算法代码 |
 | `my_robot_tools` | 小工具节点、测试脚本 | 不放机器人结构描述 |
 
-这个结构参考了很多成熟 ROS 项目的组织方式：描述包负责“机器人长什么样”，bringup 包负责“系统怎样启动”，tools 或 demos 包负责“辅助测试和演示”。这比把所有文件塞进一个包更容易维护。
+这个结构参考了很多成熟 ROS 项目的组织方式：描述包负责“机器人长什么样”，bringup 包负责“系统怎样启动”，tools 或 demos 包负责“辅助测试和演示”。这比把所有文件放入一个包更容易维护。
 
 ## 10.4 推荐项目结构
 
@@ -6582,7 +6582,7 @@ catkin_ws/
 - `bringup`：只放系统启动入口、参数和组合 launch。
 - `tools`：放简单工具节点。
 
-不要把 URDF、控制脚本、bag 命令、RViz 配置全部塞进一个包。一个目录能跑，不代表它适合教学、协作和复现。
+不应把 URDF、控制脚本、bag 命令、RViz 配置全部放入一个包。一个目录能跑，不代表它适合教学、协作和复现。
 
 ## 10.5 创建 bringup 包
 
@@ -6611,7 +6611,7 @@ rospack find my_robot_bringup
 正确输出应指向：
 
 ```text
-/home/你的用户名/catkin_ws/src/my_robot_bringup
+/home/用户名/catkin_ws/src/my_robot_bringup
 ```
 
 如果找不到，回到第 5 章检查：包是否在 `src/`，是否编译，是否 source 了 `devel/setup.bash`。
@@ -6730,7 +6730,7 @@ catkin_make
 source ~/catkin_ws/devel/setup.bash
 ```
 
-这个节点不是复杂控制器，只是一个可测试的小工具：发布几秒速度，然后停止。它帮助你验证 `/cmd_vel` 链路是否有效。加入限幅是为了养成安全习惯，即使是在仿真中也不应该无约束地发布速度。
+这个节点不是复杂控制器，只是一个可测试的小工具：发布几秒速度，然后停止。它用于验证 `/cmd_vel` 链路是否有效。加入限幅是为了养成安全习惯，即使是在仿真中也不应该无约束地发布速度。
 
 ## 10.8 simulation.launch
 
@@ -6755,7 +6755,7 @@ catkin_make
 source ~/catkin_ws/devel/setup.bash
 ```
 
-如果你的 ROS 软件源已经提供完整二进制包，也可以用：
+如果当前 ROS 软件源已经提供完整二进制包，也可以用：
 
 ```bash
 sudo apt install -y ros-noetic-turtlebot3 ros-noetic-turtlebot3-simulations
@@ -6927,7 +6927,7 @@ roslaunch my_robot_bringup record.launch bag_name:=textbook_bot_run
 - 为什么录这些 topic。
 - 回放时需要启动哪些订阅者。
 - 哪些 topic 是仿真产生，哪些是控制输入。
-- bag 文件是否纳入提交。如果文件很大，应只提交说明，不提交大文件。
+- bag 文件是否纳入提交。如果文件较大，应只提交说明，不提交大文件。
 
 ## 10.11 项目数据流
 
@@ -7008,7 +7008,7 @@ Gazebo 中观察：
 
 ## 项目目标
 
-说明本项目要完成什么，不要只写“学习 ROS”。
+说明本项目要完成什么，不应只写“学习 ROS”。
 
 ## 环境
 
@@ -7065,7 +7065,7 @@ rqt_graph
 列出本项目中最容易发生的 3-5 个错误和检查命令。
 ````
 
-文档不是形式主义。它迫使你解释系统结构，也让别人能复现你的项目。
+文档不是形式主义。它迫使项目作者解释系统结构，也让其他人能复现项目。
 
 ## 10.14 最小可运行实验与验收流程
 
@@ -7166,7 +7166,7 @@ rosbag play textbook_bot_run.bag
 | `/odom` 无数据 | 仿真未运行或控制器异常 | `rostopic info /odom` | 查看 Gazebo 终端日志 |
 | RViz 不显示激光 | Fixed Frame 或 topic 选择错误 | `rostopic list`; RViz Displays | 设置正确 frame 和 LaserScan topic |
 | bag 回放无效果 | 没有启动订阅者，或 topic 名不匹配 | `rostopic list`; `rosbag info` | 启动需要的显示/处理节点 |
-| 换机器运行失败 | 依赖未写入 README 或包结构混乱 | `rosdep check --from-paths src --ignore-src` | 补依赖说明和 package.xml |
+| 换机器运行失败 | 依赖未写入 README 或包结构不清 | `rosdep check --from-paths src --ignore-src` | 补依赖说明和 package.xml |
 
 ### 总排障流程
 
@@ -7193,16 +7193,16 @@ flowchart TD
 2. 为什么建议把 description、bringup、tools 分成不同包？
 3. `/cmd_vel` 有数据是否一定说明机器人会动？为什么？
 4. 一个 bag 文件能复现实验的哪些部分？不能复现哪些部分？
-5. 如果 RViz 报 Fixed Frame 错误，你会如何排查？
+5. 如果 RViz 报 Fixed Frame 错误，应如何排查？
 6. 为什么项目 README 要写节点、topic、参数表？
 7. 什么样的项目算“只能在作者电脑上运行”？
-8. 如果你要把本项目交给同学运行，最少要提供哪些信息？
+8. 如果要把本项目交给同学运行，最少要提供哪些信息？
 9. 为什么综合项目不要求完整自动导航？
-10. 如何判断一个项目是“功能堆砌”还是“系统结构清楚”？
+10. 如何判断一个项目是“功能堆叠”还是“系统结构清楚”？
 
 ### 参考答案
 
-1. 统一启动入口能把节点、参数、命名空间、仿真和可视化配置固化下来，避免靠作者记忆手动打开多个终端。它让别人可以用同一条命令复现主体系统，也让排障有明确起点。没有统一入口的项目，很难判断失败是配置问题、命令遗漏还是代码问题。
+1. 统一启动入口能把节点、参数、命名空间、仿真和可视化配置固化下来，避免靠作者记忆手动打开多个终端。它让别人可以用同一条命令复现主体系统，也让排障有明确起点。没有统一入口的项目，较难判断失败是配置问题、命令遗漏还是代码问题。
 
 2. `description` 放模型和可视化配置，`bringup` 放系统启动和参数，`tools` 放测试脚本和辅助节点。这样分包后，每个包职责清楚，修改 URDF 不会影响启动逻辑，修改工具脚本也不会污染模型描述。成熟 ROS 项目常用类似分层，便于协作和复用。
 
@@ -7212,7 +7212,7 @@ flowchart TD
 
 5. 先看 RViz 中 Fixed Frame 写的 frame 名是否真实存在；再用 `rosrun tf view_frames` 或 `rostopic echo /tf`、`/tf_static` 检查 TF 树；然后检查 RobotModel、LaserScan 或 Odometry 的 `frame_id` 是否能连接到 Fixed Frame。若是 TurtleBot3，常见选择是 `odom` 或 `base_link`，建图导航时才常用 `map`。
 
-6. README 中的节点、topic、参数表让项目结构可检查、可交流、可复现。别人不应该通过猜 launch 文件来理解系统，而应能从 README 知道每个节点做什么、发布和订阅什么、参数在哪里、如何录 bag、常见错误怎么排查。写文档也是检验自己是否真正理解系统的方式。
+6. README 中的节点、topic、参数表让项目结构可检查、可交流、可复现。别人不应该通过猜 launch 文件来理解系统，而应能从 README 知道每个节点做什么、发布和订阅什么、参数在哪里、如何录 bag、常见错误怎么排查。写文档也是检验自己是否准确理解系统的方式。
 
 7. 只能在作者电脑上运行的项目通常依赖隐含环境：没有写依赖包、没有统一 launch、参数散落在终端历史里、路径写死到个人目录、bag 和 RViz 配置缺失、README 只写一句“运行即可”。换一台机器后，如果别人无法按文档安装、启动、观察和排障，就说明可复现性不合格。
 
@@ -7220,11 +7220,11 @@ flowchart TD
 
 9. 完整自动导航涉及地图、定位、代价地图、全局规划、局部规划、恢复行为和大量参数调优，已经超出 ROS1 入门上册目标。综合项目的重点是证明学生能组织系统、观察数据、控制机器人、记录实验和解释结构。先把工程闭环做稳，再深入导航算法更合理。
 
-10. 功能堆砌的项目通常 launch 很多东西但解释不清节点关系、topic 方向、参数来源和错误定位；系统结构清楚的项目能画出数据流，能说明每个包职责，能用 CLI 验证关键接口，能录制和回放数据，能让别人按 README 复现。判断标准不是功能数量，而是结构是否可解释、可观察、可维护。
+10. 功能堆叠的项目通常 launch 很多东西但解释不清节点关系、topic 方向、参数来源和错误定位；系统结构清楚的项目能画出数据流，能说明每个包职责，能用 CLI 验证关键接口，能录制和回放数据，能让别人按 README 复现。判断标准不是功能数量，而是结构是否可解释、可观察、可维护。
 
 ## 10.18 本章小结
 
-本章把全书上册内容合成为一个工程闭环。你现在应理解：ROS 学习的目标不是记住一堆命令，而是能组织一个可解释、可观察、可复现的机器人软件系统。
+本章把全书上册内容合成为一个工程闭环。读者现在应理解：ROS 学习的目标不是记住一堆命令，而是能组织一个可解释、可观察、可复现的机器人软件系统。
 
 一个合格的 ROS1 入门项目至少要能回答：
 
@@ -7252,3 +7252,5 @@ flowchart TD
 - rosbag 文档：https://mirror.umd.edu/roswiki/rosbag.html
 - Autolabor ROS 文档：https://autolaborcenter.github.io/pm1-docs-sphinx/user-guide/using-ros/doc.html
 - 鱼香 ROS 官网与论坛：https://fishros.org.cn/
+
+---

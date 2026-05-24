@@ -2,13 +2,13 @@
 
 ## 本章解决什么问题
 
-前面你已经能创建工作空间和功能包。本章开始自己写 ROS 节点。节点是 ROS 系统里真正执行计算的进程：发布者产生数据，订阅者消费数据，服务端处理请求，客户端发出请求。
+前面已经完成工作空间和功能包的创建。本章开始编写 ROS 节点。节点是 ROS 系统里实际执行计算的进程：发布者产生数据，订阅者消费数据，服务端处理请求，客户端发出请求。
 
 本章采用“同一个通信思想，Python 和 C++ 各实现一遍”的方式。先用 Python 建立通信直觉，再用 C++ 理解编译、链接和类型约束。这样安排不是说 Python 比 C++ 更重要，而是为了避免初学者同时被 ROS 通信、CMake、头文件、链接错误和类型系统淹没。
 
-本章的核心目标不是背 API，而是理解一个 ROS 节点最基本的生命周期：初始化节点、创建通信接口、循环发布或等待回调、输出日志、在 ROS 关闭时退出。你还要学会用 CLI 验证自己的程序是否真的进入 ROS 计算图。
+本章的核心目标不是背 API，而是理解一个 ROS 节点最基本的生命周期：初始化节点、创建通信接口、循环发布或等待回调、输出日志、在 ROS 关闭时退出。还需要学会用 CLI 验证程序是否实际进入 ROS 计算图。
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 用 `rospy` 写发布者和订阅者。
 - 用 `roscpp` 写发布者和订阅者。
@@ -35,7 +35,7 @@ flowchart LR
   F --> G
 ```
 
-你应该把本章看成 ROS 编程的最低闭环：写代码、编译或授权、运行节点、观察图、定位错误。
+应把本章看成 ROS 编程的最低闭环：写代码、编译或授权、运行节点、观察图、定位错误。
 
 ## 6.2 必须理解的概念
 
@@ -62,7 +62,7 @@ flowchart LR
 | 常见用途 | 实验脚本、配置节点、数据处理原型 | 控制、驱动、实时性更高的模块 |
 | 本章目标 | 建立通信直觉 | 理解工程构建与类型约束 |
 
-初学时不要把“Python 能跑”误解为“ROS 工程只需要 Python”，也不要把“C++ 更快”误解为“所有节点都必须用 C++”。真正的工程选择取决于频率、延迟、硬件接口、团队维护能力和项目规模。
+初学时不应把“Python 能跑”误解为“ROS 工程只需要 Python”，也不应把“C++ 更快”误解为“所有节点都必须用 C++”。工程选择取决于频率、延迟、硬件接口、团队维护能力和项目规模。
 
 ## 6.4 发布订阅模型回顾
 
@@ -253,7 +253,7 @@ rqt_graph
 - `rostopic info /chatter` 显示一个 publisher 和至少一个 subscriber。
 - `rqt_graph` 显示 `/talker` 通过 `/chatter` 连接 `/listener`。
 
-如果 `listener.py` 没有输出，先不要改代码，先看图和 topic：
+如果 `listener.py` 没有输出，暂不应改代码，先看图和 topic：
 
 ```bash
 rostopic info /chatter
@@ -310,7 +310,7 @@ int main(int argc, char** argv) {
 - `ros::NodeHandle nh` 是访问 ROS 通信接口的句柄。
 - `nh.advertise<std_msgs::String>("chatter_cpp", 10)` 创建发布者。
 - `ros::ok()` 类似 Python 中的 `not rospy.is_shutdown()`。
-- `ros::spinOnce()` 处理一次回调。这个发布者暂时没有订阅回调，写上它是为了让你熟悉常见循环结构。
+- `ros::spinOnce()` 处理一次回调。这个发布者暂时没有订阅回调，写上它是为了便于熟悉常见循环结构。
 - `ROS_INFO` 是 C++ 里的 ROS 日志宏。
 
 ## 6.10 C++ 订阅者
@@ -398,7 +398,7 @@ rosrun beginner_tutorials cpp_listener
 
 ## 6.12 发布订阅实验复盘
 
-| 观察命令 | 你应该看到什么 | 说明什么 |
+| 观察命令 | 应能看到什么 | 说明什么 |
 |---|---|---|
 | `rosnode list` | `/talker`、`/listener` 或 `/cpp_talker`、`/cpp_listener` | 节点已加入计算图 |
 | `rostopic list` | `/chatter` 或 `/chatter_cpp` | topic 已注册 |
@@ -408,7 +408,7 @@ rosrun beginner_tutorials cpp_listener
 | `rosmsg show std_msgs/String` | `string data` | 消息字段结构 |
 | `rqt_graph` | 节点通过 topic 相连 | 计算图结构正确 |
 
-如果你只看终端打印，很容易误判。例如发布者在打印日志，不代表订阅者已经收到；订阅者没输出，也不一定是代码错，可能是 topic 名或类型不一致。CLI 观察是 ROS 编程的一部分。
+如果只看终端打印，容易误判。例如发布者在打印日志，不代表订阅者已经收到；订阅者没输出，也不一定是代码错，可能是 topic 名或类型不一致。CLI 观察是 ROS 编程的一部分。
 
 ## 6.13 Service 最小概念
 
@@ -652,7 +652,7 @@ rosrun beginner_tutorials add_two_ints_client.py 10 32
 [INFO] ... 10 + 32 = 42
 ```
 
-`rospy.wait_for_service("add_two_ints")` 很重要。没有它时，客户端可能在服务端还没注册完成之前就发起调用，导致偶发失败。真实系统中，等待 topic/service/action 就绪比依赖启动顺序更可靠。
+`rospy.wait_for_service("add_two_ints")` 重要。没有它时，客户端可能在服务端还没注册完成之前就发起调用，导致偶发失败。真实系统中，等待 topic/service/action 就绪比依赖启动顺序更可靠。
 
 ## 6.17 C++ service server
 
@@ -749,7 +749,7 @@ add_dependencies(cpp_add_two_ints_client
 target_link_libraries(cpp_add_two_ints_client ${catkin_LIBRARIES})
 ```
 
-这里的 `add_dependencies` 很关键。因为 `beginner_tutorials/AddTwoInts.h` 是根据 `.srv` 生成的头文件，C++ 节点必须等服务头文件生成后再编译。
+这里的 `add_dependencies` 关键。因为 `beginner_tutorials/AddTwoInts.h` 是根据 `.srv` 生成的头文件，C++ 节点必须等服务头文件生成后再编译。
 
 编译：
 
@@ -780,7 +780,7 @@ rosrun beginner_tutorials cpp_add_two_ints_client 7 8
 
 ## 6.18 Service 实验复盘
 
-| 你做了什么 | 系统发生了什么 | 验证方式 |
+| 操作内容 | 系统发生了什么 | 验证方式 |
 |---|---|---|
 | 创建 `srv/AddTwoInts.srv` | 定义请求和响应结构 | `cat srv/AddTwoInts.srv` |
 | 修改 `package.xml` | 声明消息生成和运行依赖 | `grep message package.xml` |
@@ -795,7 +795,7 @@ Service 的错误通常分成三类，必须分清楚：
 2. **服务没有注册**：`rossrv show` 成功，但 `rosservice list` 看不到 `/add_two_ints`。这说明类型已经生成，问题在 server 节点没有启动、启动后崩溃、服务名写错或没有连接到同一个 Master。
 3. **调用参数或逻辑错误**：`rosservice list` 能看到服务，但 `rosservice call /add_two_ints "a: 1 b: 2"` 报类型或字段错误，或者返回值不符合预期。这时才检查请求字段、client 传参、server 回调逻辑。
 
-这三类错误的检查命令不同。不要在类型未生成时反复启动 server，也不要在服务未注册时修改 `.srv` 文件。正确顺序是：
+这三类错误的检查命令不同。不应在类型未生成时反复启动 server，也不应在服务未注册时修改 `.srv` 文件。正确顺序是：
 
 ```text
 rossrv show 包/服务类型 -> rosservice list -> rosservice type 服务名 -> rosservice call 服务名 参数
@@ -906,7 +906,7 @@ rqt_graph
 | Python 无法导入 `beginner_tutorials.srv` | 没编译或没 source | `rossrv show beginner_tutorials/AddTwoInts` | `catkin_make` 后重新 source |
 | listener 没收到消息 | topic 名不一致 | `rostopic list`; `rqt_graph` | 确认发布和订阅 topic 相同 |
 | `rostopic echo` 没输出 | 发布者没运行或消息频率太低 | `rostopic info /chatter` | 启动发布者，检查 publishers |
-| service call 卡住 | server 未启动或服务名不一致 | `rosservice list` | 启动 server，确认服务名 |
+| service call 长时间无响应 | server 未启动或服务名不一致 | `rosservice list` | 启动 server，确认服务名 |
 
 ### 排障顺序
 
@@ -938,9 +938,9 @@ flowchart TD
 7. Topic 名相同但消息类型不同会发生什么？
 8. Service 和 topic 的本质差异是什么？
 9. 修改 `.srv` 文件后为什么必须重新 `catkin_make` 并重新 source？
-10. 如果客户端调用 service 卡住，你会先查哪些命令？
+10. 如果客户端调用 service 后长时间无响应，应先检查哪些命令？
 11. 为什么 C++ service 节点需要 `add_dependencies`？
-12. 你如何判断一个节点没有收到数据是发布者问题还是订阅者问题？
+12. 如何判断一个节点没有收到数据是发布者问题还是订阅者问题？
 
 ### 参考答案
 
@@ -948,7 +948,7 @@ flowchart TD
 
 2. `rosrun` 运行 Python 脚本时，本质上要把脚本当作可执行文件启动。没有执行权限时，Linux 会拒绝执行，即使脚本内容正确也会报 `Permission denied`。通常用 `chmod +x scripts/*.py` 解决，同时确保第一行 shebang 是 `#!/usr/bin/env python3`。
 
-3. C++ 源文件不会被 catkin 自动猜测并编译。你必须在 `CMakeLists.txt` 中写 `add_executable` 告诉 CMake 要生成哪个可执行文件，再用 `target_link_libraries` 链接 ROS 库。否则 `catkin_make` 可能成功结束，但不会生成你期望的 C++ 节点。
+3. C++ 源文件不会被 catkin 自动猜测并编译。必须在 `CMakeLists.txt` 中写 `add_executable` 告诉 CMake 要生成哪个可执行文件，再用 `target_link_libraries` 链接 ROS 库。否则 `catkin_make` 可能成功结束，但不会生成预期的 C++ 节点。
 
 4. `rospy.spin()` 让订阅节点保持运行并处理回调，否则程序可能创建订阅者后直接退出。`rate.sleep()` 用在循环发布中，用于按指定频率休眠，控制发布节奏。一个解决“等待回调”，一个解决“循环频率”。
 
@@ -958,11 +958,11 @@ flowchart TD
 
 7. ROS 要求同一个 topic 上发布者和订阅者的消息类型一致。如果 topic 名相同但类型不同，连接通常无法正常建立，工具会显示类型不匹配或订阅者收不到数据。排查时要同时用 `rostopic type 话题名` 和代码中的消息类型核对。
 
-8. Topic 是持续、异步的数据流，适合传感器、状态、速度命令等；Service 是一次请求、一次响应，适合查询、重置、计算等离散操作。Topic 不要求接收方立即回应，service 客户端通常会等待服务端响应。选错通信方式会让系统语义混乱，例如用 service 传激光数据就不合适。
+8. Topic 是持续、异步的数据流，适合传感器、状态、速度命令等；Service 是一次请求、一次响应，适合查询、重置、计算等离散操作。Topic 不要求接收方立即回应，service 客户端通常会等待服务端响应。选错通信方式会让系统语义不清，例如用 service 传激光数据就不合适。
 
 9. `.srv` 文件只是接口定义，必须经过 catkin 的消息生成流程，才能生成 Python 可导入模块和 C++ 头文件。修改后如果不重新 `catkin_make`，代码仍看不到新生成类型；不重新 source，当前终端也可能找不到生成结果。因此改 `.srv` 后要编译并重新加载工作空间环境。
 
-10. 先查 `rosservice list` 看服务是否注册；再查 `rosservice type /服务名` 和 `rossrv show 类型` 看类型是否正确；用 `rosnode list` 看 server 节点是否运行；必要时看 server 终端日志。如果服务不存在，客户端卡住通常是在等待服务；如果服务存在但调用失败，要查请求参数和服务端异常。
+10. 先查 `rosservice list` 看服务是否注册；再查 `rosservice type /服务名` 和 `rossrv show 类型` 看类型是否正确；用 `rosnode list` 看 server 节点是否运行；必要时查看 server 终端日志。如果服务不存在，客户端通常是在等待服务；如果服务存在但调用失败，要检查请求参数和服务端异常。
 
 11. `AddTwoInts.h` 这类 C++ 头文件是由 `.srv` 生成的，不是源码目录中一开始就存在的文件。`add_dependencies` 告诉 CMake：编译 service 节点前，必须先完成消息/服务代码生成。否则可能出现偶发的“找不到生成头文件”或并行构建顺序错误。
 
@@ -970,7 +970,7 @@ flowchart TD
 
 ## 6.22 本章小结
 
-本章完成了第一个自写 ROS 节点闭环。你现在应该理解：ROS 节点不是孤立程序，而是计算图中的参与者。写节点时要同时考虑代码、包结构、构建规则、运行环境和观察工具。
+本章完成了第一个自写 ROS 节点闭环。读者现在应理解：ROS 节点不是孤立程序，而是计算图中的参与者。写节点时要同时考虑代码、包结构、构建规则、运行环境和观察工具。
 
 后续写更复杂的机器人程序时，调试顺序仍然不变：
 

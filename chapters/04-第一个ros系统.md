@@ -1,14 +1,14 @@
-﻿# 第 4 章 第一个 ROS 系统
+# 第 4 章 第一个 ROS 系统
 
 ## 本章解决什么问题
 
-前两章你已经知道 ROS 的概念，也完成了安装。本章要让 ROS 从“术语”变成“可观察系统”。我们使用 `turtlesim`，不是因为小乌龟本身重要，而是因为它足够小，能清楚展示节点、话题、消息和计算图。
+前两章已经介绍了 ROS 的概念，并完成了安装。本章要让 ROS 从“术语”变成“可观察系统”。本章使用 `turtlesim`，不是因为模拟海龟本身重要，而是因为它足够小，能清楚展示节点、话题、消息和计算图。
 
-成熟 ROS 入门教程通常都会从 turtlesim 开始。原因很简单：它能在几分钟内让你看到一个完整的 ROS 闭环：一个节点提供仿真窗口，一个节点发布速度命令，两个节点通过 topic 解耦，CLI 和 rqt 工具可以观察整个系统。
+成熟 ROS 入门教程通常都会从 turtlesim 开始。原因在于：它能在几分钟内呈现一个完整的 ROS 闭环：一个节点提供仿真窗口，一个节点发布速度命令，两个节点通过 topic 解耦，CLI 和 rqt 工具可以观察整个系统。
 
-本章的重点不是“用键盘控制乌龟”，而是学会问：有哪些节点？哪些 topic？消息类型是什么？数据从哪里流向哪里？如果系统不动，我先检查什么？
+本章的重点不是“用键盘控制 turtlesim 模拟海龟”，而是学会提出系统观察问题：有哪些节点？哪些 topic？消息类型是什么？数据从哪里流向哪里？如果系统不动，应先检查什么？
 
-## 学完以后你应该能做到
+## 学习完成后应达到的能力
 
 - 启动 `roscore`、`turtlesim_node`、`turtle_teleop_key`。
 - 使用 `rosnode list` 和 `rosnode info` 查看节点。
@@ -30,19 +30,19 @@ flowchart LR
     D --> F[第6章 自己写节点]
 ```
 
-如果本章只做到“能让小乌龟动起来”，学习是不完整的。真正目标是能解释这只小乌龟背后的 ROS 结构。你要把窗口中看到的运动，映射到节点、topic、消息类型和数据流。
+如果本章只做到“能让 turtlesim 模拟海龟运动”，学习是不完整的。核心目标是能解释该现象背后的 ROS 结构。读者需要把窗口中看到的运动，映射到节点、topic、消息类型和数据流。
 
 ## 4.2 为什么用 turtlesim
 
-真实机器人系统包含驱动、控制器、传感器、坐标变换、地图和导航，初学者一开始很难判断错误来自哪里。turtlesim 则把问题简化到最低：
+实际机器人系统包含驱动、控制器、传感器、坐标变换、地图和导航，初学者一开始较难判断错误来自哪里。turtlesim 则把问题简化到最低：
 
 - 一个二维窗口。
-- 一个可控制的小乌龟。
+- 一个可控制的 turtlesim 模拟海龟。
 - 一个速度命令 topic。
 - 一个位姿反馈 topic。
 - 一个键盘控制节点。
 
-这个系统足够小，但 ROS 通信机制是真实的。你在 turtlesim 中学会的观察方法，后续可以直接迁移到移动机器人：
+这个系统足够小，但 ROS 通信机制是真实的。读者在 turtlesim 中学会的观察方法，后续可以直接迁移到移动机器人：
 
 | turtlesim | 移动机器人类比 | 共同点 |
 |---|---|---|
@@ -54,22 +54,22 @@ flowchart LR
 
 ### 一个重要提醒
 
-不要因为 turtlesim 简单就轻视它。很多真实系统的问题，缩小后和 turtlesim 一样：
+不应因为 turtlesim 简单就轻视它。很多真实系统的问题，缩小后和 turtlesim 一样：
 
 - 控制节点有没有发布 `/cmd_vel`？
 - 底盘节点有没有订阅 `/cmd_vel`？
 - 消息类型是不是 `geometry_msgs/Twist`？
 - 反馈 topic 有没有数据？
-- 图里看到的连接和你以为的一样吗？
+- 图里看到的连接是否符合预期？
 
 ## 4.3 本章必须理解的概念
 
 | 概念 | 简明定义 | 容易误解的点 | 最小观察方法 |
 |---|---|---|---|
-| `turtlesim_node` | 小乌龟仿真节点 | 它不是 ROS Master | `rosnode info /turtlesim` |
+| `turtlesim_node` | turtlesim 仿真节点 | 它不是 ROS Master | `rosnode info /turtlesim` |
 | `turtle_teleop_key` | 键盘控制节点 | 只有终端获得焦点时才响应按键 | `rosnode info /teleop_turtle` |
-| `/turtle1/cmd_vel` | 控制乌龟速度的 topic | 不是键盘节点直接调用仿真函数 | `rostopic echo /turtle1/cmd_vel` |
-| `/turtle1/pose` | 乌龟当前位姿 topic | 不是命令，而是状态反馈 | `rostopic echo /turtle1/pose` |
+| `/turtle1/cmd_vel` | 控制 turtlesim 模拟海龟速度的 topic | 不是键盘节点直接调用仿真函数 | `rostopic echo /turtle1/cmd_vel` |
+| `/turtle1/pose` | turtlesim 模拟海龟当前位姿 topic | 不是命令，而是状态反馈 | `rostopic echo /turtle1/pose` |
 | `geometry_msgs/Twist` | 速度消息类型 | 字段结构必须写对 | `rosmsg show geometry_msgs/Twist` |
 | `rqt_graph` | 计算图可视化工具 | 图不刷新时不等于系统坏了 | 点击刷新 |
 
@@ -87,9 +87,9 @@ flowchart LR
     G -.观察节点关系.-> S
 ```
 
-这张图里，键盘控制节点没有直接调用 turtlesim 的内部函数。它只是把按键转换成速度消息，发布到 `/turtle1/cmd_vel`。turtlesim 订阅这个 topic，收到速度后更新小乌龟状态，再发布 `/turtle1/pose`。
+这张图里，键盘控制节点没有直接调用 turtlesim 的内部函数。它只是把按键转换成速度消息，发布到 `/turtle1/cmd_vel`。turtlesim 订阅这个 topic，收到速度后更新模拟海龟状态，再发布 `/turtle1/pose`。
 
-你后续看到移动机器人时，也可以画类似图：
+后续分析移动机器人时，也可以画类似图：
 
 ```text
 teleop -> /cmd_vel -> base_driver -> /odom
@@ -139,7 +139,7 @@ source /opt/ros/noetic/setup.bash
 rosrun turtlesim turtle_teleop_key
 ```
 
-让终端 3 保持焦点，按方向键控制乌龟。
+让终端 3 保持焦点，按方向键控制 turtlesim 模拟海龟。
 
 终端 4：观察系统。
 
@@ -161,8 +161,8 @@ rqt_graph
 ### 正确现象
 
 - `roscore` 终端持续运行。
-- turtlesim 窗口显示一只小乌龟。
-- 按方向键时，小乌龟移动或旋转。
+- turtlesim 窗口显示一个模拟海龟。
+- 按方向键时，模拟海龟移动或旋转。
 - `rosnode list` 能看到类似 `/turtlesim`、`/teleop_turtle`、`/rosout` 的节点。
 - `rostopic list` 能看到 `/turtle1/cmd_vel`、`/turtle1/pose` 等 topic。
 - `rostopic echo /turtle1/pose` 持续输出 x、y、theta、linear_velocity、angular_velocity。
@@ -172,14 +172,14 @@ rqt_graph
 
 把实验分成四层：
 
-| 层次 | 你做了什么 | 对应命令 | 你应该理解什么 |
+| 层次 | 操作内容 | 对应命令 | 应理解的内容 |
 |---|---|---|---|
 | Master | 启动注册发现服务 | `roscore` | 节点需要注册和发现 |
 | 节点 | 启动仿真和键盘节点 | `rosrun turtlesim ...` | 节点是运行中的进程 |
 | topic | 观察命令和反馈通道 | `rostopic list/echo` | 数据通过 topic 流动 |
 | 图 | 看系统连接关系 | `rqt_graph` | 节点通过 topic 解耦 |
 
-如果你能把这四层讲给别人听，就不是在“跑 demo”，而是在理解 ROS 系统。
+如果能够把这四层讲给别人听，就不是在“跑 demo”，而是在理解 ROS 系统。
 
 ## 4.6 观察 topic 数据
 
@@ -201,12 +201,12 @@ angular_velocity: 0.0
 
 解释：
 
-- `x`、`y`：乌龟在窗口中的位置。
+- `x`、`y`：模拟海龟在窗口中的位置。
 - `theta`：朝向角。
 - `linear_velocity`：线速度。
 - `angular_velocity`：角速度。
 
-当你按方向键时，这些数值会变化。这里你看到的是状态反馈，不是控制命令。
+按方向键时，这些数值会变化。这里观察到的是状态反馈，不是控制命令。
 
 ### 查看 `/turtle1/cmd_vel`
 
@@ -237,23 +237,23 @@ angular:
 
 ### `rostopic info` 比 `rostopic echo` 更适合第一步排查
 
-如果你不知道某个 topic 是否有发布者或订阅者，先执行：
+如果不确定某个 topic 是否有发布者或订阅者，先执行：
 
 ```bash
 rostopic info /turtle1/cmd_vel
 ```
 
-你应关注：
+应关注：
 
 - Type：消息类型。
 - Publishers：谁在发布。
 - Subscribers：谁在订阅。
 
-`echo` 只能看到数据；`info` 能告诉你连接关系。
+`echo` 只能看到数据；`info` 能显示连接关系。
 
 ## 4.7 手动发布速度命令
 
-你不一定需要键盘控制节点。只要知道 topic 名和消息类型，也可以用 CLI 直接发布。
+不一定需要键盘控制节点。只要知道 topic 名和消息类型，也可以用 CLI 直接发布。
 
 先确认消息类型：
 
@@ -311,9 +311,9 @@ angular:
 
 `-r 10` 表示 10 Hz 发布。按 `Ctrl+C` 停止。
 
-### 为什么手动 pub 很重要
+### 为什么手动 pub 重要
 
-手动发布是最小控制实验。真实移动机器人调试中，如果导航节点没写好，你也可以先手动向 `/cmd_vel` 发一条速度命令，检查底盘链路是否正常。
+手动发布是最小控制实验。实际移动机器人调试中，如果导航节点尚未完成，也可以先手动向 `/cmd_vel` 发一条速度命令，检查底盘链路是否正常。
 
 这能把问题拆开：
 
@@ -330,7 +330,7 @@ rqt_graph
 
 如果图为空，先点击刷新按钮。
 
-你应看到：
+应看到：
 
 - `/teleop_turtle` 节点。
 - `/turtlesim` 节点。
@@ -348,7 +348,7 @@ rqt_graph
 | topic 中数据 | `rostopic echo 话题名` |
 | 消息字段 | `rosmsg show 消息类型` |
 
-不要只看图。图只能告诉你连接关系，不能告诉你数据是否合理。
+不应只看图。图只能显示连接关系，不能判断数据是否合理。
 
 ## 4.9 用 `rosnode info` 深入观察节点
 
@@ -370,17 +370,17 @@ rosnode info /turtlesim
 rosnode info /teleop_turtle
 ```
 
-你会发现 teleop 主要发布速度命令，而 turtlesim 订阅速度命令并发布状态。这比只看窗口更能说明 ROS 系统结构。
+可以观察到 teleop 主要发布速度命令，而 turtlesim 订阅速度命令并发布状态。这比只看窗口更能说明 ROS 系统结构。
 
 ### 仿真节点还提供服务
 
-turtlesim 不只使用 topic，也提供 service。你可以查看：
+turtlesim 不只使用 topic，也提供 service。可以查看：
 
 ```bash
 rosservice list | grep turtle
 ```
 
-常见服务包括清空背景、重置、生成新乌龟等。这里先不深入使用 service，但要注意：一个节点可以同时发布 topic、订阅 topic、提供 service。
+常见服务包括清空背景、重置、生成新的模拟海龟等。这里先不深入使用 service，但要注意：一个节点可以同时发布 topic、订阅 topic、提供 service。
 
 这正是 ROS 节点的真实形态。
 
@@ -393,13 +393,13 @@ rosservice list | grep turtle
 | `rqt_graph` 图为空 | 没刷新或节点没启动 | `rosnode list` | 启动节点后刷新 |
 | `rostopic echo /turtle1/cmd_vel` 没输出 | 没有按键或没有发布者 | `rostopic info /turtle1/cmd_vel` | 按住方向键或手动 pub |
 | `rostopic pub` 报 YAML 错误 | 消息字段缩进或类型错误 | `rosmsg show geometry_msgs/Twist` | 按消息结构重新写 |
-| 小乌龟不动但 topic 有数据 | turtlesim 节点未运行或 topic 名不匹配 | `rosnode list`; `rostopic info /turtle1/cmd_vel` | 确认订阅者存在 |
+| 模拟海龟不动但 topic 有数据 | turtlesim 节点未运行或 topic 名不匹配 | `rosnode list`; `rostopic info /turtle1/cmd_vel` | 确认订阅者存在 |
 
 ### 排障顺序
 
 ```mermaid
 flowchart TD
-    A[小乌龟不动] --> B{turtlesim窗口是否存在?}
+    A[模拟海龟不动] --> B{turtlesim窗口是否存在?}
     B -- 否 --> B1[检查 turtlesim 是否启动]
     B -- 是 --> C{teleop终端是否有焦点?}
     C -- 否 --> C1[点击teleop终端再按键]
@@ -416,20 +416,20 @@ flowchart TD
 2. `/turtle1/cmd_vel` 和 `/turtle1/pose` 分别代表命令还是反馈？
 3. `rostopic type` 和 `rosmsg show` 的区别是什么？
 4. `rostopic pub -1` 和 `rostopic pub -r 10` 的区别是什么？
-5. 如果 `rqt_graph` 看不到 teleop 和 turtlesim 的连接，你会先查哪些命令？
+5. 如果 `rqt_graph` 看不到 teleop 和 turtlesim 的连接，应先检查哪些命令？
 6. 为什么 teleop 节点不需要知道 turtlesim 内部代码？
 7. `rosnode info` 中 Publications 和 Subscriptions 分别代表什么？
-8. 如果 `rostopic echo /turtle1/cmd_vel` 有数据但小乌龟不动，可能是什么原因？
+8. 如果 `rostopic echo /turtle1/cmd_vel` 有数据但模拟海龟不动，可能是什么原因？
 9. 为什么 `rostopic info` 有时比 `rostopic echo` 更适合作为第一步排查？
 10. turtlesim 中学到的观察方法如何迁移到移动机器人？
 
 ### 参考答案
 
-1. turtlesim 足够小，启动快、依赖少、现象直观，同时包含节点、topic、message、service、参数和 rqt_graph 等 ROS 核心观察对象。它把真实机器人中的“控制输入”和“状态反馈”简化成小乌龟运动，适合初学者先理解 ROS 计算图，而不是一开始面对复杂硬件和仿真。
+1. turtlesim 足够小，启动快、依赖少、现象直观，同时包含节点、topic、message、service、参数和 rqt_graph 等 ROS 核心观察对象。它把真实机器人中的“控制输入”和“状态反馈”简化成模拟海龟运动，适合初学者先理解 ROS 计算图，而不是一开始面对复杂硬件和仿真。
 
-2. `/turtle1/cmd_vel` 是命令输入，通常由 teleop 或手动 `rostopic pub` 发布，告诉小乌龟期望速度；`/turtle1/pose` 是状态反馈，由 turtlesim 节点发布，描述当前位姿和速度信息。真实移动机器人中，类似关系是 `/cmd_vel` 作为控制输入，`/odom` 作为运动反馈。
+2. `/turtle1/cmd_vel` 是命令输入，通常由 teleop 或手动 `rostopic pub` 发布，表示模拟海龟的期望速度；`/turtle1/pose` 是状态反馈，由 turtlesim 节点发布，描述当前位姿和速度信息。真实移动机器人中，类似关系是 `/cmd_vel` 作为控制输入，`/odom` 作为运动反馈。
 
-3. `rostopic type /turtle1/cmd_vel` 只告诉你 topic 使用的消息类型，例如 `geometry_msgs/Twist`；`rosmsg show geometry_msgs/Twist` 会展开这个类型的字段结构，例如 `linear.x`、`angular.z`。前者解决“这条 topic 是什么类型”，后者解决“这个类型里有哪些字段”。
+3. `rostopic type /turtle1/cmd_vel` 只显示 topic 使用的消息类型，例如 `geometry_msgs/Twist`；`rosmsg show geometry_msgs/Twist` 会展开这个类型的字段结构，例如 `linear.x`、`angular.z`。前者解决“这条 topic 是什么类型”，后者解决“这个类型里有哪些字段”。
 
 4. `rostopic pub -1` 只发布一次消息，适合测试单次命令是否能被接收；`rostopic pub -r 10` 以 10 Hz 持续发布，适合模拟持续控制输入。速度控制通常需要持续发布，因为很多机器人或仿真系统会在命令停止后逐渐停止或触发安全机制。
 
@@ -439,15 +439,15 @@ flowchart TD
 
 7. Publications 表示该节点发布了哪些 topic，即它向外输出哪些数据；Subscriptions 表示该节点订阅了哪些 topic，即它依赖哪些输入数据。对 turtlesim 来说，它订阅 `/turtle1/cmd_vel` 并发布 `/turtle1/pose`，这能直接说明它的输入和输出边界。
 
-8. 可能原因包括：发布的是零速度、消息字段不符合预期、turtlesim 节点没有订阅同一个 topic、节点卡住或窗口未响应、topic 命名空间不一致。排查顺序应先看 `rostopic info /turtle1/cmd_vel` 是否有 turtlesim 作为 subscriber，再看 echo 出来的速度值是否非零。
+8. 可能原因包括：发布的是零速度、消息字段不符合预期、turtlesim 节点没有订阅同一个 topic、节点长时间无响应或窗口未响应、topic 命名空间不一致。排查顺序应先看 `rostopic info /turtle1/cmd_vel` 是否有 turtlesim 作为 subscriber，再看 echo 出来的速度值是否非零。
 
-9. `rostopic info` 能快速告诉你 topic 类型、发布者和订阅者，比 `echo` 更适合判断连接关系。`echo` 只能看数据流，如果没有输出，你还不知道是没有 publisher、没有 subscriber、topic 名错，还是发布频率太低。第一步看 info，可以先确定系统结构。
+9. `rostopic info` 能快速显示 topic 类型、发布者和订阅者，比 `echo` 更适合判断连接关系。`echo` 只能看数据流，如果没有输出，仍无法区分是没有 publisher、没有 subscriber、topic 名错，还是发布频率太低。第一步看 info，可以先确定系统结构。
 
-10. 把 `/turtle1/cmd_vel` 对应到移动机器人的 `/cmd_vel`，把 `/turtle1/pose` 对应到 `/odom` 或机器人状态，把 turtlesim 节点对应到底盘或仿真节点。迁移后的观察顺序仍然是：`rosnode list` 看节点，`rostopic list` 看接口，`rostopic info` 看连接，`rostopic echo/hz` 看数据，`rqt_graph` 看整体关系。
+10. 可以把 `/turtle1/cmd_vel` 对应到移动机器人的 `/cmd_vel`，把 `/turtle1/pose` 对应到 `/odom` 或机器人状态，把 turtlesim 节点对应为底盘或仿真节点。迁移后的观察顺序仍然是：`rosnode list` 看节点，`rostopic list` 看接口，`rostopic info` 看连接，`rostopic echo/hz` 看数据，`rqt_graph` 看整体关系。
 
 ## 4.12 本章小结
 
-本章完成了第一个可观察 ROS 系统。你不只是运行了一个 demo，而是学会了观察 ROS 系统的基本顺序：
+本章完成了第一个可观察 ROS 系统。学习重点不只是运行一个 demo，而是掌握观察 ROS 系统的基本顺序：
 
 1. `rosnode list` 看节点。
 2. `rostopic list` 看话题。
@@ -458,7 +458,7 @@ flowchart TD
 7. `rostopic pub` 手动构造数据。
 8. `rqt_graph` 看节点关系。
 
-后续进入 catkin、Python、C++ 和移动机器人系统时，这套方法仍然适用。真正的 ROS 入门，不是会启动 turtlesim，而是能从 turtlesim 中读出系统结构。
+后续进入 catkin、Python、C++ 和移动机器人系统时，这套方法仍然适用。规范的 ROS 入门，不是只会启动 turtlesim，而是能从 turtlesim 中读出系统结构。
 
 ## 延伸阅读
 
