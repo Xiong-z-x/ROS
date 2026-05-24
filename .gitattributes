@@ -1,2 +1,5 @@
 *.md text eol=lf
 .gitattributes text eol=lf
+.gitignore text eol=lf
+*.ps1 text eol=lf
+*.py text eol=lf

@@ -5,6 +5,7 @@
 最终合订版文档：
 
 - [ROS1 零基础自学指导书：最终版](ROS1零基础自学指导书-最终版.md)
+- [ROS1 零基础自学指导书：PDF 版](ROS1零基础自学指导书-最终版.pdf)
 
 ## 读者对象
 
@@ -31,6 +32,12 @@
 
 ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续选择 Noetic，是为了教授 ROS1 体系、维护历史项目和为后续平台适配研究打基础，不是建议新机器人项目默认继续优先选择 ROS1。
 
+## 如何求助与核对版本
+
+Noetic 已经 EOL，这意味着不应期待官方继续提供新功能、bug 修复或安全更新；但既有二进制包、历史文档和大量项目经验不会在 EOL 当天立即消失。本仓库正文默认只以 **Ubuntu 20.04 + ROS Noetic** 为主线核对命令。
+
+遇到问题时，优先按本书排障索引收集证据：Ubuntu 版本、`ROS_DISTRO`、`ROS_MASTER_URI`、报错全文、`rostopic info`、`rosnode list`、`roswtf` 输出等。当前活跃求助入口优先使用 Robotics Stack Exchange 和 ROS Discourse；ROS Answers 更适合作为历史问题检索材料。
+
 ## 学完以后应达到的能力
 
 完成本书后，读者应能做到：
@@ -55,6 +62,7 @@ ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续选择 Noetic，
 - [资料来源与事实边界](docs/04-资料来源与事实边界.md)：官方资料、开源仓库、中文社区资料的使用优先级。
 - [术语与常见误区](docs/05-术语与常见误区.md)：ROS1 入门必须先纠正的概念错误。
 - [学习成果验收与排障索引](docs/06-学习成果验收与排障索引.md)：按章节列出可观察产出、排障入口和最终验收清单。
+- [构建与 PDF 导出说明](docs/07-构建与PDF导出说明.md)：合订版同步、PDF 导出和提交前检查。
 
 ### 主体章节
 
@@ -118,6 +126,9 @@ ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续选择 Noetic，
 - ROS Noetic Ubuntu 安装：https://mirror.umd.edu/roswiki/noetic%282f%29Installation%282f%29Ubuntu.html
 - ROS Tutorials：https://mirror.umd.edu/roswiki/ROS%282f%29Tutorials.html
 - ROS Technical Overview：https://mirror.umd.edu/roswiki/ROS%282f%29Technical%2820%29Overview.html
+- Robotics Stack Exchange：https://robotics.stackexchange.com/
+- ROS Discourse：https://discourse.ros.org/
+- ROS Answers archive：https://answers.ros.org/
 - catkin：https://github.com/ros/catkin
 - robot_state_publisher：https://github.com/ros/robot_state_publisher
 - TurtleBot3 e-Manual：https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/

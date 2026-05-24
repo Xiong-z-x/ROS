@@ -30,6 +30,8 @@ ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续使用 Noetic，
 
 ---
 
+---
+
 # 学习成果验收与排障索引
 
 ## 为什么需要这份索引
@@ -48,7 +50,7 @@ ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续使用 Noetic，
 | 4 | 第一个 ROS 系统 | 能用 turtlesim 观察节点、话题、消息类型和计算图 | `rqt_graph` 图、`rostopic info /turtle1/cmd_vel`、`rostopic echo` 输出 |
 | 5 | catkin 工程组织 | 能创建工作空间和功能包，解释 `src/build/devel` 的关系 | `tree ~/catkin_ws -L 2`、`catkin_make` 成功输出、`rospack find` |
 | 6 | Python/C++ 节点编程 | 能写发布者、订阅者、服务端、客户端，并解释回调和消息类型 | talker/listener 运行日志、`rostopic hz`、`rossrv show`、service 调用输出 |
-| 7 | 运行管理 | 能用 launch、YAML、remap、命名空间和 rosbag 组织可复现实验 | launch 文件、参数 YAML、`rosbag info`、回放时的 topic 输出 |
+| 7 | 运行管理 | 能用 launch、YAML、remap、命名空间、rosbag、`roswtf` 和仿真时间组织可复现实验 | launch 文件、参数 YAML、`rosbag info`、`roswtf` 输出、回放时的 topic 输出 |
 | 8 | 坐标、模型与可视化 | 能解释 TF 树、URDF link/joint、RViz Fixed Frame | `view_frames` 生成图、RViz RobotModel/TF 截图、URDF 文件 |
 | 9 | 移动机器人仿真 | 能观察 `/cmd_vel`、`/odom`、`/scan`、`/tf`，区分 RViz 和 Gazebo | Gazebo/RViz 截图、`rostopic hz /scan`、`rosrun tf view_frames` |
 | 10 | 综合项目 | 能交付一个可启动、可观察、可控制、可记录、可复现的小项目 | README、launch、YAML、RViz 配置、bag 文件说明和系统图 |
@@ -908,7 +910,9 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 
 成熟 ROS 教程通常不会在开始阶段讲复杂机器人算法，而是先让学习者理解计算图、节点、话题、服务、参数这些基本结构。原因在于：如果不能解释“谁在发布数据、谁在订阅数据、消息类型是什么、Master 做了什么”，后面写 Python/C++ 节点、launch 文件、TF、导航都会变成命令堆叠。
 
-本章先建立 ROS1 的运行时心智模型。将使用最小系统观察 `roscore`、`rosnode`、`rostopic`、`rosservice` 和 `rosparam`，但重点不是记住命令，而是理解命令背后的系统结构。
+本章先建立 ROS1 的运行时心智模型。重点不是提前执行命令，而是先理解 `roscore`、`rosnode`、`rostopic`、`rosservice` 和 `rosparam` 分别观察什么对象，以及这些对象之间如何协同。
+
+> 学习提示：如果尚未完成第 3 章 ROS 安装，本章只阅读概念、图示、表格和决策方法，不执行任何 ROS 命令。真正的第一次运行与观察，统一放到第 3 章安装验证和第 4 章 turtlesim 实验中完成。这样可以避免读者在环境尚未准备好时，被 `roscore`、`rosnode list` 之类的命令打断学习节奏。
 
 ## 学习完成后应达到的能力
 
@@ -917,7 +921,7 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 - 区分发布订阅、请求响应、长时间任务三种通信方式。
 - 解释为什么 ROS Master 不负责转发所有 topic 数据。
 - 根据任务类型判断应使用 topic、service、action 还是 parameter。
-- 用 `roscore`、`rosnode`、`rostopic`、`rosservice`、`rosparam` 观察最小 ROS1 系统。
+- 说明安装完成后应如何用 `roscore`、`rosnode`、`rostopic`、`rosservice`、`rosparam` 观察最小 ROS1 系统。
 - 遇到“连不上 Master”“topic 没数据”“参数改了没效果”等问题时，能先做第一层诊断。
 
 ## 2.1 ROS 在本书中的位置
@@ -1249,6 +1253,20 @@ Service 不适合激光雷达、图像、里程计这类连续数据。连续数
 
 后续导航章节再深入 action。现在不应急于写 action 代码，先能判断它解决的问题。
 
+### Action 的最小观察练习
+
+当前阶段不要求编写 Action Server 或 Action Client，但应能观察一个 Action 的表面结构。当系统中存在某个 Action Server 时，通常可以看到与该任务同名前缀相关的一组接口：
+
+| Action 底层接口 | 语义 | 学习时的理解方式 |
+|---|---|---|
+| `goal` | 任务目标 | “我要机器人做什么” |
+| `cancel` | 取消请求 | “这个长任务是否可以中途停止” |
+| `status` | 任务状态 | “任务当前处于等待、执行、成功、失败还是取消状态” |
+| `feedback` | 过程反馈 | “任务执行到哪一步了” |
+| `result` | 最终结果 | “任务最终是否完成，结果是什么” |
+
+例如导航到目标点时，目标点不是一条连续传感器数据，也不适合作为普通 service 一直等待。更合理的语义是：发送一个 goal，执行过程中持续获得 feedback，需要时可以 cancel，最后得到 result。这就是 Action 与普通 Service 的根本区别。
+
 ## 2.11 Parameter Server：配置不是数据流
 
 Parameter Server 用来存储运行参数。参数通常是低频配置，例如：
@@ -1319,11 +1337,11 @@ flowchart TD
 - 不应用 topic 表达必须有明确返回值的短请求。
 - 不应用普通 service 表达需要反馈和取消的长任务。
 
-## 2.13 最小可运行实验
+## 2.13 安装后的观察预告
 
-### 实验目标
+### 学习目标
 
-启动一个最小 ROS1 系统，用命令观察 Master、节点、topic、service、parameter，并把观察结果和本章概念对应起来。
+本节不是第 2 章必须立即执行的实验，而是安装完成后的观察预告。读者完成第 3 章安装后，可以回到这里，用命令观察 Master、节点、topic、service、parameter，并把观察结果和本章概念对应起来。
 
 ### 前置条件
 
@@ -1347,7 +1365,7 @@ echo $ROS_DISTRO
 noetic
 ```
 
-### 操作步骤
+### 安装后操作步骤
 
 终端 1：启动 ROS Master。
 
@@ -1417,7 +1435,7 @@ rosparam delete /chapter2/student_name
 | `rosparam set` 报连接错误 | `echo $ROS_MASTER_URI` | 当前终端找不到 Master |
 | `grep` 没有输出 | `rosparam list` | 可能参数已删除或名称写错 |
 
-## 2.14 命令解释
+## 2.14 观察命令解释
 
 ### `roscore`
 
@@ -1739,6 +1757,10 @@ curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo ap
 - 这一步添加 ROS 软件源签名密钥。
 
 注意：`apt-key` 在较新 Ubuntu 中已不推荐作为长期方式，但 ROS Noetic 官方安装文档仍使用这套历史流程。本书为 Noetic 主线保留官方文档方式。
+
+> 历史写法说明：本书这里保留的是 ROS Noetic 官方安装页的历史命令写法，因为它与 Ubuntu 20.04 + Noetic 的教学主线一致。如果在较新的 APT 文档或现代 Linux 教程中看到基于 keyring / `Signed-By` 的仓库配置方式，不应把这种差异误判成“本书命令错误”或“安装失败”。更准确的理解是：Noetic 已进入维护结束阶段，官方原始文档与当前 Linux 生态习惯之间会出现时代差异。本书主线目标是让读者能解释 Noetic 官方安装流程；现代 keyring 写法可以作为教师补充或附录阅读。
+
+> 现实维护边界：Noetic EOL 之后，不应期待官方继续提供新功能、bug 修复或安全更新；但已经发布的二进制包和历史文档不会在 EOL 当天立即消失。学习时应把 Noetic 视为 ROS1 历史项目维护与体系理解平台，而不是新机器人项目的默认技术选型。
 
 ### 更新索引并选择安装规模
 
@@ -4429,7 +4451,7 @@ flowchart TD
 
 到目前为止，已经可以手动打开多个终端运行节点。但实际 ROS 系统不会依赖“记住打开十几个终端”来运行。一个稍微完整的机器人系统可能包含底盘驱动、传感器驱动、状态估计、地图、导航、可视化、日志和数据记录。如果每次都手动输入命令，实验无法稳定复现，错误也较难定位。
 
-本章讲 ROS1 的运行管理工具：`roslaunch`、参数服务器、YAML 配置、remap、命名空间、日志和 rosbag。核心目标是把多个节点组织成一个可复现实验：同一份配置、同一条启动命令、同一套观察方法、同一份记录数据。
+本章讲 ROS1 的运行管理工具：`roslaunch`、参数服务器、YAML 配置、remap、命名空间、日志、rosbag、`roswtf` 和仿真时间。核心目标是把多个节点组织成一个可复现实验：同一份配置、同一条启动命令、同一套观察方法、同一份记录数据。
 
 必须先纠正一个误区：launch 文件不是普通顺序脚本。它描述要启动哪些节点、加载哪些参数、如何命名和重映射，但不能保证写在前面的节点业务逻辑一定先完成初始化。节点之间的依赖要通过 topic、service、action 和显式等待机制处理。
 
@@ -4442,6 +4464,8 @@ flowchart TD
 - 理解私有参数、全局参数和命名空间。
 - 使用 remap 改变 topic 名。
 - 使用 rosbag 录制、查看、回放数据。
+- 使用 `roswtf` 做第一轮自动诊断。
+- 解释 `/clock`、`use_sim_time` 与 rosbag/仿真的关系。
 - 使用日志和 CLI 判断系统启动失败原因。
 - 解释“能一键启动”和“能复现实验”之间的区别。
 
@@ -4476,6 +4500,8 @@ flowchart LR
 | remap | 运行时重映射 topic/service 名称 | 不改变代码，只改变名称解析结果 |
 | 命名空间 | 给节点、topic、参数加前缀的组织方式 | 滥用会让初学者找不到真实名称 |
 | rosbag | 记录和回放 ROS topic 数据的工具 | 记录的是消息数据，不是节点代码和算法状态 |
+| `roswtf` | ROS1 自动诊断工具 | 只能提示常见环境和图结构问题，不能替代理解 |
+| `/clock` | 仿真或回放发布的时间 topic | 只有启用 `use_sim_time` 的节点才会使用它 |
 | 日志 | ROS 节点输出诊断信息的机制 | `print` 不是 ROS 工程中的主要日志方式 |
 
 ## 7.3 为什么需要 launch
@@ -4979,7 +5005,7 @@ rosbag 回放并不会“复活原来的节点”。它只是按照记录的时�
 
 - 如果回放 `/chatter`，需要有订阅 `/chatter` 的节点才能看到效果。
 - 如果原系统还有 service 调用、参数变化、文件读写，bag 不会自动复现这些行为。
-- 如果算法依赖 `/clock` 或仿真时间，需要理解 `use_sim_time` 和 `rosbag play --clock`，本书后续仿真章节再展开。
+- 如果算法依赖 `/clock` 或仿真时间，需要理解 `use_sim_time` 和 `rosbag play --clock`，下一小节会给出最小说明。
 - bag 文件越大，记录和回放对磁盘、CPU、网络的压力越大。
 
 一个简单验证流程：
@@ -4993,7 +5019,75 @@ rosbag 回放并不会“复活原来的节点”。它只是按照记录的时�
 
 这个流程用于说明：回放时数据来自 bag，而不是来自原来的 talker。
 
-## 7.17 最小可运行实验
+## 7.17 `roswtf`：第一轮自动诊断
+
+`roswtf` 是 ROS1 提供的自动诊断工具。它会检查环境变量、ROS 图、包路径、消息依赖等常见问题，并给出 warning 或 error。它适合做第一轮检查，但不能替代本书一直强调的分层排障。
+
+基本用法：
+
+```bash
+source ~/catkin_ws/devel/setup.bash
+roswtf
+```
+
+建议在两种情况下运行：
+
+- 刚完成安装或工作空间配置后，检查环境是否明显异常。
+- launch 启动后系统行为不符合预期，先让工具扫描一遍常见问题。
+
+阅读输出时要区分：
+
+| 输出类型 | 含义 | 处理方式 |
+|---|---|---|
+| `ERROR` | 很可能影响系统运行 | 优先处理，并回到对应命令验证 |
+| `WARNING` | 可能是问题，也可能是当前实验不需要的配置 | 阅读上下文，不要机械修改 |
+| 无明显异常 | 只能说明常见问题未被发现 | 仍需用 `rosnode`、`rostopic`、`rosparam`、日志继续验证 |
+
+例如 `roswtf` 提示找不到某个包时，不应直接重装 ROS，而应先执行：
+
+```bash
+rospack find 包名
+echo $ROS_PACKAGE_PATH
+```
+
+`roswtf` 的价值是把部分低层错误提前暴露出来；真正的判断仍要回到系统状态和可观察证据。
+
+## 7.18 `/clock` 与 `use_sim_time`：回放和仿真时间
+
+真实机器人通常使用系统时间；仿真和 rosbag 回放常常需要使用“仿真时间”。ROS1 中，仿真时间通常通过 `/clock` topic 发布，节点是否使用它由全局参数 `/use_sim_time` 决定。
+
+查看当前设置：
+
+```bash
+rosparam get /use_sim_time
+rostopic echo /clock
+```
+
+典型场景：
+
+| 场景 | 常见设置 | 原因 |
+|---|---|---|
+| 普通真实机器人实验 | `/use_sim_time` 为 `false` 或不存在 | 节点直接使用系统时间 |
+| Gazebo 仿真 | `/use_sim_time` 为 `true`，Gazebo 发布 `/clock` | 节点按仿真世界时间运行 |
+| rosbag 回放仿真数据 | `rosparam set /use_sim_time true`，`rosbag play --clock 文件.bag` | 回放时重新发布记录的时间 |
+
+最小回放示例：
+
+```bash
+rosparam set /use_sim_time true
+rosbag play --clock chatter_demo.bag
+```
+
+注意：如果设置了 `/use_sim_time=true`，但系统中没有任何节点发布 `/clock`，依赖 ROS 时间的节点可能表现为等待、时间不前进或定时器不触发。排障时先查：
+
+```bash
+rosparam get /use_sim_time
+rostopic info /clock
+```
+
+这个概念在第 9 章 Gazebo 仿真和第 10 章综合项目中会反复出现。它不改变消息内容，但会影响节点对时间戳、定时器、TF 缓存和 bag 回放的解释。
+
+## 7.19 最小可运行实验
 
 ### 实验目标
 
@@ -5095,7 +5189,7 @@ rosbag play chatter_demo.bag
 | 录制 bag | 保存 topic 数据 | `rosbag info chatter_demo.bag` |
 | 回放 bag | 重新发布记录过的消息 | listener 日志、`rostopic echo` |
 
-## 7.18 高频错误与排查
+## 7.20 高频错误与排查
 
 | 现象 | 高概率原因 | 第一检查命令 | 修复思路 |
 |---|---|---|---|
@@ -5107,6 +5201,7 @@ rosbag play chatter_demo.bag
 | 命名空间下找不到 topic | 观察时使用了错误名称 | `rostopic list` | 使用完整 topic 名 |
 | bag 太大 | 录制了所有 topic | `rosbag info` | 初学阶段只录关键 topic |
 | 回放没效果 | 没有订阅者或 topic 名不同 | `rostopic list`; `rqt_graph` | 启动订阅节点，确认 topic 名 |
+| 设置仿真时间后节点不动 | `/clock` 没有发布 | `rosparam get /use_sim_time`; `rostopic info /clock` | 启动 Gazebo 或用 `rosbag play --clock` |
 | 日志看不到 | 未设置 `output="screen"` 或看错日志目录 | `ls ~/.ros/log/latest` | 打开 screen 输出或查看日志文件 |
 
 ### 排障树
@@ -5126,7 +5221,7 @@ flowchart TD
   F -- 是 --> G[进入第8章坐标/模型/可视化]
 ```
 
-## 7.19 本章自测
+## 7.21 本章自测
 
 1. 为什么实际 ROS 系统不应该靠手动打开多个终端运行？
 2. `roslaunch` 自动启动 roscore 是否意味着它就是 ROS Master？
@@ -5140,6 +5235,8 @@ flowchart TD
 10. 为什么初学阶段不建议直接 `rosbag record -a`？
 11. 如果 bag 回放后 listener 没输出，应先检查哪些命令？
 12. `output="screen"` 对调试有什么帮助？
+13. `roswtf` 能解决什么问题？为什么不能完全依赖它？
+14. `/use_sim_time=true` 但没有 `/clock` 时，可能出现什么现象？
 
 ### 参考答案
 
@@ -5167,7 +5264,11 @@ flowchart TD
 
 12. `output="screen"` 会把节点日志直接显示在 roslaunch 终端，初学阶段能立即看到 Python traceback、C++ 错误和 ROS 日志。没有它时，错误可能只写入 `~/.ros/log`，学生容易误以为节点“没反应”。调试阶段建议打开 screen 输出，稳定后再按项目需要调整日志方式。
 
-## 7.20 本章小结
+13. `roswtf` 能检查环境变量、包路径、ROS 图、依赖和常见配置问题，适合作为第一轮自动诊断。但它只能发现工具规则覆盖到的问题，不能判断业务语义是否正确，例如速度值是否合理、TF 语义是否符合机器人模型、参数是否被节点代码使用。使用 `roswtf` 后仍要用 CLI 和日志验证具体状态。
+
+14. 如果 `/use_sim_time=true`，节点会等待 `/clock` 提供时间。若没有 Gazebo 或 `rosbag play --clock` 发布 `/clock`，依赖 ROS 时间的定时器、时间戳或 TF 查询可能长时间不前进，表现为节点等待、回调不触发或 RViz/TF 时间相关警告。排查时先看 `rosparam get /use_sim_time` 和 `rostopic info /clock`。
+
+## 7.22 本章小结
 
 本章把 ROS 程序从“能单独运行”推进到“能组织成系统”。launch、参数、remap、命名空间、日志和 bag 是 ROS 工程化的基础。
 
@@ -5203,7 +5304,7 @@ flowchart TD
 
 本章建立三个核心概念：TF 坐标树、URDF 机器人模型、RViz 可视化。需要理解：TF 描述坐标系之间的空间关系，URDF 描述机器人结构，RViz 只是显示已有 ROS 数据，不负责真实物理仿真。
 
-本章不追求复杂机械建模，而是用一个最小两轮差速机器人例子说明 `link`、`joint`、`robot_description`、`joint_states`、`robot_state_publisher` 和 RViz 的关系。写完本章后，应能从 RViz 的报错反推出是 TF 缺失、URDF 错误、参数未加载，还是 Fixed Frame 选错。
+本章不追求复杂机械建模，而是用一个最小两轮差速机器人例子说明 `link`、`joint`、`robot_description`、`joint_states`、`robot_state_publisher` 和 RViz 的关系。写完本章后，应能从 RViz 的报错反推出是 TF 缺失、URDF 错误、参数未加载，还是 Fixed Frame（固定参考坐标系）选错。
 
 ## 学习完成后应达到的能力
 
@@ -5213,7 +5314,7 @@ flowchart TD
 - 用 `robot_state_publisher` 发布机器人模型对应的 TF。
 - 用 RViz 显示 RobotModel、TF 和坐标轴。
 - 区分 RViz 可视化和 Gazebo 物理仿真。
-- 根据 RViz 报错排查 fixed frame、TF 缺失、URDF 参数未加载等问题。
+- 根据 RViz 报错排查 Fixed Frame（固定参考坐标系）、TF 缺失、URDF 参数未加载等问题。
 
 ## 8.1 本章在全书中的位置
 
@@ -5262,7 +5363,7 @@ flowchart LR
 
 例如激光雷达发现前方 1 米有障碍物。这个“前方”是 `laser_link` 的前方。如果激光雷达安装在车体前方 20 cm，且相对车体有旋转，那么必须把激光坐标转换到 `base_link`，才能知道障碍物相对机器人本体在哪里。
 
-再举一个常见错误：RViz 中 LaserScan 有数据，但看不到激光点。很多时候不是 `/scan` 没有发布，而是 RViz 的 Fixed Frame 和 LaserScan 的 `header.frame_id` 之间没有 TF 路径。
+再举一个常见错误：RViz 中 LaserScan 有数据，但看不到激光点。很多时候不是 `/scan` 没有发布，而是 RViz 的 Fixed Frame（固定参考坐标系）和 LaserScan 的 `header.frame_id` 之间没有 TF 路径。
 
 ## 8.4 常见坐标系
 
@@ -5552,7 +5653,7 @@ roslaunch my_robot_description display.launch
 
 在 RViz 中：
 
-1. 将 Fixed Frame 改为 `base_link`。
+1. 将 Fixed Frame（固定参考坐标系）改为 `base_link`。
 2. Add -> RobotModel。
 3. Add -> TF。
 4. 观察 Displays 面板中 RobotModel 和 TF 是否为绿色状态。
@@ -5785,7 +5886,7 @@ URDF -> robot_description -> robot_state_publisher -> /tf -> RViz
 - 使用键盘控制机器人运动。
 - 用 `rostopic echo`、`rostopic hz`、`rostopic info`、`rqt_graph`、RViz 观察系统。
 - 初步理解 SLAM、定位、导航在 ROS 系统中的位置。
-- 根据常见现象排查模型变量、topic、TF、Fixed Frame、仿真性能问题。
+- 根据常见现象排查模型变量、topic、TF、Fixed Frame（固定参考坐标系）、仿真性能问题。
 
 ## 9.1 本章在全书中的位置
 
@@ -5913,6 +6014,8 @@ TurtleBot3 是广泛使用的开源移动机器人平台，资料、仿真、模
 | 学习从 demo 走向综合项目的系统拆解方法 | 不把 ROS2 的 `ros2 launch` 命令混入 ROS1 Noetic 主线 |
 
 特别注意官方资料版本。TurtleBot3 e-Manual 当前页面会出现 ROS2 Humble 等新版本命令，例如 `ros2 launch ...`。这些资料仍然适合学习“仿真系统如何组织、RViz 和 Gazebo 如何分工、fake node 和 Gazebo 有什么区别”，但本书命令必须使用 ROS1 Noetic 对应的包、分支和 `roslaunch` 形式。看到 `ros2`、`colcon`、`ament`、`rviz2` 时，要知道那是 ROS2 体系，不应直接复制到本书实验中。
+
+> 边界说明：本章固定采用 TurtleBot3 Noetic + Gazebo Classic 作为 ROS1 教学路线。若查到的是 ROS2、`colcon`、`rviz2` 或现代 Gazebo 的命令，不应直接复制到本章实验中。它们属于不同技术栈，不在本书当前实验边界内。
 
 ## 9.6 安装 TurtleBot3 仿真包
 
@@ -6125,7 +6228,7 @@ rviz
 - Odometry
 - Map
 
-RViz 中最常见问题是 Fixed Frame。移动机器人中常用：
+RViz 中最常见问题是 Fixed Frame（固定参考坐标系）。移动机器人中常用：
 
 - `odom`：看局部运动。
 - `map`：看建图/导航结果。
@@ -6951,7 +7054,37 @@ flowchart LR
 
 这张图比“运行了哪些命令”更重要。它能说明系统为什么可观察、可记录、可复现。
 
-## 10.12 项目观察清单
+## 10.12 版本管理与提交规范
+
+综合项目通常会生成大量中间文件。正式提交仓库时，应提交源码、配置和说明，不应提交可重新生成的大型结果。
+
+建议在工作空间根目录维护 `.gitignore`，至少包含：
+
+```gitignore
+build/
+devel/
+install/
+log/
+logs/
+.catkin_tools/
+*.bag
+*.bag.active
+__pycache__/
+*.pyc
+```
+
+这些条目的含义：
+
+| 条目 | 为什么不提交 |
+|---|---|
+| `build/`、`devel/`、`install/` | catkin 或构建工具生成，可由源码重新生成 |
+| `log/`、`logs/`、`.catkin_tools/` | 本机运行状态和工具缓存，不具备教材复现价值 |
+| `*.bag`、`*.bag.active` | rosbag 文件可能很大，适合单独归档并在 README 中说明 |
+| `__pycache__/`、`*.pyc` | Python 解释器缓存 |
+
+如果某个 bag 文件很小且确实是教学样例，可以单独说明后再提交；否则更推荐提交 `rosbag info` 输出、录制命令和下载位置。判断标准不是“文件能不能上传”，而是“别人是否需要它才能复现实验，以及仓库是否会因此变得难以维护”。
+
+## 10.13 项目观察清单
 
 每次启动项目后，按这个顺序观察：
 
@@ -6999,7 +7132,7 @@ Gazebo 中观察：
 
 这三类成果分别对应“仿真存在”“ROS 数据可视化”“实验可复现”。
 
-## 10.13 项目说明文档模板
+## 10.14 项目说明文档模板
 
 每个项目至少写一份 `README.md`，包含：
 
@@ -7015,6 +7148,12 @@ Gazebo 中观察：
 - Ubuntu 20.04
 - ROS Noetic
 - 依赖包
+
+## 版本管理约定
+
+- 提交 `src/`、`launch/`、`config/`、`urdf/`、`rviz/` 和 README。
+- 不提交 `build/`、`devel/`、`logs/`。
+- 大型 `.bag` 文件单独归档，并在 README 中写明录制命令和获取方式。
 
 ## 包结构
 
@@ -7067,7 +7206,7 @@ rqt_graph
 
 文档不是形式主义。它迫使项目作者解释系统结构，也让其他人能复现项目。
 
-## 10.14 最小可运行实验与验收流程
+## 10.15 最小可运行实验与验收流程
 
 ### 启动
 
@@ -7141,7 +7280,7 @@ rosbag play textbook_bot_run.bag
 | 记录 | bag 包含关键 topic | `rosbag info` |
 | 文档 | README 能说明节点/topic/参数/排障 | 文档检查 |
 
-## 10.15 评分建议
+## 10.16 评分建议
 
 | 项目 | 分值 | 判定标准 |
 |---|---:|---|
@@ -7156,7 +7295,7 @@ rosbag play textbook_bot_run.bag
 
 评分不是为了惩罚格式，而是为了强迫项目具备工程可复现性。
 
-## 10.16 高频错误与排查
+## 10.17 高频错误与排查
 
 | 现象 | 高概率原因 | 第一检查命令 | 修复思路 |
 |---|---|---|---|
@@ -7167,6 +7306,7 @@ rosbag play textbook_bot_run.bag
 | RViz 不显示激光 | Fixed Frame 或 topic 选择错误 | `rostopic list`; RViz Displays | 设置正确 frame 和 LaserScan topic |
 | bag 回放无效果 | 没有启动订阅者，或 topic 名不匹配 | `rostopic list`; `rosbag info` | 启动需要的显示/处理节点 |
 | 换机器运行失败 | 依赖未写入 README 或包结构不清 | `rosdep check --from-paths src --ignore-src` | 补依赖说明和 package.xml |
+| 仓库体积异常变大 | 提交了 `build/`、`devel/` 或大 bag | `git status --short`; `git ls-files '*.bag'` | 补 `.gitignore`，大文件改为外部归档 |
 
 ### 总排障流程
 
@@ -7187,7 +7327,7 @@ flowchart TD
   G -- 是 --> H[项目达到入门验收]
 ```
 
-## 10.17 本章自测
+## 10.18 本章自测
 
 1. 为什么综合项目必须有一个统一启动入口？
 2. 为什么建议把 description、bringup、tools 分成不同包？
@@ -7199,6 +7339,7 @@ flowchart TD
 8. 如果要把本项目交给同学运行，最少要提供哪些信息？
 9. 为什么综合项目不要求完整自动导航？
 10. 如何判断一个项目是“功能堆叠”还是“系统结构清楚”？
+11. 为什么不应把 `build/`、`devel/` 和大型 bag 文件直接提交进仓库？
 
 ### 参考答案
 
@@ -7222,7 +7363,9 @@ flowchart TD
 
 10. 功能堆叠的项目通常 launch 很多东西但解释不清节点关系、topic 方向、参数来源和错误定位；系统结构清楚的项目能画出数据流，能说明每个包职责，能用 CLI 验证关键接口，能录制和回放数据，能让别人按 README 复现。判断标准不是功能数量，而是结构是否可解释、可观察、可维护。
 
-## 10.18 本章小结
+11. `build/`、`devel/` 是构建产物，可由源码重新生成，提交后会造成仓库噪声和跨机器路径问题；大型 bag 文件会迅速增大仓库体积，也不一定是每个读者复现实验的必要文件。更好的做法是提交源码、launch、参数、RViz 配置、README 和 `rosbag info` 输出；确有必要的数据集应单独归档并在 README 中说明获取方式。
+
+## 10.19 本章小结
 
 本章把全书上册内容合成为一个工程闭环。读者现在应理解：ROS 学习的目标不是记住一堆命令，而是能组织一个可解释、可观察、可复现的机器人软件系统。
 
@@ -7252,5 +7395,3 @@ flowchart TD
 - rosbag 文档：https://mirror.umd.edu/roswiki/rosbag.html
 - Autolabor ROS 文档：https://autolaborcenter.github.io/pm1-docs-sphinx/user-guide/using-ros/doc.html
 - 鱼香 ROS 官网与论坛：https://fishros.org.cn/
-
----

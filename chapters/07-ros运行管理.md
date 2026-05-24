@@ -4,7 +4,7 @@
 
 到目前为止，已经可以手动打开多个终端运行节点。但实际 ROS 系统不会依赖“记住打开十几个终端”来运行。一个稍微完整的机器人系统可能包含底盘驱动、传感器驱动、状态估计、地图、导航、可视化、日志和数据记录。如果每次都手动输入命令，实验无法稳定复现，错误也较难定位。
 
-本章讲 ROS1 的运行管理工具：`roslaunch`、参数服务器、YAML 配置、remap、命名空间、日志和 rosbag。核心目标是把多个节点组织成一个可复现实验：同一份配置、同一条启动命令、同一套观察方法、同一份记录数据。
+本章讲 ROS1 的运行管理工具：`roslaunch`、参数服务器、YAML 配置、remap、命名空间、日志、rosbag、`roswtf` 和仿真时间。核心目标是把多个节点组织成一个可复现实验：同一份配置、同一条启动命令、同一套观察方法、同一份记录数据。
 
 必须先纠正一个误区：launch 文件不是普通顺序脚本。它描述要启动哪些节点、加载哪些参数、如何命名和重映射，但不能保证写在前面的节点业务逻辑一定先完成初始化。节点之间的依赖要通过 topic、service、action 和显式等待机制处理。
 
@@ -17,6 +17,8 @@
 - 理解私有参数、全局参数和命名空间。
 - 使用 remap 改变 topic 名。
 - 使用 rosbag 录制、查看、回放数据。
+- 使用 `roswtf` 做第一轮自动诊断。
+- 解释 `/clock`、`use_sim_time` 与 rosbag/仿真的关系。
 - 使用日志和 CLI 判断系统启动失败原因。
 - 解释“能一键启动”和“能复现实验”之间的区别。
 
@@ -51,6 +53,8 @@ flowchart LR
 | remap | 运行时重映射 topic/service 名称 | 不改变代码，只改变名称解析结果 |
 | 命名空间 | 给节点、topic、参数加前缀的组织方式 | 滥用会让初学者找不到真实名称 |
 | rosbag | 记录和回放 ROS topic 数据的工具 | 记录的是消息数据，不是节点代码和算法状态 |
+| `roswtf` | ROS1 自动诊断工具 | 只能提示常见环境和图结构问题，不能替代理解 |
+| `/clock` | 仿真或回放发布的时间 topic | 只有启用 `use_sim_time` 的节点才会使用它 |
 | 日志 | ROS 节点输出诊断信息的机制 | `print` 不是 ROS 工程中的主要日志方式 |
 
 ## 7.3 为什么需要 launch
@@ -554,7 +558,7 @@ rosbag 回放并不会“复活原来的节点”。它只是按照记录的时�
 
 - 如果回放 `/chatter`，需要有订阅 `/chatter` 的节点才能看到效果。
 - 如果原系统还有 service 调用、参数变化、文件读写，bag 不会自动复现这些行为。
-- 如果算法依赖 `/clock` 或仿真时间，需要理解 `use_sim_time` 和 `rosbag play --clock`，本书后续仿真章节再展开。
+- 如果算法依赖 `/clock` 或仿真时间，需要理解 `use_sim_time` 和 `rosbag play --clock`，下一小节会给出最小说明。
 - bag 文件越大，记录和回放对磁盘、CPU、网络的压力越大。
 
 一个简单验证流程：
@@ -568,7 +572,75 @@ rosbag 回放并不会“复活原来的节点”。它只是按照记录的时�
 
 这个流程用于说明：回放时数据来自 bag，而不是来自原来的 talker。
 
-## 7.17 最小可运行实验
+## 7.17 `roswtf`：第一轮自动诊断
+
+`roswtf` 是 ROS1 提供的自动诊断工具。它会检查环境变量、ROS 图、包路径、消息依赖等常见问题，并给出 warning 或 error。它适合做第一轮检查，但不能替代本书一直强调的分层排障。
+
+基本用法：
+
+```bash
+source ~/catkin_ws/devel/setup.bash
+roswtf
+```
+
+建议在两种情况下运行：
+
+- 刚完成安装或工作空间配置后，检查环境是否明显异常。
+- launch 启动后系统行为不符合预期，先让工具扫描一遍常见问题。
+
+阅读输出时要区分：
+
+| 输出类型 | 含义 | 处理方式 |
+|---|---|---|
+| `ERROR` | 很可能影响系统运行 | 优先处理，并回到对应命令验证 |
+| `WARNING` | 可能是问题，也可能是当前实验不需要的配置 | 阅读上下文，不要机械修改 |
+| 无明显异常 | 只能说明常见问题未被发现 | 仍需用 `rosnode`、`rostopic`、`rosparam`、日志继续验证 |
+
+例如 `roswtf` 提示找不到某个包时，不应直接重装 ROS，而应先执行：
+
+```bash
+rospack find 包名
+echo $ROS_PACKAGE_PATH
+```
+
+`roswtf` 的价值是把部分低层错误提前暴露出来；真正的判断仍要回到系统状态和可观察证据。
+
+## 7.18 `/clock` 与 `use_sim_time`：回放和仿真时间
+
+真实机器人通常使用系统时间；仿真和 rosbag 回放常常需要使用“仿真时间”。ROS1 中，仿真时间通常通过 `/clock` topic 发布，节点是否使用它由全局参数 `/use_sim_time` 决定。
+
+查看当前设置：
+
+```bash
+rosparam get /use_sim_time
+rostopic echo /clock
+```
+
+典型场景：
+
+| 场景 | 常见设置 | 原因 |
+|---|---|---|
+| 普通真实机器人实验 | `/use_sim_time` 为 `false` 或不存在 | 节点直接使用系统时间 |
+| Gazebo 仿真 | `/use_sim_time` 为 `true`，Gazebo 发布 `/clock` | 节点按仿真世界时间运行 |
+| rosbag 回放仿真数据 | `rosparam set /use_sim_time true`，`rosbag play --clock 文件.bag` | 回放时重新发布记录的时间 |
+
+最小回放示例：
+
+```bash
+rosparam set /use_sim_time true
+rosbag play --clock chatter_demo.bag
+```
+
+注意：如果设置了 `/use_sim_time=true`，但系统中没有任何节点发布 `/clock`，依赖 ROS 时间的节点可能表现为等待、时间不前进或定时器不触发。排障时先查：
+
+```bash
+rosparam get /use_sim_time
+rostopic info /clock
+```
+
+这个概念在第 9 章 Gazebo 仿真和第 10 章综合项目中会反复出现。它不改变消息内容，但会影响节点对时间戳、定时器、TF 缓存和 bag 回放的解释。
+
+## 7.19 最小可运行实验
 
 ### 实验目标
 
@@ -670,7 +742,7 @@ rosbag play chatter_demo.bag
 | 录制 bag | 保存 topic 数据 | `rosbag info chatter_demo.bag` |
 | 回放 bag | 重新发布记录过的消息 | listener 日志、`rostopic echo` |
 
-## 7.18 高频错误与排查
+## 7.20 高频错误与排查
 
 | 现象 | 高概率原因 | 第一检查命令 | 修复思路 |
 |---|---|---|---|
@@ -682,6 +754,7 @@ rosbag play chatter_demo.bag
 | 命名空间下找不到 topic | 观察时使用了错误名称 | `rostopic list` | 使用完整 topic 名 |
 | bag 太大 | 录制了所有 topic | `rosbag info` | 初学阶段只录关键 topic |
 | 回放没效果 | 没有订阅者或 topic 名不同 | `rostopic list`; `rqt_graph` | 启动订阅节点，确认 topic 名 |
+| 设置仿真时间后节点不动 | `/clock` 没有发布 | `rosparam get /use_sim_time`; `rostopic info /clock` | 启动 Gazebo 或用 `rosbag play --clock` |
 | 日志看不到 | 未设置 `output="screen"` 或看错日志目录 | `ls ~/.ros/log/latest` | 打开 screen 输出或查看日志文件 |
 
 ### 排障树
@@ -701,7 +774,7 @@ flowchart TD
   F -- 是 --> G[进入第8章坐标/模型/可视化]
 ```
 
-## 7.19 本章自测
+## 7.21 本章自测
 
 1. 为什么实际 ROS 系统不应该靠手动打开多个终端运行？
 2. `roslaunch` 自动启动 roscore 是否意味着它就是 ROS Master？
@@ -715,6 +788,8 @@ flowchart TD
 10. 为什么初学阶段不建议直接 `rosbag record -a`？
 11. 如果 bag 回放后 listener 没输出，应先检查哪些命令？
 12. `output="screen"` 对调试有什么帮助？
+13. `roswtf` 能解决什么问题？为什么不能完全依赖它？
+14. `/use_sim_time=true` 但没有 `/clock` 时，可能出现什么现象？
 
 ### 参考答案
 
@@ -742,7 +817,11 @@ flowchart TD
 
 12. `output="screen"` 会把节点日志直接显示在 roslaunch 终端，初学阶段能立即看到 Python traceback、C++ 错误和 ROS 日志。没有它时，错误可能只写入 `~/.ros/log`，学生容易误以为节点“没反应”。调试阶段建议打开 screen 输出，稳定后再按项目需要调整日志方式。
 
-## 7.20 本章小结
+13. `roswtf` 能检查环境变量、包路径、ROS 图、依赖和常见配置问题，适合作为第一轮自动诊断。但它只能发现工具规则覆盖到的问题，不能判断业务语义是否正确，例如速度值是否合理、TF 语义是否符合机器人模型、参数是否被节点代码使用。使用 `roswtf` 后仍要用 CLI 和日志验证具体状态。
+
+14. 如果 `/use_sim_time=true`，节点会等待 `/clock` 提供时间。若没有 Gazebo 或 `rosbag play --clock` 发布 `/clock`，依赖 ROS 时间的定时器、时间戳或 TF 查询可能长时间不前进，表现为节点等待、回调不触发或 RViz/TF 时间相关警告。排查时先看 `rosparam get /use_sim_time` 和 `rostopic info /clock`。
+
+## 7.22 本章小结
 
 本章把 ROS 程序从“能单独运行”推进到“能组织成系统”。launch、参数、remap、命名空间、日志和 bag 是 ROS 工程化的基础。
 
