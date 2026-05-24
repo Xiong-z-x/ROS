@@ -34,10 +34,23 @@ python scripts/build_combined_book.py
 
 ## PDF 导出
 
-PDF 导出脚本为：
+先生成主体合订版和练习小册：
+
+```bash
+python scripts/build_combined_book.py
+python scripts/build_exercise_booklet.py
+```
+
+主体 PDF 导出命令为：
 
 ```bash
 python scripts/export_book_pdf.py
+```
+
+练习小册 PDF 导出命令为：
+
+```bash
+python scripts/export_book_pdf.py --input "ROS1零基础自学指导书-自测题与参考答案小册.md" --html "ROS1零基础自学指导书-自测题与参考答案小册.html" --pdf "ROS1零基础自学指导书-自测题与参考答案小册.pdf"
 ```
 
 脚本会生成：
@@ -45,6 +58,8 @@ python scripts/export_book_pdf.py
 ```text
 ROS1零基础自学指导书-最终版.html
 ROS1零基础自学指导书-最终版.pdf
+ROS1零基础自学指导书-自测题与参考答案小册.html
+ROS1零基础自学指导书-自测题与参考答案小册.pdf
 ```
 
 脚本使用 Python Markdown 生成 HTML，再调用本机 Chrome 或 Edge 的 headless print 功能导出 PDF。教材正文已改为文字说明、表格和清单，不再依赖额外图形渲染工具。

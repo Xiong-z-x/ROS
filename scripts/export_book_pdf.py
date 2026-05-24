@@ -106,6 +106,13 @@ blockquote {
     html_path.write_text(page, encoding="utf-8", newline="\n")
 
 
+def resolve_repo_path(value: str) -> Path:
+    path = Path(value)
+    if path.is_absolute():
+        return path
+    return ROOT / path
+
+
 def print_pdf(chrome: Path, html_path: Path, pdf_path: Path) -> None:
     pdf_path.unlink(missing_ok=True)
     url = html_path.resolve().as_uri()
@@ -135,9 +142,9 @@ def main() -> None:
     parser.add_argument("--html-only", action="store_true")
     args = parser.parse_args()
 
-    markdown_path = Path(args.input)
-    html_path = Path(args.html)
-    pdf_path = Path(args.pdf)
+    markdown_path = resolve_repo_path(args.input)
+    html_path = resolve_repo_path(args.html)
+    pdf_path = resolve_repo_path(args.pdf)
 
     build_html(markdown_path, html_path)
     print(f"Wrote HTML: {html_path}")
