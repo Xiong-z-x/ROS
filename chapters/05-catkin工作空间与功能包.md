@@ -23,15 +23,6 @@ ROS 项目不是任意放置几个脚本就可以完成。一个可维护的 ROS
 
 第 2-4 章解决的是“看懂 ROS 系统”。本章开始解决“创建 ROS 项目”。从这一章开始，每一段 ROS 代码都应该放进功能包，而不是散落在桌面、下载目录或任意文件夹。
 
-```mermaid
-flowchart LR
-  A[第1章<br/>Ubuntu/终端/文件系统] --> B[第2-4章<br/>观察ROS计算图]
-  B --> C[第5章<br/>catkin工作空间与功能包]
-  C --> D[第6章<br/>Python/C++节点]
-  D --> E[第7章<br/>launch/参数/bag]
-  E --> F[第8-10章<br/>模型/仿真/综合项目]
-```
-
 这条主线有一个非常实际的原因：如果工作空间和功能包没有组织好，第 6 章的代码即使写对，也可能因为 ROS 找不到包、CMake 没有编译目标、环境变量没有叠加而无法运行。
 
 ## 5.2 必须理解的概念
@@ -49,14 +40,12 @@ flowchart LR
 
 这些概念必须连起来理解，而不是分开背。一个功能包从“磁盘上的文件夹”变成“ROS 能找到并运行的组件”，至少经历四个状态变化：
 
-```mermaid
-flowchart LR
-  A[src中的源码包] --> B[package.xml声明包名和依赖]
-  B --> C[CMakeLists.txt声明构建和安装规则]
-  C --> D[catkin_make生成build和devel]
-  D --> E[source devel/setup.bash更新当前终端环境]
-  E --> F[rospack/rosrun/roslaunch能找到包和节点]
-```
+1. 功能包源码放入 `catkin_ws/src`。
+2. `package.xml` 声明包名、维护信息和依赖。
+3. `CMakeLists.txt` 声明构建、生成、链接和安装规则。
+4. 在工作空间根目录执行 `catkin_make`，生成 `build/` 和 `devel/`。
+5. 当前终端执行 `source devel/setup.bash`，更新 ROS 包搜索路径和运行环境。
+6. `rospack`、`rosrun`、`roslaunch` 才能按包名找到对应资源和节点。
 
 这条链路能解释大量新手错误。包已经在 `src/` 里，不代表当前终端能找到它；`catkin_make` 成功，不代表新开的终端已经加载了 `devel/setup.bash`；Python 脚本放在包里，不代表它自动有执行权限；C++ 源码写好了，不代表 CMake 会自动编译它。每当出现“找不到包、找不到节点、编译没生成可执行文件”时，都要沿着这条链路检查，而不是把所有问题都归为 catkin 出错。
 
@@ -102,21 +91,7 @@ catkin_ws/
 
 catkin 不是单独替代 CMake，而是建立在 CMake 之上的 ROS 包构建体系。它把多个功能包的依赖关系、消息生成、库链接和环境叠加组织起来。
 
-```mermaid
-flowchart TB
-  A[源码空间<br/>catkin_ws/src] --> B[读取每个包的<br/>package.xml]
-  A --> C[读取每个包的<br/>CMakeLists.txt]
-  B --> D[解析包依赖]
-  C --> E[生成构建规则]
-  D --> F[catkin_make]
-  E --> F
-  F --> G[build/<br/>中间文件]
-  F --> H[devel/<br/>setup.bash/可执行入口/生成代码]
-  H --> I[source devel/setup.bash]
-  I --> J[rosrun/roslaunch/rospack<br/>能找到当前包]
-```
-
-这张图解释了为什么 “写了代码” 不等于 “ROS 能运行代码”：
+这个流程解释了为什么 “写了代码” 不等于 “ROS 能运行代码”：
 
 - ROS 要找到包，需要包在环境变量指向的路径下。
 - C++ 节点要能运行，需要 CMake 真的编译出可执行文件。
@@ -239,14 +214,7 @@ echo $CMAKE_PREFIX_PATH
 /home/用户名/catkin_ws/src:/opt/ros/noetic/share
 ```
 
-这说明当前终端查找 ROS 包时，会先看当前工作空间源码空间，再看系统安装的 `/opt/ros/noetic/share`。这就是环境覆盖。
-
-```mermaid
-flowchart LR
-  A[/opt/ros/noetic/setup.bash<br/>系统ROS环境] --> B[ROS能找到官方包]
-  B --> C[~/catkin_ws/devel/setup.bash<br/>叠加当前工作空间]
-  C --> D[ROS能找到官方包 + 当前包]
-```
+这说明当前终端查找 ROS 包时，会先看当前工作空间源码空间，再看系统安装的 `/opt/ros/noetic/share`。这就是环境覆盖：后加载的工作空间会叠加到系统 ROS 环境之上，使当前终端既能找到官方包，也能找到自己写的包。
 
 要让新终端自动加载，可以把 source 写入 `.bashrc`：
 
@@ -563,22 +531,15 @@ tree -L 2
 | 工作空间文件属于 root | 曾用 `sudo` 编译或创建文件 | `ls -l ~/catkin_ws` | 修复所有者，避免在工作空间用 `sudo` |
 | 改了 `package.xml` 但错误还在 | 没重新编译或没重新 source | `catkin_make`; `echo $ROS_PACKAGE_PATH` | 编译后重新 source |
 
-### 排障树
+### 排障顺序
 
-```mermaid
-flowchart TD
-  A[catkin/包相关错误] --> B{ROS命令是否可用}
-  B -- 否 --> B1[source /opt/ros/noetic/setup.bash]
-  B -- 是 --> C{包能否被rospack找到}
-  C -- 否 --> C1[检查包是否在catkin_ws/src]
-  C1 --> C2[回到catkin_ws执行catkin_make]
-  C2 --> C3[source devel/setup.bash]
-  C -- 是 --> D{C++可执行文件是否生成}
-  D -- 否 --> D1[检查CMakeLists add_executable/target_link_libraries]
-  D -- 是 --> E{运行时仍报依赖错误}
-  E -- 是 --> E1[检查package.xml和find_package依赖]
-  E -- 否 --> F[进入第6章编写节点]
-```
+catkin 或功能包相关错误可以按下面顺序检查：
+
+1. ROS 命令是否可用。如果 `rosrun`、`rospack` 不可用，先执行 `source /opt/ros/noetic/setup.bash`。
+2. 包是否能被 `rospack find 包名` 找到。如果找不到，检查包是否在 `~/catkin_ws/src`，并回到 `~/catkin_ws` 重新 `catkin_make`。
+3. 当前终端是否加载了工作空间。如果 `catkin_make` 成功但包仍不可见，执行 `source ~/catkin_ws/devel/setup.bash`。
+4. C++ 可执行文件是否生成。如果没有，检查 `CMakeLists.txt` 中的 `add_executable` 和 `target_link_libraries`。
+5. 运行时仍报依赖错误时，检查 `package.xml` 和 `find_package(catkin REQUIRED COMPONENTS ...)` 是否声明了真实直接依赖。
 
 ## 5.16 本章自测
 

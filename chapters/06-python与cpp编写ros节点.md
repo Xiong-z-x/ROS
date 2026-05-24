@@ -22,19 +22,6 @@
 
 第 5 章解决“代码放在哪里、怎样构建”。本章解决“代码怎样成为 ROS 计算图中的节点”。第 7 章会继续把这些节点组织成可复现实验。
 
-```mermaid
-flowchart LR
-  A[catkin工作空间] --> B[功能包beginner_tutorials]
-  B --> C[Python节点<br/>rospy]
-  B --> D[C++节点<br/>roscpp]
-  C --> E[Topic通信]
-  D --> E
-  C --> F[Service通信]
-  D --> F
-  E --> G[第7章launch统一启动]
-  F --> G
-```
-
 应把本章看成 ROS 编程的最低闭环：写代码、编译或授权、运行节点、观察图、定位错误。
 
 ## 6.2 必须理解的概念
@@ -77,17 +64,7 @@ flowchart LR
 - C++ 发布者：`cpp_talker`
 - C++ 订阅者：`cpp_listener`
 
-```mermaid
-sequenceDiagram
-  participant T as talker节点
-  participant M as ROS Master
-  participant L as listener节点
-  T->>M: 注册发布 /chatter, 类型 std_msgs/String
-  L->>M: 查询/订阅 /chatter
-  M-->>L: 返回发布者连接信息
-  L->>T: 建立数据连接
-  T-->>L: 持续发送 String 消息
-```
+发布订阅的运行关系可以按五步理解：发布者向 Master 注册 `/chatter` 及其类型，订阅者向 Master 查询并订阅 `/chatter`，Master 返回发布者连接信息，订阅者与发布者建立数据连接，发布者持续发送 `std_msgs/String` 消息，订阅者收到消息后触发回调。
 
 真实机器人里的 `/scan`、`/odom`、`/cmd_vel` 也是同样思想。区别只是消息类型和频率更复杂。
 
@@ -420,17 +397,7 @@ topic 适合持续流动的数据，例如速度、雷达、图像、里程计�
 - 请求：`a`、`b`
 - 响应：`sum`
 
-```mermaid
-sequenceDiagram
-  participant C as client节点
-  participant M as ROS Master
-  participant S as server节点
-  S->>M: 注册服务 add_two_ints
-  C->>M: 查询服务 add_two_ints
-  M-->>C: 返回服务端连接信息
-  C->>S: 请求 a=3, b=5
-  S-->>C: 响应 sum=8
-```
+服务调用的运行关系可以按五步理解：服务端向 Master 注册 `add_two_ints`，客户端向 Master 查询该服务，Master 返回服务端连接信息，客户端向服务端发送请求 `a=3, b=5`，服务端回传响应 `sum=8`。
 
 Service 的关键特点是客户端会等待服务端响应。它不适合高频传感器数据，也不适合需要持续反馈和取消的长任务。长任务后续应学习 action。
 
@@ -910,22 +877,14 @@ rqt_graph
 
 ### 排障顺序
 
-```mermaid
-flowchart TD
-  A[自写节点运行失败] --> B{roscore是否运行}
-  B -- 否 --> B1[启动roscore]
-  B -- 是 --> C{包是否可见}
-  C -- 否 --> C1[source devel/setup.bash<br/>rospack find]
-  C -- 是 --> D{Python还是C++}
-  D -- Python --> E[检查shebang/执行权限/导入错误]
-  D -- C++ --> F[检查catkin_make/CMake/链接/生成头文件]
-  E --> G{节点是否进入计算图}
-  F --> G
-  G -- 否 --> G1[rosnode list/终端日志]
-  G -- 是 --> H{接口是否存在}
-  H -- Topic --> H1[rostopic info/type/echo]
-  H -- Service --> H2[rosservice list/type/call]
-```
+自写节点运行失败时，按下面顺序检查：
+
+1. `roscore` 是否运行，当前终端是否能连接 Master。
+2. 功能包是否可见：`rospack find beginner_tutorials`，必要时重新 `source ~/catkin_ws/devel/setup.bash`。
+3. 如果是 Python 节点，检查 shebang、执行权限、导入错误和终端 traceback。
+4. 如果是 C++ 节点，检查 `catkin_make` 输出、`CMakeLists.txt`、链接库和生成的服务头文件。
+5. 节点是否进入计算图：`rosnode list` 和节点终端日志。
+6. Topic 或 service 是否存在、类型是否正确、是否真的有数据或响应：分别用 `rostopic info/type/echo` 和 `rosservice list/type/call` 检查。
 
 ## 6.21 本章自测
 

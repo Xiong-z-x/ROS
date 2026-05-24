@@ -48,20 +48,7 @@ rosrun turtlesim turtlesim_node
 
 如果读者不了解 `source`、`~`、`cd`、当前目录、工作空间这些概念，ROS 命令就会变成不可解释的命令片段。本章的目的就是避免这种情况。
 
-```mermaid
-flowchart TB
-  A[硬件与计算机] --> B[Linux内核]
-  B --> C[Ubuntu发行版]
-  C --> D[Bash终端与文件系统]
-  C --> E[APT软件包管理]
-  D --> F[环境变量与source]
-  E --> G[安装ROS Noetic]
-  F --> H[catkin工作空间]
-  G --> I[ROS节点/话题/服务]
-  H --> I
-```
-
-这张图是本书上册的基础依赖关系：Ubuntu 不是 ROS 的附属品，而是 ROS 运行、安装、构建和排障的底座。
+本书上册的基础依赖关系可以用一句话概括：硬件和 Linux 内核支撑 Ubuntu，Ubuntu 提供 Bash、文件系统、APT 和环境变量，ROS Noetic 安装在 Ubuntu 之上，catkin 工作空间再叠加到 ROS 环境之上，最终才运行节点、话题和服务。Ubuntu 不是 ROS 的附属品，而是 ROS 运行、安装、构建和排障的底座。
 
 ## 1.2 学习 ROS 时的几种 Ubuntu 环境
 

@@ -47,19 +47,7 @@ ROS1零基础自学指导书-最终版.html
 ROS1零基础自学指导书-最终版.pdf
 ```
 
-脚本使用 Python Markdown 生成 HTML，再调用本机 Chrome 或 Edge 的 headless print 功能导出 PDF。Mermaid 图表在 HTML 中渲染，并通过 CSS 限制最大高度，避免流程图在 PDF 中占用过大篇幅。
-
-如果本地存在：
-
-```text
-book-build/node_modules/mermaid/dist/mermaid.min.js
-```
-
-脚本会优先内联本地 Mermaid；否则会退回 jsDelivr CDN。为了减少网络依赖，可以先执行：
-
-```bash
-npm install --prefix book-build mermaid
-```
+脚本使用 Python Markdown 生成 HTML，再调用本机 Chrome 或 Edge 的 headless print 功能导出 PDF。教材正文已改为文字说明、表格和清单，不再依赖额外图形渲染工具。
 
 `book-build/` 是临时构建目录，不提交到 Git。
 

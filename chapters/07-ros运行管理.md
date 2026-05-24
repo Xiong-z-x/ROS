@@ -26,19 +26,6 @@
 
 第 6 章已经能写节点，但节点还像散落的零件。本章把节点、参数、topic 名和数据记录组织成一个可重复运行的小系统。
 
-```mermaid
-flowchart LR
-  A[自写节点<br/>talker/listener/service] --> B[launch统一启动]
-  B --> C[参数服务器/YAML]
-  B --> D[命名空间/remap]
-  B --> E[日志输出]
-  C --> F[可配置实验]
-  D --> F
-  E --> F
-  F --> G[rosbag记录与回放]
-  G --> H[第8-10章<br/>模型/仿真/综合项目]
-```
-
 机器人系统的工程化能力从这里开始。后面启动 RViz、Gazebo、移动机器人仿真、TF 和导航时，几乎都会依赖 launch 和参数文件。
 
 ## 7.2 必须理解的概念
@@ -497,17 +484,7 @@ rosbag 是 ROS1 的数据记录与回放工具。它记录的是 topic 中流动
 - 教师可以提供标准数据集。
 - 算法节点可以用同一份数据反复测试。
 
-rosbag 的基本数据流如下：
-
-```mermaid
-flowchart LR
-  A[talker/传感器/仿真节点] --> B[/chatter或其他topic]
-  B --> C[rosbag record]
-  C --> D[.bag文件]
-  D --> E[rosbag play]
-  E --> F[重新发布topic消息]
-  F --> G[listener/算法/RViz]
-```
+rosbag 的基本数据流可以理解为：发布者、传感器或仿真节点持续向 topic 发送消息；`rosbag record` 订阅这些 topic 并把消息写入 `.bag` 文件；`rosbag play` 读取 `.bag` 文件并按时间重新发布消息；listener、算法节点或 RViz 像接收实时数据一样接收回放数据。
 
 录制 `/chatter`：
 
@@ -757,22 +734,16 @@ rosbag play chatter_demo.bag
 | 设置仿真时间后节点不动 | `/clock` 没有发布 | `rosparam get /use_sim_time`; `rostopic info /clock` | 启动 Gazebo 或用 `rosbag play --clock` |
 | 日志看不到 | 未设置 `output="screen"` 或看错日志目录 | `ls ~/.ros/log/latest` | 打开 screen 输出或查看日志文件 |
 
-### 排障树
+### 排障顺序
 
-```mermaid
-flowchart TD
-  A[运行管理问题] --> B{roslaunch能否启动}
-  B -- 否 --> B1[检查包路径/source/launch文件名/XML语法]
-  B -- 是 --> C{节点是否存在}
-  C -- 否 --> C1[rosnode list + roslaunch终端日志]
-  C -- 是 --> D{参数是否存在}
-  D -- 否 --> D1[rosparam list/get + 检查YAML缩进和命名空间]
-  D -- 是 --> E{topic是否连通}
-  E -- 否 --> E1[rostopic info + rqt_graph + remap检查]
-  E -- 是 --> F{bag是否记录到数据}
-  F -- 否 --> F1[rosbag info + 检查录制topic名]
-  F -- 是 --> G[进入第8章坐标/模型/可视化]
-```
+运行管理问题可以按下面顺序检查：
+
+1. `roslaunch` 是否能启动。如果不能，先查包路径、`source`、launch 文件名和 XML 语法。
+2. 节点是否存在。启动后用 `rosnode list` 和 roslaunch 终端日志确认节点没有立即退出。
+3. 参数是否存在且位于正确命名空间。使用 `rosparam list/get`，同时检查 YAML 缩进和 `<rosparam>` 加载位置。
+4. topic 是否连通。使用 `rostopic info`、`rqt_graph` 和 remap 配置确认发布者与订阅者指向同一名称。
+5. bag 是否记录到预期数据。使用 `rosbag info` 检查 topic、消息类型、数量和时长。
+6. 如果启用了仿真时间，检查 `/use_sim_time` 和 `/clock`，确认 Gazebo 或 `rosbag play --clock` 正在发布时间。
 
 ## 7.21 本章自测
 

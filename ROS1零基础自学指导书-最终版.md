@@ -10,7 +10,7 @@ ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续使用 Noetic，
 
 建议按章节顺序学习。每章都包含本章目标、概念解释、最小可运行实验、正确现象、常见错误、自测题、参考答案和延伸阅读。读者应在 Ubuntu 20.04 + ROS Noetic 环境中实际运行命令，并在每次实验后先独立回答自测题，再对照参考答案检查理解是否完整。
 
-本书包含“学习成果验收与排障索引”，用于把每章学习内容转换成可观察交付物。自学时不应只看正文，应按索引保留命令输出、截图、系统图或 README 片段，作为确实完成实验的证据。
+本书包含“学习成果验收与排障索引”，用于把每章学习内容转换成可观察交付物。自学时不应只看正文，应按索引保留命令输出、截图、数据流清单或 README 片段，作为确实完成实验的证据。
 
 本书主线不展开后续平台部署主题，也不把高级算法推导作为主体。SLAM、定位、导航等内容只作为 ROS 系统集成案例出现。
 
@@ -47,13 +47,13 @@ ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续使用 Noetic，
 | 1 | Ubuntu 与 Linux 基础 | 能创建目录、编辑文件、安装软件、解释 `PATH` 和 `.bashrc` | `pwd`、`tree`、`which`、`tail ~/.bashrc` 的输出截图或文本 |
 | 2 | ROS1 计算图概念 | 能解释 Master、Node、Topic、Service、Parameter 的职责边界 | `rosnode list`、`rostopic list`、`rosservice list`、`rosparam list` 的输出 |
 | 3 | ROS1 安装与验证 | 能完成 Ubuntu 20.04 + Noetic 主线安装，并说明旁路安装方法的限制 | `rosversion -d`、`roscore`、`rosnode list`、turtlesim 启动截图 |
-| 4 | 第一个 ROS 系统 | 能用 turtlesim 观察节点、话题、消息类型和计算图 | `rqt_graph` 图、`rostopic info /turtle1/cmd_vel`、`rostopic echo` 输出 |
+| 4 | 第一个 ROS 系统 | 能用 turtlesim 观察节点、话题、消息类型和计算图 | `rqt_graph` 截图或文字记录、`rostopic info /turtle1/cmd_vel`、`rostopic echo` 输出 |
 | 5 | catkin 工程组织 | 能创建工作空间和功能包，解释 `src/build/devel` 的关系 | `tree ~/catkin_ws -L 2`、`catkin_make` 成功输出、`rospack find` |
 | 6 | Python/C++ 节点编程 | 能写发布者、订阅者、服务端、客户端，并解释回调和消息类型 | talker/listener 运行日志、`rostopic hz`、`rossrv show`、service 调用输出 |
 | 7 | 运行管理 | 能用 launch、YAML、remap、命名空间、rosbag、`roswtf` 和仿真时间组织可复现实验 | launch 文件、参数 YAML、`rosbag info`、`roswtf` 输出、回放时的 topic 输出 |
-| 8 | 坐标、模型与可视化 | 能解释 TF 树、URDF link/joint、RViz Fixed Frame | `view_frames` 生成图、RViz RobotModel/TF 截图、URDF 文件 |
+| 8 | 坐标、模型与可视化 | 能解释 TF 树、URDF link/joint、RViz Fixed Frame | `view_frames` 结果摘要、RViz RobotModel/TF 截图、URDF 文件 |
 | 9 | 移动机器人仿真 | 能观察 `/cmd_vel`、`/odom`、`/scan`、`/tf`，区分 RViz 和 Gazebo | Gazebo/RViz 截图、`rostopic hz /scan`、`rosrun tf view_frames` |
-| 10 | 综合项目 | 能交付一个可启动、可观察、可控制、可记录、可复现的小项目 | README、launch、YAML、RViz 配置、bag 文件说明和系统图 |
+| 10 | 综合项目 | 能交付一个可启动、可观察、可控制、可记录、可复现的小项目 | README、launch、YAML、RViz 配置、bag 文件说明和数据流清单 |
 
 这张表可以作为教师验收表，也可以作为自学者的进度表。每完成一章，至少保留一组命令输出或截图。没有证据，就不能确认自己真的掌握了那一章。
 
@@ -61,22 +61,12 @@ ROS Noetic 已于 **2025-05-31** 到达官方 EOL。本书继续使用 Noetic，
 
 ROS 新手最常见的问题不是“算法不会”，而是系统状态不可见。排障时不应先改代码，也不应先重装系统，应按层检查：
 
-```mermaid
-flowchart TD
-  A[出现错误现象] --> B{系统层是否正常}
-  B -- 否 --> B1[检查Ubuntu版本/网络/权限/apt/磁盘]
-  B -- 是 --> C{环境层是否正常}
-  C -- 否 --> C1[检查source/PATH/ROS_DISTRO/工作空间overlay]
-  C -- 是 --> D{构建层是否正常}
-  D -- 否 --> D1[检查catkin_make/package.xml/CMakeLists.txt/生成文件]
-  D -- 是 --> E{运行层是否正常}
-  E -- 否 --> E1[检查roscore/rosnode/roslaunch/日志]
-  E -- 是 --> F{通信层是否正常}
-  F -- 否 --> F1[检查topic/service/action/message类型/频率]
-  F -- 是 --> G{机器人语义是否正确}
-  G -- 否 --> G1[检查TF/坐标系/单位/参数/RViz fixed frame]
-  G -- 是 --> H[记录现象并收敛到具体代码或配置]
-```
+1. 系统层：Ubuntu 版本、网络、权限、APT、磁盘空间是否正常。
+2. 环境层：`source`、`PATH`、`ROS_DISTRO`、工作空间 overlay 是否生效。
+3. 构建层：`catkin_make`、`package.xml`、`CMakeLists.txt`、生成文件是否正确。
+4. 运行层：`roscore`、`rosnode`、`roslaunch` 和日志是否正常。
+5. 通信层：topic、service、action、message 类型和频率是否正确。
+6. 机器人语义层：TF、坐标系、单位、参数、RViz Fixed Frame 是否匹配。
 
 这条顺序背后的逻辑是：底层状态错误会伪装成上层错误。例如没有 source 工作空间时，`rosrun` 找不到节点；CMake 没有生成 service 头文件时，C++ 会报 include 错误；TF 缺少 `odom -> base_link` 时，RViz 里模型可能“消失”。如果不先分层，就会把所有问题都误判成“ROS 不稳定”。
 
@@ -104,7 +94,7 @@ flowchart TD
 3. 完成最小实验，不应跳过“正确现象”。如果正确现象说不清，就说明实验只是能够启动，还没有被理解。
 4. 故意做一个小错误并修复。例如不 source 工作空间、写错 topic 名、关闭 roscore，再观察报错。
 5. 完成本章自测。先独立作答，再看参考答案。参考答案不是背诵材料，而是检查解释是否覆盖原因、命令和现象。
-6. 保存一份证据。可以是截图、命令输出、系统图、bag 信息或 README 片段。
+6. 保存一份证据。可以是截图、命令输出、数据流清单、bag 信息或 README 片段。
 
 ## 参考资料的使用方式
 
@@ -131,7 +121,7 @@ flowchart TD
 - 写一个 service，并区分 `.srv` 文件、生成的类型、server 注册和 client 调用。
 - 用 launch 一次启动多个节点，给出参数和 remap 示例。
 - 录制并回放 rosbag，说明 bag 里包含哪些 topic。
-- 画出一个简单 TF 树，并解释 `map`、`odom`、`base_link` 的语义差异。
+- 列出一个简单 TF 树关系，并解释 `map`、`odom`、`base_link` 的语义差异。
 - 写一个最小 URDF，在 RViz 中显示 RobotModel。
 - 启动一个移动机器人仿真，观察速度命令、里程计、激光雷达和 TF。
 - 为综合项目写 README，说明启动方式、节点图、topic 表、参数表和排障方法。
@@ -190,20 +180,7 @@ rosrun turtlesim turtlesim_node
 
 如果读者不了解 `source`、`~`、`cd`、当前目录、工作空间这些概念，ROS 命令就会变成不可解释的命令片段。本章的目的就是避免这种情况。
 
-```mermaid
-flowchart TB
-  A[硬件与计算机] --> B[Linux内核]
-  B --> C[Ubuntu发行版]
-  C --> D[Bash终端与文件系统]
-  C --> E[APT软件包管理]
-  D --> F[环境变量与source]
-  E --> G[安装ROS Noetic]
-  F --> H[catkin工作空间]
-  G --> I[ROS节点/话题/服务]
-  H --> I
-```
-
-这张图是本书上册的基础依赖关系：Ubuntu 不是 ROS 的附属品，而是 ROS 运行、安装、构建和排障的底座。
+本书上册的基础依赖关系可以用一句话概括：硬件和 Linux 内核支撑 Ubuntu，Ubuntu 提供 Bash、文件系统、APT 和环境变量，ROS Noetic 安装在 Ubuntu 之上，catkin 工作空间再叠加到 ROS 环境之上，最终才运行节点、话题和服务。Ubuntu 不是 ROS 的附属品，而是 ROS 运行、安装、构建和排障的底座。
 
 ## 1.2 学习 ROS 时的几种 Ubuntu 环境
 
@@ -912,12 +889,12 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 
 本章先建立 ROS1 的运行时心智模型。重点不是提前执行命令，而是先理解 `roscore`、`rosnode`、`rostopic`、`rosservice` 和 `rosparam` 分别观察什么对象，以及这些对象之间如何协同。
 
-> 学习提示：如果尚未完成第 3 章 ROS 安装，本章只阅读概念、图示、表格和决策方法，不执行任何 ROS 命令。真正的第一次运行与观察，统一放到第 3 章安装验证和第 4 章 turtlesim 实验中完成。这样可以避免读者在环境尚未准备好时，被 `roscore`、`rosnode list` 之类的命令打断学习节奏。
+> 学习提示：如果尚未完成第 3 章 ROS 安装，本章只阅读概念、表格、文字说明和决策方法，不执行任何 ROS 命令。真正的第一次运行与观察，统一放到第 3 章安装验证和第 4 章 turtlesim 实验中完成。这样可以避免读者在环境尚未准备好时，被 `roscore`、`rosnode list` 之类的命令打断学习节奏。
 
 ## 学习完成后应达到的能力
 
 - 解释 ROS 为什么不是传统操作系统。
-- 画出 ROS Master、Node、Topic、Message、Service、Action、Parameter Server 的关系。
+- 用文字说明 ROS Master、Node、Topic、Message、Service、Action、Parameter Server 的关系。
 - 区分发布订阅、请求响应、长时间任务三种通信方式。
 - 解释为什么 ROS Master 不负责转发所有 topic 数据。
 - 根据任务类型判断应使用 topic、service、action 还是 parameter。
@@ -927,19 +904,6 @@ source / env  -> 最后确认环境变量是否在当前终端生效
 ## 2.1 ROS 在本书中的位置
 
 第 1 章解决的是 Ubuntu 和终端基础。本章开始进入 ROS，但仍然不写代码。这个顺序重要，因为 ROS 不是孤立存在的：
-
-```mermaid
-flowchart TD
-    A[Ubuntu 20.04] --> B[Bash 终端]
-    B --> C[APT 包管理]
-    B --> D[环境变量]
-    C --> E[ROS Noetic 安装]
-    D --> E
-    E --> F[ROS Master 和命令行工具]
-    F --> G[节点 通信 参数]
-    G --> H[catkin 工作空间和功能包]
-    H --> I[Python/C++ 节点]
-```
 
 如果第 1 章的 `source`、`PATH`、`apt`、当前目录没有理解，第 2 章的 `roscore`、`rosnode list`、`rostopic echo` 就会变成不可解释的黑箱。反过来，如果本章没有理解 ROS 计算图，第 5、6、7 章的工程和编程也会失去上下文。
 
@@ -986,19 +950,9 @@ ROS 提供的是机器人软件开发常见能力：
 
 如果没有统一通信机制，每个模块都要自己定义网络连接、数据格式、启动顺序、日志输出和调试方式。系统小的时候还能凑合，系统一复杂就会变成大量互相依赖的专用代码。
 
-ROS 的思路是把系统拆开，让每个模块只关心自己的输入输出：
+ROS 的思路是把系统拆开，让每个模块只关心自己的输入输出。例如：激光雷达节点发布 `/scan`，建图或定位节点订阅 `/scan` 和 `/odom`，导航节点根据地图与目标点发布 `/cmd_vel`，底盘驱动或仿真节点订阅 `/cmd_vel` 并反馈 `/odom`，RViz 订阅地图、轨迹、激光和 TF 后显示系统状态。
 
-```mermaid
-flowchart LR
-    Lidar[激光雷达节点] -- /scan --> Slam[建图或定位节点]
-    Odom[底盘里程计节点] -- /odom --> Slam
-    Slam -- /map --> RViz[RViz 可视化]
-    Nav[导航节点] -- /cmd_vel --> Base[底盘驱动节点]
-    Base -- /odom --> RViz
-    Lidar -- /scan --> RViz
-```
-
-这个图里，RViz 不需要知道激光雷达驱动如何读取串口；导航节点也不需要知道底盘电机如何控制。只要接口一致，模块就能组合。
+在这种结构中，RViz 不需要知道激光雷达驱动如何读取串口；导航节点也不需要知道底盘电机如何控制。只要 topic 名、消息类型、坐标系和参数约定一致，模块就能组合。
 
 ### 这一点为什么重要
 
@@ -1016,27 +970,10 @@ ROS 的学习重点不是“背命令”，而是学会把机器人系统看成�
 
 ROS1 中运行时的节点和通信关系称为 computation graph，即计算图。它不是神经网络图，也不是文件目录树，而是运行中的进程和通信关系。
 
-```mermaid
-flowchart TD
-    Master[ROS Master<br/>注册和发现]
-    A[Node A<br/>发布者]
-    B[Node B<br/>订阅者]
-    C[Parameter Server<br/>参数存储]
-    Topic[/Topic<br/>消息通道/]
+理解计算图时，要区分两类关系：
 
-    A -.注册发布者.-> Master
-    B -.注册订阅者.-> Master
-    C -.参数API.-> Master
-    A -- message data --> Topic
-    Topic -- message data --> B
-    A -.查询/设置参数.-> C
-    B -.查询参数.-> C
-```
-
-这张图要注意两种线：
-
-- 虚线表示注册、发现、参数访问等控制信息。
-- 实线表示 topic 消息数据流。
+- 控制关系：注册、发现、参数访问等信息，主要用于让节点知道系统中有什么、在哪里。
+- 数据关系：topic、service、action 中实际传递的消息或请求响应，直接影响机器人运行行为。
 
 Master 参与发现，但 topic 数据不通过 Master 转发。ROS Technical Overview 说明，节点会通过 XMLRPC 协商连接，然后使用 TCPROS 等传输机制直接传输序列化消息数据。
 
@@ -1076,25 +1013,15 @@ http://localhost:11311
 
 ### 一个 topic 连接大致怎样建立
 
-可以把连接过程理解成四步：
+可以把连接过程理解成下面几步：
 
-```mermaid
-sequenceDiagram
-    participant P as 发布者节点
-    participant M as ROS Master
-    participant S as 订阅者节点
-    participant T as 直接数据连接
+1. 发布者节点向 Master 注册：自己会发布某个 topic，例如 `/scan`。
+2. 订阅者节点向 Master 注册：自己要订阅同一个 topic。
+3. Master 把发布者的连接信息返回给订阅者。
+4. 订阅者与发布者协商传输协议和消息类型。
+5. 协商成功后，消息数据在发布者和订阅者之间传输。
 
-    P->>M: 注册发布 /scan
-    S->>M: 注册订阅 /scan
-    M-->>S: 告诉订阅者 /scan 的发布者位置
-    S->>P: 协商传输协议和消息类型
-    P-->>S: 建立连接参数
-    P->>T: 发送序列化消息数据
-    T->>S: 订阅者接收消息
-```
-
-这个图有两个关键结论：
+这个过程有两个关键结论：
 
 1. Master 参与“谁在哪里”的发现。
 2. 数据传输发生在发布者和订阅者之间，不是由 Master 逐条转发。
@@ -1317,20 +1244,14 @@ rosparam delete /chapter2_demo_rate
 
 ## 2.12 通信方式选择决策表
 
-当不确定该用 topic、service、action 还是 parameter 时，可以按下面判断：
+当不确定该用 topic、service、action 还是 parameter 时，可以按下面顺序判断：
 
-```mermaid
-flowchart TD
-    A[要传递的信息是什么?] --> B{是否是运行配置?}
-    B -- 是 --> P[Parameter<br/>例如最大速度 端口名 frame_id]
-    B -- 否 --> C{是否连续产生?}
-    C -- 是 --> T[Topic<br/>例如图像 激光 里程计 速度命令]
-    C -- 否 --> D{是否是长时间任务?}
-    D -- 是 --> AC[Action<br/>例如导航到目标点]
-    D -- 否 --> S[Service<br/>例如重置 保存 查询]
-```
+1. 如果信息是运行配置，例如最大速度、端口名、`frame_id`，优先考虑 parameter。
+2. 如果信息会连续产生，例如图像、激光、里程计、速度命令，优先考虑 topic。
+3. 如果信息不是连续数据，但任务持续时间较长，并且需要反馈、结果或取消，例如导航到目标点，优先考虑 action。
+4. 如果信息是短请求短响应，例如重置、保存、查询或简单计算，优先考虑 service。
 
-这张图不是绝对规则，但能避免初学者最常见的误用：
+这不是绝对规则，但能避免初学者最常见的误用：
 
 - 不应用 parameter 传传感器数据。
 - 不应用 service 传连续图像。
@@ -1486,17 +1407,10 @@ rosparam delete /chapter2/student_name
 
 ROS 概念排障要特别避免“只看名字”。`rostopic list` 看到 `/scan`，只能说明系统中出现过这个 topic 名；它不能证明有激光数据持续发布，也不能证明订阅者收到的数据类型正确。可靠检查应该分四层：
 
-```mermaid
-flowchart TD
-  A[ROS通信异常] --> B{Master层}
-  B --> B1[roscore是否运行<br/>ROS_MASTER_URI是否正确]
-  B1 --> C{名称层}
-  C --> C1[rosnode list<br/>rostopic list<br/>rosservice list]
-  C1 --> D{类型层}
-  D --> D1[rostopic type<br/>rosmsg show<br/>rosservice type]
-  D1 --> E{数据层}
-  E --> E1[rostopic echo<br/>rostopic hz<br/>日志/rqt_graph]
-```
+1. Master 层：`roscore` 是否运行，`ROS_MASTER_URI` 是否正确。
+2. 名称层：`rosnode list`、`rostopic list`、`rosservice list` 是否能看到目标对象。
+3. 类型层：`rostopic type`、`rosmsg show`、`rosservice type` 是否与预期一致。
+4. 数据层：`rostopic echo`、`rostopic hz`、日志和 `rqt_graph` 是否证明数据确实在流动。
 
 例如“机器人不动”不能只看 `/cmd_vel` 是否存在。最低限度要确认：控制节点是否在 `rosnode list` 中；`/cmd_vel` 的消息类型是不是 `geometry_msgs/Twist`；`rostopic echo /cmd_vel` 是否真的有非零速度；底盘或仿真节点是否订阅了同一个 topic；TF 和坐标参数是否让速度命令进入了正确机器人实例。只查 topic 名，最多能证明名字存在，不能证明控制链路成立。
 
@@ -1595,24 +1509,15 @@ flowchart TD
 
 成熟 ROS 教程通常把安装和环境配置放在最前面，然后马上进入 ROS 文件系统、节点、话题等基础实验。这个顺序合理，因为安装后的第一目标不是“装完了”，而是能够运行最小系统并观察它。
 
-本章的安装判断流程如下：
+本章的安装判断原则如下：
 
-```mermaid
-flowchart TD
-    A[准备学习 ROS1 Noetic] --> B{是否能使用 Ubuntu 20.04?}
-    B -- 是 --> C{是否是完整桌面环境?}
-    C -- 是 --> D[主线: 官方 apt + desktop-full]
-    C -- 否 --> E[可选: ros-base 或 desktop<br/>但图形实验需补包]
-    B -- 否 --> F{是否只是前期 CLI 学习?}
-    F -- 是 --> G[WSL2 或 Docker 备用]
-    F -- 否 --> H[建议先建 Ubuntu 20.04 虚拟机]
-    D --> I[验证 roscore + rosnode + turtlesim]
-    E --> I
-    G --> J[先验证 CLI<br/>GUI/Gazebo 不作为主验收]
-    H --> D
-```
+1. 如果可以使用完整 Ubuntu 20.04 桌面环境，优先采用官方 apt 安装 `desktop-full`，这是本书主线。
+2. 如果环境空间有限，但仍需要 RViz、rqt 等图形工具，可以选择 `desktop`，缺什么再补什么。
+3. 如果是服务器、容器或只做命令行基础实验，可以选择 `ros-base`，但图形和仿真实验不能按完整主线验收。
+4. 如果当前电脑无法直接安装 Ubuntu 20.04，优先建立 Ubuntu 20.04 虚拟机；WSL2 和 Docker 作为备用路线。
+5. 如果主要问题是国内网络、rosdep 或换源，鱼香 ROS 可以作为辅助工具，但不能替代对软件源、APT 和环境变量的理解。
 
-这张图表达一个原则：方法可以多，但主线必须清晰。零基础教学首先追求可复现和可排障，而不是展示所有可能路径。
+这些判断表达一个原则：方法可以多，但主线必须清晰。零基础教学首先追求可复现和可排障，而不是展示所有可能路径。
 
 ## 3.2 安装前必须确认的事实
 
@@ -1852,18 +1757,7 @@ ls /etc/ros/rosdep/sources.list.d/
 
 ## 3.5 安装过程的系统状态变化
 
-新手常见问题是只关注命令本身，却不知道系统状态发生了哪些变化。可以按下面理解：
-
-```mermaid
-flowchart LR
-    A[启用 Ubuntu 仓库] --> B[添加 ROS 软件源文件]
-    B --> C[添加软件源密钥]
-    C --> D[apt update 更新索引]
-    D --> E[apt install 安装 ROS 包]
-    E --> F[source setup.bash 修改当前终端环境]
-    F --> G[写入 bashrc 让新终端自动加载]
-    G --> H[rosdep 初始化依赖解析]
-```
+新手常见问题是只关注命令本身，却不知道系统状态发生了哪些变化。完整安装过程可以按“启用仓库、添加 ROS 软件源、添加密钥、更新索引、安装软件包、加载环境、写入 Bash 配置、初始化 rosdep”这几类状态来理解。
 
 对应文件或状态：
 
@@ -2257,22 +2151,15 @@ rosrun turtlesim turtlesim_node
 | WSL2 中 RViz/Gazebo 异常 | GUI/显卡/显示服务问题 | `echo $DISPLAY`; 运行简单 GUI 程序 | 不把该错误归因于 ROS 本体 |
 | `.bashrc` 写了多行 source | 多发行版环境冲突 | `tail ~/.bashrc` | 保留当前使用的一个发行版 |
 
-### 安装排障树
+### 安装排障顺序
 
-```mermaid
-flowchart TD
-    A[安装失败] --> B{apt update 是否成功?}
-    B -- 否 --> B1[先修网络和软件源]
-    B -- 是 --> C{能找到 ros-noetic 包?}
-    C -- 否 --> C1[检查 Ubuntu codename 和 ros-latest.list]
-    C -- 是 --> D{安装后 roscore 可找到?}
-    D -- 否 --> D1[检查 source 和 PATH]
-    D -- 是 --> E{roscore 能运行?}
-    E -- 否 --> E1[检查终端错误和端口占用]
-    E -- 是 --> F{turtlesim 有窗口?}
-    F -- 否 --> F1[检查 GUI 或补装 turtlesim]
-    F -- 是 --> G[安装主线通过]
-```
+安装失败时按下面顺序检查：
+
+1. `sudo apt update` 是否成功。如果失败，先修网络、Ubuntu 软件源和 ROS 软件源，不要继续安装。
+2. apt 是否能找到 `ros-noetic-*` 包。如果找不到，检查 Ubuntu codename 是否为 `focal`，以及 `/etc/apt/sources.list.d/ros-latest.list` 是否存在且内容正确。
+3. 安装后 `roscore` 是否能被找到。如果找不到，检查 `/opt/ros/noetic` 是否存在，以及当前终端是否执行过 `source /opt/ros/noetic/setup.bash`。
+4. `roscore` 是否能运行。如果命令存在但启动失败，阅读终端错误，检查端口占用、Python 环境和系统日志。
+5. `turtlesim` 是否能打开窗口。如果核心命令正常但图形示例失败，优先检查是否安装 `ros-noetic-turtlesim`、桌面显示环境、虚拟机或 WSL2 图形支持。
 
 ## 3.14 本章自测
 
@@ -2352,14 +2239,6 @@ flowchart TD
 
 第 2 章讲概念，第 3 章讲安装，本章用最小系统把概念和安装结果连接起来。
 
-```mermaid
-flowchart LR
-    A[第2章 ROS概念] --> D[第4章 turtlesim]
-    B[第3章 ROS安装] --> D
-    D --> E[第5章 catkin工作空间]
-    D --> F[第6章 自己写节点]
-```
-
 如果本章只做到“能让 turtlesim 模拟海龟运动”，学习是不完整的。核心目标是能解释该现象背后的 ROS 结构。读者需要把窗口中看到的运动，映射到节点、topic、消息类型和数据流。
 
 ## 4.2 为什么用 turtlesim
@@ -2390,7 +2269,7 @@ flowchart LR
 - 底盘节点有没有订阅 `/cmd_vel`？
 - 消息类型是不是 `geometry_msgs/Twist`？
 - 反馈 topic 有没有数据？
-- 图里看到的连接是否符合预期？
+- `rqt_graph` 中看到的连接是否符合预期？
 
 ## 4.3 本章必须理解的概念
 
@@ -2405,21 +2284,9 @@ flowchart LR
 
 ## 4.4 turtlesim 的数据流
 
-先看整体结构：
+先看整体结构：键盘输入由 `turtle_teleop_key` 节点接收，这个节点把按键转换成 `geometry_msgs/Twist` 速度消息并发布到 `/turtle1/cmd_vel`；`turtlesim_node` 订阅该 topic，收到速度后更新模拟海龟状态，再发布 `/turtle1/pose` 供外部观察。
 
-```mermaid
-flowchart LR
-    K[键盘输入] --> T[turtle_teleop_key<br/>/teleop_turtle]
-    T -- /turtle1/cmd_vel<br/>geometry_msgs/Twist --> S[turtlesim_node<br/>/turtlesim]
-    S -- /turtle1/pose<br/>turtlesim/Pose --> E[rostopic echo<br/>观察状态]
-    S -- /rosout --> R[日志系统]
-    G[rqt_graph] -.观察节点关系.-> T
-    G -.观察节点关系.-> S
-```
-
-这张图里，键盘控制节点没有直接调用 turtlesim 的内部函数。它只是把按键转换成速度消息，发布到 `/turtle1/cmd_vel`。turtlesim 订阅这个 topic，收到速度后更新模拟海龟状态，再发布 `/turtle1/pose`。
-
-后续分析移动机器人时，也可以画类似图：
+后续分析移动机器人时，也可以写成类似的数据流：
 
 ```text
 teleop -> /cmd_vel -> base_driver -> /odom
@@ -2727,18 +2594,13 @@ rosservice list | grep turtle
 
 ### 排障顺序
 
-```mermaid
-flowchart TD
-    A[模拟海龟不动] --> B{turtlesim窗口是否存在?}
-    B -- 否 --> B1[检查 turtlesim 是否启动]
-    B -- 是 --> C{teleop终端是否有焦点?}
-    C -- 否 --> C1[点击teleop终端再按键]
-    C -- 是 --> D{cmd_vel是否有数据?}
-    D -- 否 --> D1[rostopic info /turtle1/cmd_vel]
-    D -- 是 --> E{turtlesim是否订阅cmd_vel?}
-    E -- 否 --> E1[检查topic名和节点状态]
-    E -- 是 --> F[检查消息格式或仿真状态]
-```
+模拟海龟不动时，按下面顺序检查：
+
+1. turtlesim 窗口是否已经打开。如果没有，先检查 `rosrun turtlesim turtlesim_node` 是否成功。
+2. 键盘控制终端是否获得焦点。如果没有，点击 `turtle_teleop_key` 所在终端再按方向键。
+3. `/turtle1/cmd_vel` 是否真的有数据。使用 `rostopic echo /turtle1/cmd_vel` 或 `rostopic info /turtle1/cmd_vel` 检查。
+4. `turtlesim_node` 是否订阅了 `/turtle1/cmd_vel`。如果 topic 名不一致，速度消息不会进入仿真节点。
+5. 如果 topic 和订阅关系都正常，再检查消息格式、仿真窗口状态或终端错误输出。
 
 ## 4.11 本章自测
 
@@ -2824,15 +2686,6 @@ ROS 项目不是任意放置几个脚本就可以完成。一个可维护的 ROS
 
 第 2-4 章解决的是“看懂 ROS 系统”。本章开始解决“创建 ROS 项目”。从这一章开始，每一段 ROS 代码都应该放进功能包，而不是散落在桌面、下载目录或任意文件夹。
 
-```mermaid
-flowchart LR
-  A[第1章<br/>Ubuntu/终端/文件系统] --> B[第2-4章<br/>观察ROS计算图]
-  B --> C[第5章<br/>catkin工作空间与功能包]
-  C --> D[第6章<br/>Python/C++节点]
-  D --> E[第7章<br/>launch/参数/bag]
-  E --> F[第8-10章<br/>模型/仿真/综合项目]
-```
-
 这条主线有一个非常实际的原因：如果工作空间和功能包没有组织好，第 6 章的代码即使写对，也可能因为 ROS 找不到包、CMake 没有编译目标、环境变量没有叠加而无法运行。
 
 ## 5.2 必须理解的概念
@@ -2850,14 +2703,12 @@ flowchart LR
 
 这些概念必须连起来理解，而不是分开背。一个功能包从“磁盘上的文件夹”变成“ROS 能找到并运行的组件”，至少经历四个状态变化：
 
-```mermaid
-flowchart LR
-  A[src中的源码包] --> B[package.xml声明包名和依赖]
-  B --> C[CMakeLists.txt声明构建和安装规则]
-  C --> D[catkin_make生成build和devel]
-  D --> E[source devel/setup.bash更新当前终端环境]
-  E --> F[rospack/rosrun/roslaunch能找到包和节点]
-```
+1. 功能包源码放入 `catkin_ws/src`。
+2. `package.xml` 声明包名、维护信息和依赖。
+3. `CMakeLists.txt` 声明构建、生成、链接和安装规则。
+4. 在工作空间根目录执行 `catkin_make`，生成 `build/` 和 `devel/`。
+5. 当前终端执行 `source devel/setup.bash`，更新 ROS 包搜索路径和运行环境。
+6. `rospack`、`rosrun`、`roslaunch` 才能按包名找到对应资源和节点。
 
 这条链路能解释大量新手错误。包已经在 `src/` 里，不代表当前终端能找到它；`catkin_make` 成功，不代表新开的终端已经加载了 `devel/setup.bash`；Python 脚本放在包里，不代表它自动有执行权限；C++ 源码写好了，不代表 CMake 会自动编译它。每当出现“找不到包、找不到节点、编译没生成可执行文件”时，都要沿着这条链路检查，而不是把所有问题都归为 catkin 出错。
 
@@ -2903,21 +2754,7 @@ catkin_ws/
 
 catkin 不是单独替代 CMake，而是建立在 CMake 之上的 ROS 包构建体系。它把多个功能包的依赖关系、消息生成、库链接和环境叠加组织起来。
 
-```mermaid
-flowchart TB
-  A[源码空间<br/>catkin_ws/src] --> B[读取每个包的<br/>package.xml]
-  A --> C[读取每个包的<br/>CMakeLists.txt]
-  B --> D[解析包依赖]
-  C --> E[生成构建规则]
-  D --> F[catkin_make]
-  E --> F
-  F --> G[build/<br/>中间文件]
-  F --> H[devel/<br/>setup.bash/可执行入口/生成代码]
-  H --> I[source devel/setup.bash]
-  I --> J[rosrun/roslaunch/rospack<br/>能找到当前包]
-```
-
-这张图解释了为什么 “写了代码” 不等于 “ROS 能运行代码”：
+这个流程解释了为什么 “写了代码” 不等于 “ROS 能运行代码”：
 
 - ROS 要找到包，需要包在环境变量指向的路径下。
 - C++ 节点要能运行，需要 CMake 真的编译出可执行文件。
@@ -3040,14 +2877,7 @@ echo $CMAKE_PREFIX_PATH
 /home/用户名/catkin_ws/src:/opt/ros/noetic/share
 ```
 
-这说明当前终端查找 ROS 包时，会先看当前工作空间源码空间，再看系统安装的 `/opt/ros/noetic/share`。这就是环境覆盖。
-
-```mermaid
-flowchart LR
-  A[/opt/ros/noetic/setup.bash<br/>系统ROS环境] --> B[ROS能找到官方包]
-  B --> C[~/catkin_ws/devel/setup.bash<br/>叠加当前工作空间]
-  C --> D[ROS能找到官方包 + 当前包]
-```
+这说明当前终端查找 ROS 包时，会先看当前工作空间源码空间，再看系统安装的 `/opt/ros/noetic/share`。这就是环境覆盖：后加载的工作空间会叠加到系统 ROS 环境之上，使当前终端既能找到官方包，也能找到自己写的包。
 
 要让新终端自动加载，可以把 source 写入 `.bashrc`：
 
@@ -3364,22 +3194,15 @@ tree -L 2
 | 工作空间文件属于 root | 曾用 `sudo` 编译或创建文件 | `ls -l ~/catkin_ws` | 修复所有者，避免在工作空间用 `sudo` |
 | 改了 `package.xml` 但错误还在 | 没重新编译或没重新 source | `catkin_make`; `echo $ROS_PACKAGE_PATH` | 编译后重新 source |
 
-### 排障树
+### 排障顺序
 
-```mermaid
-flowchart TD
-  A[catkin/包相关错误] --> B{ROS命令是否可用}
-  B -- 否 --> B1[source /opt/ros/noetic/setup.bash]
-  B -- 是 --> C{包能否被rospack找到}
-  C -- 否 --> C1[检查包是否在catkin_ws/src]
-  C1 --> C2[回到catkin_ws执行catkin_make]
-  C2 --> C3[source devel/setup.bash]
-  C -- 是 --> D{C++可执行文件是否生成}
-  D -- 否 --> D1[检查CMakeLists add_executable/target_link_libraries]
-  D -- 是 --> E{运行时仍报依赖错误}
-  E -- 是 --> E1[检查package.xml和find_package依赖]
-  E -- 否 --> F[进入第6章编写节点]
-```
+catkin 或功能包相关错误可以按下面顺序检查：
+
+1. ROS 命令是否可用。如果 `rosrun`、`rospack` 不可用，先执行 `source /opt/ros/noetic/setup.bash`。
+2. 包是否能被 `rospack find 包名` 找到。如果找不到，检查包是否在 `~/catkin_ws/src`，并回到 `~/catkin_ws` 重新 `catkin_make`。
+3. 当前终端是否加载了工作空间。如果 `catkin_make` 成功但包仍不可见，执行 `source ~/catkin_ws/devel/setup.bash`。
+4. C++ 可执行文件是否生成。如果没有，检查 `CMakeLists.txt` 中的 `add_executable` 和 `target_link_libraries`。
+5. 运行时仍报依赖错误时，检查 `package.xml` 和 `find_package(catkin REQUIRED COMPONENTS ...)` 是否声明了真实直接依赖。
 
 ## 5.16 本章自测
 
@@ -3471,19 +3294,6 @@ flowchart TD
 
 第 5 章解决“代码放在哪里、怎样构建”。本章解决“代码怎样成为 ROS 计算图中的节点”。第 7 章会继续把这些节点组织成可复现实验。
 
-```mermaid
-flowchart LR
-  A[catkin工作空间] --> B[功能包beginner_tutorials]
-  B --> C[Python节点<br/>rospy]
-  B --> D[C++节点<br/>roscpp]
-  C --> E[Topic通信]
-  D --> E
-  C --> F[Service通信]
-  D --> F
-  E --> G[第7章launch统一启动]
-  F --> G
-```
-
 应把本章看成 ROS 编程的最低闭环：写代码、编译或授权、运行节点、观察图、定位错误。
 
 ## 6.2 必须理解的概念
@@ -3526,17 +3336,7 @@ flowchart LR
 - C++ 发布者：`cpp_talker`
 - C++ 订阅者：`cpp_listener`
 
-```mermaid
-sequenceDiagram
-  participant T as talker节点
-  participant M as ROS Master
-  participant L as listener节点
-  T->>M: 注册发布 /chatter, 类型 std_msgs/String
-  L->>M: 查询/订阅 /chatter
-  M-->>L: 返回发布者连接信息
-  L->>T: 建立数据连接
-  T-->>L: 持续发送 String 消息
-```
+发布订阅的运行关系可以按五步理解：发布者向 Master 注册 `/chatter` 及其类型，订阅者向 Master 查询并订阅 `/chatter`，Master 返回发布者连接信息，订阅者与发布者建立数据连接，发布者持续发送 `std_msgs/String` 消息，订阅者收到消息后触发回调。
 
 真实机器人里的 `/scan`、`/odom`、`/cmd_vel` 也是同样思想。区别只是消息类型和频率更复杂。
 
@@ -3869,17 +3669,7 @@ topic 适合持续流动的数据，例如速度、雷达、图像、里程计�
 - 请求：`a`、`b`
 - 响应：`sum`
 
-```mermaid
-sequenceDiagram
-  participant C as client节点
-  participant M as ROS Master
-  participant S as server节点
-  S->>M: 注册服务 add_two_ints
-  C->>M: 查询服务 add_two_ints
-  M-->>C: 返回服务端连接信息
-  C->>S: 请求 a=3, b=5
-  S-->>C: 响应 sum=8
-```
+服务调用的运行关系可以按五步理解：服务端向 Master 注册 `add_two_ints`，客户端向 Master 查询该服务，Master 返回服务端连接信息，客户端向服务端发送请求 `a=3, b=5`，服务端回传响应 `sum=8`。
 
 Service 的关键特点是客户端会等待服务端响应。它不适合高频传感器数据，也不适合需要持续反馈和取消的长任务。长任务后续应学习 action。
 
@@ -4359,22 +4149,14 @@ rqt_graph
 
 ### 排障顺序
 
-```mermaid
-flowchart TD
-  A[自写节点运行失败] --> B{roscore是否运行}
-  B -- 否 --> B1[启动roscore]
-  B -- 是 --> C{包是否可见}
-  C -- 否 --> C1[source devel/setup.bash<br/>rospack find]
-  C -- 是 --> D{Python还是C++}
-  D -- Python --> E[检查shebang/执行权限/导入错误]
-  D -- C++ --> F[检查catkin_make/CMake/链接/生成头文件]
-  E --> G{节点是否进入计算图}
-  F --> G
-  G -- 否 --> G1[rosnode list/终端日志]
-  G -- 是 --> H{接口是否存在}
-  H -- Topic --> H1[rostopic info/type/echo]
-  H -- Service --> H2[rosservice list/type/call]
-```
+自写节点运行失败时，按下面顺序检查：
+
+1. `roscore` 是否运行，当前终端是否能连接 Master。
+2. 功能包是否可见：`rospack find beginner_tutorials`，必要时重新 `source ~/catkin_ws/devel/setup.bash`。
+3. 如果是 Python 节点，检查 shebang、执行权限、导入错误和终端 traceback。
+4. 如果是 C++ 节点，检查 `catkin_make` 输出、`CMakeLists.txt`、链接库和生成的服务头文件。
+5. 节点是否进入计算图：`rosnode list` 和节点终端日志。
+6. Topic 或 service 是否存在、类型是否正确、是否真的有数据或响应：分别用 `rostopic info/type/echo` 和 `rosservice list/type/call` 检查。
 
 ## 6.21 本章自测
 
@@ -4472,19 +4254,6 @@ flowchart TD
 ## 7.1 本章在全书中的位置
 
 第 6 章已经能写节点，但节点还像散落的零件。本章把节点、参数、topic 名和数据记录组织成一个可重复运行的小系统。
-
-```mermaid
-flowchart LR
-  A[自写节点<br/>talker/listener/service] --> B[launch统一启动]
-  B --> C[参数服务器/YAML]
-  B --> D[命名空间/remap]
-  B --> E[日志输出]
-  C --> F[可配置实验]
-  D --> F
-  E --> F
-  F --> G[rosbag记录与回放]
-  G --> H[第8-10章<br/>模型/仿真/综合项目]
-```
 
 机器人系统的工程化能力从这里开始。后面启动 RViz、Gazebo、移动机器人仿真、TF 和导航时，几乎都会依赖 launch 和参数文件。
 
@@ -4944,17 +4713,7 @@ rosbag 是 ROS1 的数据记录与回放工具。它记录的是 topic 中流动
 - 教师可以提供标准数据集。
 - 算法节点可以用同一份数据反复测试。
 
-rosbag 的基本数据流如下：
-
-```mermaid
-flowchart LR
-  A[talker/传感器/仿真节点] --> B[/chatter或其他topic]
-  B --> C[rosbag record]
-  C --> D[.bag文件]
-  D --> E[rosbag play]
-  E --> F[重新发布topic消息]
-  F --> G[listener/算法/RViz]
-```
+rosbag 的基本数据流可以理解为：发布者、传感器或仿真节点持续向 topic 发送消息；`rosbag record` 订阅这些 topic 并把消息写入 `.bag` 文件；`rosbag play` 读取 `.bag` 文件并按时间重新发布消息；listener、算法节点或 RViz 像接收实时数据一样接收回放数据。
 
 录制 `/chatter`：
 
@@ -5204,22 +4963,16 @@ rosbag play chatter_demo.bag
 | 设置仿真时间后节点不动 | `/clock` 没有发布 | `rosparam get /use_sim_time`; `rostopic info /clock` | 启动 Gazebo 或用 `rosbag play --clock` |
 | 日志看不到 | 未设置 `output="screen"` 或看错日志目录 | `ls ~/.ros/log/latest` | 打开 screen 输出或查看日志文件 |
 
-### 排障树
+### 排障顺序
 
-```mermaid
-flowchart TD
-  A[运行管理问题] --> B{roslaunch能否启动}
-  B -- 否 --> B1[检查包路径/source/launch文件名/XML语法]
-  B -- 是 --> C{节点是否存在}
-  C -- 否 --> C1[rosnode list + roslaunch终端日志]
-  C -- 是 --> D{参数是否存在}
-  D -- 否 --> D1[rosparam list/get + 检查YAML缩进和命名空间]
-  D -- 是 --> E{topic是否连通}
-  E -- 否 --> E1[rostopic info + rqt_graph + remap检查]
-  E -- 是 --> F{bag是否记录到数据}
-  F -- 否 --> F1[rosbag info + 检查录制topic名]
-  F -- 是 --> G[进入第8章坐标/模型/可视化]
-```
+运行管理问题可以按下面顺序检查：
+
+1. `roslaunch` 是否能启动。如果不能，先查包路径、`source`、launch 文件名和 XML 语法。
+2. 节点是否存在。启动后用 `rosnode list` 和 roslaunch 终端日志确认节点没有立即退出。
+3. 参数是否存在且位于正确命名空间。使用 `rosparam list/get`，同时检查 YAML 缩进和 `<rosparam>` 加载位置。
+4. topic 是否连通。使用 `rostopic info`、`rqt_graph` 和 remap 配置确认发布者与订阅者指向同一名称。
+5. bag 是否记录到预期数据。使用 `rosbag info` 检查 topic、消息类型、数量和时长。
+6. 如果启用了仿真时间，检查 `/use_sim_time` 和 `/clock`，确认 Gazebo 或 `rosbag play --clock` 正在发布时间。
 
 ## 7.21 本章自测
 
@@ -5320,18 +5073,7 @@ flowchart TD
 
 第 2-7 章已经建立节点和数据流的组织方式。本章开始引入“空间流”：同一条传感器数据必须知道自己来自哪个坐标系，才能被其他节点正确解释。
 
-```mermaid
-flowchart LR
-  A[Topic数据<br/>scan/odom/image] --> B[Frame ID<br/>数据属于哪个坐标系]
-  C[URDF<br/>机器人结构] --> D[robot_description参数]
-  E[joint_states<br/>关节状态] --> F[robot_state_publisher]
-  D --> F
-  F --> G[/tf 和 /tf_static]
-  B --> H[RViz/算法节点]
-  G --> H
-```
-
-这张图说明：机器人系统不是只有 topic。每条传感器数据背后都有 `frame_id`，而 TF 负责告诉系统这些 frame 之间如何转换。
+机器人系统不是只有 topic。每条传感器数据背后都有 `frame_id`，说明这条数据属于哪个坐标系；TF 负责提供这些 frame 之间的位置和姿态关系；URDF 负责描述机器人结构；RViz 根据 topic、TF 和 `robot_description` 显示机器人状态。
 
 ## 8.2 必须理解的概念
 
@@ -5377,17 +5119,14 @@ flowchart LR
 | `camera_link` | 相机物理坐标系 | 还可能有 `camera_optical_frame` |
 | `left_wheel_link` | 左轮坐标系 | 由 URDF joint 定义相对位置 |
 
-移动机器人常见 TF 链：
+移动机器人常见 TF 链可以写成：
 
-```mermaid
-flowchart TD
-  map --> odom
-  odom --> base_footprint
-  base_footprint --> base_link
-  base_link --> laser_link
-  base_link --> camera_link
-  base_link --> left_wheel_link
-  base_link --> right_wheel_link
+```text
+map -> odom -> base_footprint -> base_link
+base_link -> laser_link
+base_link -> camera_link
+base_link -> left_wheel_link
+base_link -> right_wheel_link
 ```
 
 不应把 `map`、`odom`、`base_link` 混成一个坐标系。它们表达不同层次的空间关系：
@@ -5434,18 +5173,7 @@ URDF 是 Unified Robot Description Format，即统一机器人描述格式。它
 
 本章先只使用最小 visual 模型。真实 Gazebo 仿真中还要认真处理 `collision` 和 `inertial`，否则物理行为会不可信。例如一个机器人在 RViz 中显示正常，不代表它在 Gazebo 中能稳定落地、不会抖动、轮子能正确接触地面。
 
-URDF 的核心是 link 和 joint 形成一棵树：
-
-```mermaid
-flowchart TD
-  base_link[link: base_link]
-  left[link: left_wheel_link]
-  right[link: right_wheel_link]
-  laser[link: laser_link]
-  base_link -- joint: base_to_left_wheel --> left
-  base_link -- joint: base_to_right_wheel --> right
-  base_link -- joint: base_to_laser --> laser
-```
+URDF 的核心是 link 和 joint 形成一棵树。例如最小两轮机器人可以用 `base_link` 作为根 link，再通过 `base_to_left_wheel`、`base_to_right_wheel`、`base_to_laser` 等 joint 连接到 `left_wheel_link`、`right_wheel_link` 和 `laser_link`。
 
 `joint` 的 `origin` 表示 child link 坐标系相对 parent link 坐标系的位置和姿态。很多模型“轮子在车体中间”“激光雷达方向不对”的问题，都来自 `origin xyz/rpy` 理解不清。
 
@@ -5455,18 +5183,7 @@ flowchart TD
 
 `joint_state_publisher` 的作用是：在没有真实编码器或控制器时，发布模拟的关节状态，帮助 RViz 显示模型。对于全 fixed joint 的最小模型，即使没有复杂关节运动，也常用它配合教学。
 
-两者关系：
-
-```mermaid
-flowchart LR
-  A[URDF文件] --> B[robot_description参数]
-  C[joint_state_publisher] --> D[/joint_states]
-  B --> E[robot_state_publisher]
-  D --> E
-  E --> F[/tf 和 /tf_static]
-  F --> G[RViz: TF显示]
-  B --> H[RViz: RobotModel显示]
-```
+两者关系可以按数据链理解：URDF 文件加载到 `robot_description` 参数；`joint_state_publisher` 发布 `/joint_states`；`robot_state_publisher` 同时读取 `robot_description` 和 `/joint_states`，再发布 `/tf` 与 `/tf_static`；RViz 依靠 TF 显示坐标轴，依靠 `robot_description` 显示 RobotModel。
 
 这条链路也是本章排障的主线。RViz 不显示模型时，不应只盯着 RViz。要向前检查：`robot_description` 有没有加载？`robot_state_publisher` 有没有启动？`/tf` 有没有发布？Fixed Frame 是否选对？
 
@@ -5716,14 +5433,6 @@ Gazebo 是仿真器。它负责模拟物理世界、机器人运动、传感器�
 - RViz：看 ROS 数据。
 - Gazebo：模拟机器人和世界。
 
-```mermaid
-flowchart LR
-  A[URDF/TF/Topic/Map/LaserScan] --> B[RViz<br/>显示数据]
-  C[URDF/SDF/World/Physics/Plugins] --> D[Gazebo<br/>产生仿真数据]
-  D --> E[/scan /odom /tf /cmd_vel接口]
-  E --> B
-```
-
 可以在 RViz 中看到机器人模型，但这不代表机器人在物理世界里能运动。要让机器人在 Gazebo 中真实运动，还需要 collision、inertial、控制插件、关节控制器等。第 9 章会使用 TurtleBot3 这类成熟仿真包，而不是从零手写完整物理插件。
 
 ## 8.13 最小可运行实验
@@ -5793,22 +5502,16 @@ rosrun tf tf_echo base_link laser_link
 | `tf_echo` 报两个 frame 不连通 | frame 名写错或 TF 缺失 | `rostopic echo /tf_static` | 检查 link/joint 名称 |
 | Gazebo 不显示但 RViz 显示 | URDF 只有 visual，缺少仿真配置 | 不应只看 RViz | 后续添加 collision/inertial/plugin |
 
-### 排障树
+### 排障顺序
 
-```mermaid
-flowchart TD
-  A[RViz模型/TF异常] --> B{URDF能否解析}
-  B -- 否 --> B1[check_urdf定位XML/link/joint错误]
-  B -- 是 --> C{robot_description是否存在}
-  C -- 否 --> C1[检查launch param路径]
-  C -- 是 --> D{robot_state_publisher是否运行}
-  D -- 否 --> D1[rosnode list/安装包/launch节点名]
-  D -- 是 --> E{TF是否存在}
-  E -- 否 --> E1[rostopic echo /tf_static /tf]
-  E -- 是 --> F{RViz Fixed Frame是否正确}
-  F -- 否 --> F1[改为base_link或已有frame]
-  F -- 是 --> G[检查visual几何和origin/rpy]
-```
+RViz、URDF 或 TF 异常时，按下面顺序检查：
+
+1. URDF 是否能解析。先运行 `check_urdf`，排除 XML、link、joint 基本错误。
+2. `robot_description` 参数是否存在。使用 `rosparam get /robot_description` 检查 launch 是否加载了模型。
+3. `robot_state_publisher` 是否运行。使用 `rosnode list` 和终端日志确认节点没有启动失败。
+4. TF 是否存在。检查 `/tf_static`、`/tf`，或运行 `rosrun tf view_frames`。
+5. RViz 的 Fixed Frame（固定参考坐标系）是否选对。先选择系统中实际存在的 `base_link` 或 `odom`。
+6. 如果 TF 正常但模型位置或方向异常，再检查 URDF 中 visual 几何、joint 的 `origin xyz/rpy` 和坐标轴约定。
 
 ## 8.15 本章自测
 
@@ -5892,20 +5595,7 @@ URDF -> robot_description -> robot_state_publisher -> /tf -> RViz
 
 第 8 章让机器人“有结构、能显示”。第 9 章让机器人“在仿真世界中运动并产生传感器数据”。第 10 章会把这些能力整理成综合项目。
 
-```mermaid
-flowchart LR
-  A[URDF/TF/RViz<br/>看见机器人] --> B[Gazebo<br/>模拟世界与物理]
-  B --> C[/cmd_vel<br/>速度输入]
-  B --> D[/odom<br/>里程计输出]
-  B --> E[/scan<br/>激光输出]
-  B --> F[/tf<br/>坐标关系]
-  D --> G[RViz观察]
-  E --> G
-  F --> G
-  C --> H[键盘控制/导航节点]
-```
-
-应关注的不是“Gazebo 窗口能打开”，而是仿真节点是否确实和 ROS topic、TF、RViz 形成闭环。
+应关注的不是“Gazebo 窗口能打开”，而是仿真节点是否确实完成了 ROS 闭环：控制节点发布 `/cmd_vel`，Gazebo 或控制插件订阅速度命令，仿真系统发布 `/odom`、`/scan` 和 `/tf`，RViz 再订阅这些数据进行显示。
 
 ## 9.2 必须理解的概念
 
@@ -5938,34 +5628,6 @@ flowchart LR
 | 产生 `/odom`、`/scan` | 不可以 | 可由插件和仿真模型产生 |
 
 初学者常见误解是：“RViz 中看到机器人，就说明仿真成功了。”不对。RViz 只显示数据。机器人能否在物理世界中动起来，要看 Gazebo、控制器、插件和话题连接。
-
-```mermaid
-flowchart TB
-  subgraph Gazebo[Gazebo仿真]
-    W[world环境]
-    R[机器人模型]
-    P[物理引擎/传感器插件]
-  end
-  subgraph ROS[ROS通信层]
-    C[/cmd_vel]
-    O[/odom]
-    S[/scan]
-    T[/tf]
-  end
-  subgraph RViz[RViz可视化]
-    V1[RobotModel]
-    V2[LaserScan]
-    V3[TF/Odometry]
-  end
-  C --> P
-  P --> O
-  P --> S
-  P --> T
-  O --> V3
-  S --> V2
-  T --> V1
-  T --> V3
-```
 
 ## 9.4 移动机器人最小数据流
 
@@ -6328,21 +5990,7 @@ ROS 系统中，SLAM 节点可能订阅：
 
 导航最终通常向 `/cmd_vel` 发布速度命令。
 
-```mermaid
-flowchart LR
-  scan[/scan] --> slam[SLAM]
-  odom[/odom] --> slam
-  tf[/tf] --> slam
-  slam --> map[/map]
-  map --> loc[定位AMCL等]
-  scan --> loc
-  tf --> loc
-  loc --> nav[导航]
-  map --> nav
-  nav --> cmd[/cmd_vel]
-```
-
-本书后续不把导航算法写成重点，只把它作为 ROS 系统集成案例。现在最重要的是知道这些模块在 ROS 图里怎样连接。
+本书后续不把导航算法写成重点，只把它作为 ROS 系统集成案例。现在最重要的是知道这些模块在 ROS 系统中的输入输出关系：SLAM 通常使用 `/scan`、`/odom` 和 `/tf` 生成 `/map`；定位模块在已有地图中结合激光和 TF 估计位姿；导航模块使用地图、定位结果和目标点规划路径，最终向 `/cmd_vel` 输出速度命令。
 
 ## 9.13 最小可运行实验
 
@@ -6466,22 +6114,16 @@ rosbag info tb3_intro.bag
 | 仿真运行缓慢 | 图形性能不足 | `top`; 观察 Gazebo 实时率 | 降低负载，换原生 Ubuntu |
 | bag 文件巨大 | 录制过多 topic | `rosbag info` | 只录关键 topic |
 
-### 排障树
+### 排障顺序
 
-```mermaid
-flowchart TD
-  A[移动机器人仿真异常] --> B{Gazebo是否启动并显示机器人}
-  B -- 否 --> B1[检查TURTLEBOT3_MODEL和turtlebot3_gazebo]
-  B -- 是 --> C{cmd_vel是否有数据}
-  C -- 否 --> C1[检查teleop终端焦点和发布者]
-  C -- 是 --> D{cmd_vel是否有订阅者}
-  D -- 否 --> D1[检查Gazebo控制插件/launch]
-  D -- 是 --> E{odom/scan是否发布}
-  E -- 否 --> E1[检查Gazebo日志和传感器插件]
-  E -- 是 --> F{RViz是否正常显示}
-  F -- 否 --> F1[检查Fixed Frame/TF/topic]
-  F -- 是 --> G[录制bag并进入综合项目]
-```
+移动机器人仿真异常时，按下面顺序检查：
+
+1. Gazebo 是否启动并显示机器人。如果没有，先检查 `TURTLEBOT3_MODEL` 和 `turtlebot3_gazebo` 包。
+2. `/cmd_vel` 是否有数据。如果没有，检查 teleop 终端焦点、发布者是否存在、topic 名是否正确。
+3. `/cmd_vel` 是否有订阅者。如果没有，检查 Gazebo 控制插件、launch 文件和 remap。
+4. `/odom`、`/scan`、`/tf` 是否发布。如果缺失，查看 Gazebo 日志和传感器插件状态。
+5. RViz 是否正常显示。如果不正常，检查 Fixed Frame（固定参考坐标系）、TF 路径和 topic 名。
+6. 如果以上都正常，再录制 rosbag，进入第 10 章综合项目验收。
 
 ## 9.15 本章自测
 
@@ -6575,17 +6217,7 @@ Gazebo 世界 -> 传感器插件 -> /scan 或 /camera/... -> RViz/算法节点�
 
 本章不是新的孤立知识点，而是对前九章的整合验收。
 
-```mermaid
-flowchart TB
-  A[Ubuntu/Linux] --> B[ROS概念与安装]
-  B --> C[turtlesim观察计算图]
-  C --> D[catkin功能包]
-  D --> E[Python/C++节点]
-  E --> F[launch/参数/rosbag]
-  F --> G[TF/URDF/RViz]
-  G --> H[Gazebo/移动机器人]
-  H --> I[综合项目<br/>启动/观察/控制/记录/复现]
-```
+整合关系可以概括为：Ubuntu/Linux 提供基础环境，ROS 概念和安装提供运行平台，turtlesim 训练计算图观察能力，catkin 提供工程组织，Python/C++ 节点实现通信逻辑，launch/参数/rosbag 保证可复现运行，TF/URDF/RViz 处理空间与可视化，Gazebo/移动机器人仿真提供控制、传感器和状态数据，综合项目最终要求学生能启动、观察、控制、记录和复现整个系统。
 
 如果无法解释综合项目中的每个包、每个节点、每条关键 topic 和每个参数，那么项目即使能启动，也只是“能够启动”，还不算达到学习要求。
 
@@ -6624,18 +6256,7 @@ flowchart TB
 
 推荐采用“三包结构”：description、bringup、tools。
 
-```mermaid
-flowchart LR
-  A[my_robot_description<br/>URDF/RViz模型] --> B[my_robot_bringup<br/>launch/config]
-  C[my_robot_tools<br/>辅助脚本] --> B
-  B --> D[Gazebo/TurtleBot3仿真]
-  B --> E[RViz可视化]
-  C --> F[/cmd_vel]
-  D --> G[/odom /scan /tf]
-  F --> D
-  G --> E
-  G --> H[rosbag record]
-```
+三包之间的关系可以理解为：`my_robot_description` 提供 URDF、mesh 和 RViz 模型配置；`my_robot_bringup` 组合启动 Gazebo/TurtleBot3、RViz、参数和记录流程；`my_robot_tools` 放置辅助控制脚本或检查脚本。仿真或真实底盘发布 `/odom`、`/scan`、`/tf` 等数据，RViz 和 rosbag 负责观察与记录，控制脚本或键盘节点向 `/cmd_vel` 发布速度命令。
 
 包分层的目的：
 
@@ -7034,25 +6655,17 @@ roslaunch my_robot_bringup record.launch bag_name:=textbook_bot_run
 
 ## 10.11 项目数据流
 
-综合项目至少要能画出自己的数据流。对于 TurtleBot3 仿真版本，可以写成：
+综合项目至少要能列出自己的数据流。对于 TurtleBot3 仿真版本，可以写成：
 
-```mermaid
-flowchart LR
-  A[teleop或cmd_vel_publisher] -->|geometry_msgs/Twist| B[/cmd_vel]
-  B --> C[Gazebo/TurtleBot3控制插件]
-  C -->|nav_msgs/Odometry| D[/odom]
-  C -->|sensor_msgs/LaserScan| E[/scan]
-  C -->|tf2_msgs/TFMessage| F[/tf /tf_static]
-  D --> G[RViz Odometry]
-  E --> H[RViz LaserScan]
-  F --> I[RViz TF/RobotModel]
-  B --> J[rosbag]
-  D --> J
-  E --> J
-  F --> J
+```text
+teleop 或 cmd_vel_publisher -> /cmd_vel -> Gazebo/TurtleBot3 控制插件
+Gazebo/TurtleBot3 控制插件 -> /odom -> RViz Odometry
+Gazebo/TurtleBot3 控制插件 -> /scan -> RViz LaserScan
+Gazebo/TurtleBot3 控制插件 -> /tf 与 /tf_static -> RViz TF/RobotModel
+/cmd_vel、/odom、/scan、/tf、/tf_static -> rosbag record -> bag 文件
 ```
 
-这张图比“运行了哪些命令”更重要。它能说明系统为什么可观察、可记录、可复现。
+这份数据流说明比“运行了哪些命令”更重要。它能说明系统为什么可观察、可记录、可复现。
 
 ## 10.12 版本管理与提交规范
 
@@ -7193,7 +6806,7 @@ rqt_graph
 
 ## TF 说明
 
-画出或列出关键 frame，例如 `odom -> base_link -> base_scan`。
+列出关键 frame，例如 `odom -> base_link -> base_scan`。
 
 ## rosbag 录制与回放
 
@@ -7310,22 +6923,14 @@ rosbag play textbook_bot_run.bag
 
 ### 总排障流程
 
-```mermaid
-flowchart TD
-  A[综合项目失败] --> B{包是否可见}
-  B -- 否 --> B1[catkin_make + source devel/setup.bash]
-  B -- 是 --> C{launch是否启动}
-  C -- 否 --> C1[检查launch路径/XML/依赖包]
-  C -- 是 --> D{关键节点是否存在}
-  D -- 否 --> D1[rosnode list + 终端日志]
-  D -- 是 --> E{关键topic是否存在}
-  E -- 否 --> E1[rostopic list/info]
-  E -- 是 --> F{TF是否完整}
-  F -- 否 --> F1[view_frames + RViz Fixed Frame]
-  F -- 是 --> G{能否控制/观察/记录}
-  G -- 否 --> G1[检查cmd_vel/odom/scan/bag]
-  G -- 是 --> H[项目达到入门验收]
-```
+综合项目失败时，按下面顺序检查：
+
+1. 包是否可见：`rospack find my_robot_bringup`。如果不可见，先 `catkin_make` 并 `source ~/catkin_ws/devel/setup.bash`。
+2. launch 是否能启动：检查 launch 路径、XML 语法、依赖包和终端日志。
+3. 关键节点是否存在：`rosnode list`，并结合 roslaunch 输出判断节点是否启动后立即退出。
+4. 关键 topic 是否存在且方向正确：`rostopic list`、`rostopic info /cmd_vel`、`rostopic info /odom`。
+5. TF 是否完整：`rosrun tf view_frames`，并在 RViz 中检查 Fixed Frame（固定参考坐标系）。
+6. 控制、观察、记录是否闭环：检查 `/cmd_vel`、`/odom`、`/scan`、bag 录制和回放结果。
 
 ## 10.18 本章自测
 
@@ -7361,7 +6966,7 @@ flowchart TD
 
 9. 完整自动导航涉及地图、定位、代价地图、全局规划、局部规划、恢复行为和大量参数调优，已经超出 ROS1 入门上册目标。综合项目的重点是证明学生能组织系统、观察数据、控制机器人、记录实验和解释结构。先把工程闭环做稳，再深入导航算法更合理。
 
-10. 功能堆叠的项目通常 launch 很多东西但解释不清节点关系、topic 方向、参数来源和错误定位；系统结构清楚的项目能画出数据流，能说明每个包职责，能用 CLI 验证关键接口，能录制和回放数据，能让别人按 README 复现。判断标准不是功能数量，而是结构是否可解释、可观察、可维护。
+10. 功能堆叠的项目通常 launch 很多东西但解释不清节点关系、topic 方向、参数来源和错误定位；系统结构清楚的项目能列出数据流，能说明每个包职责，能用 CLI 验证关键接口，能录制和回放数据，能让别人按 README 复现。判断标准不是功能数量，而是结构是否可解释、可观察、可维护。
 
 11. `build/`、`devel/` 是构建产物，可由源码重新生成，提交后会造成仓库噪声和跨机器路径问题；大型 bag 文件会迅速增大仓库体积，也不一定是每个读者复现实验的必要文件。更好的做法是提交源码、launch、参数、RViz 配置、README 和 `rosbag info` 输出；确有必要的数据集应单独归档并在 README 中说明获取方式。
 

@@ -22,14 +22,6 @@
 
 第 2 章讲概念，第 3 章讲安装，本章用最小系统把概念和安装结果连接起来。
 
-```mermaid
-flowchart LR
-    A[第2章 ROS概念] --> D[第4章 turtlesim]
-    B[第3章 ROS安装] --> D
-    D --> E[第5章 catkin工作空间]
-    D --> F[第6章 自己写节点]
-```
-
 如果本章只做到“能让 turtlesim 模拟海龟运动”，学习是不完整的。核心目标是能解释该现象背后的 ROS 结构。读者需要把窗口中看到的运动，映射到节点、topic、消息类型和数据流。
 
 ## 4.2 为什么用 turtlesim
@@ -60,7 +52,7 @@ flowchart LR
 - 底盘节点有没有订阅 `/cmd_vel`？
 - 消息类型是不是 `geometry_msgs/Twist`？
 - 反馈 topic 有没有数据？
-- 图里看到的连接是否符合预期？
+- `rqt_graph` 中看到的连接是否符合预期？
 
 ## 4.3 本章必须理解的概念
 
@@ -75,21 +67,9 @@ flowchart LR
 
 ## 4.4 turtlesim 的数据流
 
-先看整体结构：
+先看整体结构：键盘输入由 `turtle_teleop_key` 节点接收，这个节点把按键转换成 `geometry_msgs/Twist` 速度消息并发布到 `/turtle1/cmd_vel`；`turtlesim_node` 订阅该 topic，收到速度后更新模拟海龟状态，再发布 `/turtle1/pose` 供外部观察。
 
-```mermaid
-flowchart LR
-    K[键盘输入] --> T[turtle_teleop_key<br/>/teleop_turtle]
-    T -- /turtle1/cmd_vel<br/>geometry_msgs/Twist --> S[turtlesim_node<br/>/turtlesim]
-    S -- /turtle1/pose<br/>turtlesim/Pose --> E[rostopic echo<br/>观察状态]
-    S -- /rosout --> R[日志系统]
-    G[rqt_graph] -.观察节点关系.-> T
-    G -.观察节点关系.-> S
-```
-
-这张图里，键盘控制节点没有直接调用 turtlesim 的内部函数。它只是把按键转换成速度消息，发布到 `/turtle1/cmd_vel`。turtlesim 订阅这个 topic，收到速度后更新模拟海龟状态，再发布 `/turtle1/pose`。
-
-后续分析移动机器人时，也可以画类似图：
+后续分析移动机器人时，也可以写成类似的数据流：
 
 ```text
 teleop -> /cmd_vel -> base_driver -> /odom
@@ -397,18 +377,13 @@ rosservice list | grep turtle
 
 ### 排障顺序
 
-```mermaid
-flowchart TD
-    A[模拟海龟不动] --> B{turtlesim窗口是否存在?}
-    B -- 否 --> B1[检查 turtlesim 是否启动]
-    B -- 是 --> C{teleop终端是否有焦点?}
-    C -- 否 --> C1[点击teleop终端再按键]
-    C -- 是 --> D{cmd_vel是否有数据?}
-    D -- 否 --> D1[rostopic info /turtle1/cmd_vel]
-    D -- 是 --> E{turtlesim是否订阅cmd_vel?}
-    E -- 否 --> E1[检查topic名和节点状态]
-    E -- 是 --> F[检查消息格式或仿真状态]
-```
+模拟海龟不动时，按下面顺序检查：
+
+1. turtlesim 窗口是否已经打开。如果没有，先检查 `rosrun turtlesim turtlesim_node` 是否成功。
+2. 键盘控制终端是否获得焦点。如果没有，点击 `turtle_teleop_key` 所在终端再按方向键。
+3. `/turtle1/cmd_vel` 是否真的有数据。使用 `rostopic echo /turtle1/cmd_vel` 或 `rostopic info /turtle1/cmd_vel` 检查。
+4. `turtlesim_node` 是否订阅了 `/turtle1/cmd_vel`。如果 topic 名不一致，速度消息不会进入仿真节点。
+5. 如果 topic 和订阅关系都正常，再检查消息格式、仿真窗口状态或终端错误输出。
 
 ## 4.11 本章自测
 

@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
-"""Export the combined ROS1 textbook Markdown file to HTML/PDF.
-
-The script keeps Mermaid diagrams compact in print output. It uses Python
-Markdown for Markdown-to-HTML conversion and a local Chrome/Edge executable for
-PDF printing. If a local Mermaid bundle exists under book-build/node_modules,
-it is embedded into the HTML; otherwise the HTML falls back to the jsDelivr CDN.
-"""
+"""Export the combined ROS1 textbook Markdown file to HTML/PDF."""
 
 from __future__ import annotations
 
 import argparse
-import html
-import re
 import subprocess
 from pathlib import Path
 
@@ -22,28 +14,6 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INPUT = ROOT / "ROS1零基础自学指导书-最终版.md"
 DEFAULT_HTML = ROOT / "ROS1零基础自学指导书-最终版.html"
 DEFAULT_PDF = ROOT / "ROS1零基础自学指导书-最终版.pdf"
-
-
-def replace_mermaid_blocks(markdown_text: str) -> str:
-    pattern = re.compile(r"```mermaid\s*\n(.*?)\n```", re.DOTALL)
-
-    def repl(match: re.Match[str]) -> str:
-        diagram = html.escape(match.group(1).strip())
-        return f'\n<pre class="mermaid">{diagram}</pre>\n'
-
-    return pattern.sub(repl, markdown_text)
-
-
-def find_mermaid_script() -> str:
-    candidates = [
-        ROOT / "book-build" / "node_modules" / "mermaid" / "dist" / "mermaid.min.js",
-        ROOT / "node_modules" / "mermaid" / "dist" / "mermaid.min.js",
-    ]
-    for candidate in candidates:
-        if candidate.exists():
-            return f"<script>{candidate.read_text(encoding='utf-8')}</script>"
-    return '<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>'
-
 
 def find_chrome(explicit: str | None) -> Path:
     if explicit:
@@ -66,9 +36,8 @@ def find_chrome(explicit: str | None) -> Path:
 
 def build_html(markdown_path: Path, html_path: Path) -> None:
     raw = markdown_path.read_text(encoding="utf-8")
-    prepared = replace_mermaid_blocks(raw)
     body = markdown.markdown(
-        prepared,
+        raw,
         extensions=[
             "extra",
             "toc",
@@ -78,7 +47,6 @@ def build_html(markdown_path: Path, html_path: Path) -> None:
         output_format="html5",
     )
 
-    mermaid_script = find_mermaid_script()
     css = """
 @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
 body {
@@ -121,39 +89,6 @@ blockquote {
   padding: 6px 12px;
   background: #f8fafc;
 }
-.mermaid {
-  background: #ffffff;
-  border: 1px solid #d0d7de;
-  border-radius: 5px;
-  padding: 6px;
-  margin: 8px auto 12px;
-  text-align: center;
-  page-break-inside: avoid;
-  overflow: hidden;
-}
-.mermaid svg {
-  max-width: 100% !important;
-  max-height: 240px !important;
-  height: auto !important;
-}
-"""
-
-    script = """
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-  if (window.mermaid) {
-    mermaid.initialize({
-      startOnLoad: false,
-      securityLevel: "loose",
-      theme: "neutral",
-      flowchart: { htmlLabels: true, curve: "basis" },
-      sequence: { mirrorActors: false }
-    });
-    await mermaid.run({ querySelector: ".mermaid" });
-  }
-  document.body.dataset.rendered = "true";
-});
-</script>
 """
 
     page = f"""<!doctype html>
@@ -162,8 +97,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   <meta charset="utf-8">
   <title>ROS1 零基础自学指导书</title>
   <style>{css}</style>
-  {mermaid_script}
-  {script}
 </head>
 <body>
 {body}
